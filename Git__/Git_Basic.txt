@@ -1,17 +1,22 @@
 
-��װmsysgit��ɺ�:
+安装msysgit完成后:
 $ git config --global user.name "Your Name"
 $ git config --global user.email "email@example.com"
 
 
-��������µĲֿ�,��Ҫ: �л����ֿ�Ŀ¼, git init
+如果创建新的仓库,需要: 切换到仓库目录:
+git init
 
-�����ļ�:
+添加文件:
 git add readme.txt
 
-�ύ�ļ�:
+提交文件:
 git commit -m "wrote a readme file"
 
-�鿴��ǰ״̬:
+推送到GitHub:
+git push
+输入用户名(邮箱!)、密码即可。
+
+查看当前状态:
 git status
 
