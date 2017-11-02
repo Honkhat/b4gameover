@@ -10,6 +10,11 @@ git init
 添加文件:
 git add readme.txt
 
+git add -u  提交被修改(modified)和被删除(deleted)文件，不包括新文件(new)
+git add .  提交新文件(new)和被修改(modified)文件，不包括被删除(deleted)文件
+git add -A  提交所有变化(上面两个选项结果的合集)
+
+
 提交文件:
 git commit -m "wrote a readme file"
 
@@ -19,4 +24,9 @@ git push
 
 查看当前状态:
 git status
+
+提交修改和提交新文件是一样的两步，第一步是git add, 然后git commit -m "comment"
+
+刪除文件:
+rm test.txt
 

@@ -1,0 +1,4 @@
+当1个MapReduce输入分片的大小等于HDFS的块大小(64M)时, 传输效率最高。
+
+Hadoop Pipes是MapReduce的C++接口。
+
