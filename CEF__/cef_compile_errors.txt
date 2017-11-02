@@ -1,0 +1,9 @@
+Error:	1>d:\workspace_hj\codesfork\cefwebkitbrowser-master\entry.cc(75): error C2664: “bool CefStringBase<traits>::FromString(const wchar_t *,size_t,bool)”: 不能将参数 1 从“TCHAR [260]”转换为“const wchar_t *”
+Analysis:	在cef_string.h中可以看到, 默认定义的是CEF_STRING_TYPE_UTF16。 
+Solution:	如果要使用多字节字符集的话, 修改 #define CEF_STRING_TYPE_UTF16 1 成 #define CEF_STRING_TYPE_UTF8 1. 即可。
+		如果继续使用CEF16，那么外部可以使用CefString::FromASCCII() CefString::ToString().c_str()方法转化多字节编码的字符串.
+
+Error:	error LNK2038: 检测到“_ITERATOR_DEBUG_LEVEL”的不匹配项: 值“0”不匹配值“2”
+Solution:	拷贝Debug版本的libcef.lib libcef_dll_wrapper.lib到Debug模式下的lib目录即可。
+Analysis:	Debug使用了Release的库文件。即使你连接库里面两个都添加着呢，但是release库文件放在了debug前面，也是出错的。默认按顺序使用库文件。
+

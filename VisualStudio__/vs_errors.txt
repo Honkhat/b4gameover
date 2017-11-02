@@ -1,0 +1,7 @@
+Error: 无法解析的外部符号 _AtlTraceVU，无法解析的外部符号 ATL::CTrace ATL::CTrace::s_trace.
+Solution: 工程属性添加依赖库atlsd.lib 或者 #pragma comment(lib,"atlsd.lib"). 从VS2010-VS2013需要显式指定atlsd.lib, VS2013及以上版本不需要.
+
+Error:	fatal error C1083: 无法打开预编译头文件：“Debug/StdAfx.pch”: No such file or  directory
+Solution:	如果确定该.pch文件不存在, 去工程属性-->C/C++-->预编译头-->创建预编译头即可;
+		或者 直接不使用预编译头. 使用预编译头的目的是提高编译速度。
+

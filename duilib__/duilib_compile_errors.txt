@@ -1,0 +1,4 @@
+Error:	>LINK : fatal error LNK1104: 无法打开文件“lib\DuiLib_d.lib”, 明明修改了工程属性的配置, 为什么VS还是会找旧的lib文件?
+Solution:	stdafx.h 中用代码显示指定了 #pragma comment(lib, "lib\DuiLib_d.lib")
+
+
