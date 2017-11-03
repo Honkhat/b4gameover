@@ -1,0 +1,9 @@
+双击Caption最大化窗口:	
+	1. 指定caption属性:<Window size="600,600" caption="0,0,0,50" roundcorner="4,4" bktrans="true">;
+	2. 创建窗口时使用UI_WNDSTYLE_FRAME风格(UI_CLASSSTYLE_DIALOG等内部包含WS_POPUP的不行);
+	代码实现:	LRESULT WindowImplBase::OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+
+
+
+
+

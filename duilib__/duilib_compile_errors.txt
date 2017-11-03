@@ -2,3 +2,27 @@ Error:	>LINK : fatal error LNK1104: 无法打开文件“lib\DuiLib_d.lib”, �
 Solution:	stdafx.h 中用代码显示指定了 #pragma comment(lib, "lib\DuiLib_d.lib")
 
 
+Error:
+1>\include/cef_dom.h(261): warning C4003: “GetNextSibling”宏的实参不足
+1>\include/cef_dom.h(261): error C2059: 语法错误:“,”
+1>\include/cef_dom.h(273): warning C4003: “GetFirstChild”宏的实参不足
+Solution:
+	头文件的放置位置引发的问题，因为cef是跨平台的库, 所以在包含本地(native)的头文件之前,先包含cef的头文件.
+	为了防止多个工程引用CCefBrowserUI时，重复包含一大堆cef相关的头文件, 需要创建一个CefHeaders.h,然后把这一堆文件扔进去:
+		#pragma once
+		#include <cef_client.h>
+		#include <cef_app.h>
+		#include <capi/cef_app_capi.h>
+		#include <string>
+		#include <sstream>
+		#include <base/cef_bind.h>
+		#include <wrapper/cef_closure_task.h>
+		#include <cef_app.h>
+		#include <cef_base.h>
+		#include <base/cef_lock.h>
+		#include <wrapper/cef_helpers.h>
+	然后选中一个cef相关的.c/.cpp文件，Ctrl+F7单独编译, 如果编译不过, 就在最上方添加#include "CefHeaders.h"即可。
+	如果放进stdafx.h中,那么多个工程时，每个工程都有stdafx.h，你不确定VS到底链接的是哪个!
+
+
+

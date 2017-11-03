@@ -1,0 +1,4 @@
+Q:	什么时候窗口会显示在任务栏区域?
+A:	说下什么时候不会吧:child/owned/WS_EX_TOOLWIDOW风格的窗口。
+
+
