@@ -1,0 +1,36 @@
+默认只支持Date，不支持Time, 如果想要支持Time, 关键点:
+	::SendMessage(m_hWnd, DTM_SETFORMAT, 0, (LPARAM)"yyyy-MM-dd HH:mm:ss");
+
+其它改动:
+	1. 给DateTime控件添加"withtime"属性;
+	void CDateTimeUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
+	{
+		if( _tcscmp(pstrName, _T("withtime")) == 0 ) {
+			SetWithTime(_tcscmp(pstrValue, _T("true")) == 0);
+		}
+		else CLabelUI::SetAttribute(pstrName, pstrValue);
+	}
+	2. 选定时间后，更新到duilib控件上的文本:
+	void CDateTimeUI::UpdateText()
+	{
+		if (m_nDTUpdateFlag == DT_DELETE)
+			SetText(_T(""));
+		else if (m_nDTUpdateFlag == DT_UPDATE)
+		{
+			CDuiString sText;
+			if(m_bWithTime)
+				sText.SmallFormat(_T("%4d-%02d-%02d %02d:%02d:%02d"),m_sysTime.wYear, m_sysTime.wMonth, m_sysTime.wDay, m_sysTime.wHour, m_sysTime.wMinute, m_sysTime.wSecond);
+			else
+				sText.SmallFormat(_T("%4d-%02d-%02d"), m_sysTime.wYear, m_sysTime.wMonth, m_sysTime.wDay);
+			SetText(sText);
+		}
+	}
+	3. duilib 控件初始化显示的文本:
+	void CDateTimeUI::SetWithTime(bool bWithTime)
+	{
+		m_bWithTime = bWithTime;
+		m_nDTUpdateFlag = DT_UPDATE;
+		UpdateText();
+	}
+
+总结: 这种Windows原生的控件，要注意看头文件中各种消息的定义，然后查阅MSDN. 发掘东西。
