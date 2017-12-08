@@ -1,0 +1,13 @@
+*******************
+GB2312与UTF8互转
+*******************
+需要以UNICODE作为桥梁. 具体流程:
+GB2312-->UNICODE-->UTF8;
+UTF8-->UNICODE-->GB2312.
+
+因为UNICODE是全世界统一的标准编码，是固定的，而多字节编码则各国有各国的自己一套编码，比如中国的GB2312。
+据此，可以大胆猜测: 不论MultiByteToWideChar()还是WideCharToMultiByte()的第一个参数指的都是多字节字符串所使用的编码表.
+MultiByteToWideChar(CP_ACP, ...)第一个参数指的是源字符串使用的编码表;
+WideCharToMultiByte(CP_UTF8,...)第一个参数指的是目标字符串使用的编码表。
+
+具体代码:

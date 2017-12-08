@@ -1,0 +1,22 @@
+UIIMEdit继承自RichEditUI.
+
+RichEditUI在不可见的时候, 设置Caret不可见:
+	void CRichEditUI::SetVisible(bool bVisible)
+	{
+		__super::SetVisible(bVisible);
+
+		if(!bVisible)
+			OnKillFocus();
+	}
+
+	void CRichEditUI::SetInternVisible(bool bVisible)
+	{
+		__super::SetInternVisible(bVisible);
+		if(!bVisible)
+			OnKillFocus();
+	}
+
+UIIMEdit所做的改动:
+	1. void UIIMEdit::DoEvent(TEventUI& event); 处理完传递给RichEdit继续处理:CRichEditUI::DoEvent(event);
+	2. LRESULT UIIMEdit::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);把对WM_SETFOCUS WM_KILLFOCUS的处理注释掉, 相当于抢夺焦点，这些东西应该让duilib PaintManager来做。
+		处理完后同样传递给CRichEditUI::MessageHandler(uMsg, wParam, lParam, bHandled);

@@ -1,0 +1,79 @@
+Codec?
+System.Data.Sqlite(.NET Version)
+
+=============
+Compilation
+=============
+Q: 从sqlite官网下载下来的binary package中只有sqlite3.def/sqlite3.dll两个文件, 我不想编译sqlite源码,如何使用?
+A: 	注意VS Command Prompt的中文名称为"Visual Studio [ver] 开发人员命令提示", 否则使用了其它的Tool, 会提示找不到LIB命令.
+	不同的VS版本, 命令参数可能会有所差异, 所以最好先打开VS Command Prompt Tool-->LIB /?
+	所有命令:
+		lib /? 	//查看当前版本的VS支持的参数;
+		d: 	//切换到D盘
+		cd D:\Kn0w13d9e\Cloud_Honkhat20\DevLib_\sqlite-dll-win32-x86-3210000	//切换到sqlite binary目录;
+		lib /def:sqlite3.def /out:sqlite3.lib /machine:x86			//生成sqlite3.lib和sqlite3.exp;
+
+******
+压缩
+******
+删除sqlite db文件中几个table后，你会发现db文件的大小没有改变。
+如何压缩/释放无用的空间:
+1. VACUUM命令;
+2. 使用Sqlite Developer工具, 右键-->压缩数据库即可。
+
+http://www.sqlite.org/lang_vacuum.html
+
+============================
+跨Database迁移数据
+============================
+1. ATTACH DATABASE.
+	1.1 使用GUI工具。在目标database的Attached Database文件夹右键-->Attach Database, 浏览选择源db文件;
+		1.1.1	当dist数据库已经存在table1表格, insert into table1(field1, field2, field3, fieldn) select field1, field2, field3, fieldn from source.table1;
+		1.1.2	当dist数据库不存在table1表时，create table table1 as  select field1, field2, fieldn from source.table1
+ 		1.1.13	在dist表中点击Detach Database ,卸载数据库source。
+	1.2 使用ATTACH命令, 注意指定的是文件(.db文件名称), 而不是别名(alias).
+		ATTACH DATABASE 'DatabaseName' As 'Alias-Name';//注意一般需要指定.db文件的绝对路径,否则会报错: NO SUCH DATABASE或者NO SUCH TABLE..
+	2.3 分离数据库
+		DETACH DATABASE 'Alias-Name';
+	参考教程 http://www.runoob.com/sqlite/sqlite-attach-database.html
+
+=============================
+sqlite 多线程/并发处理
+==============================
+参考 http://www.sqlite.org/threadsafe.html
+
+==========================================================
+QL 语句判断记录是否存在（最简洁简单性能最优）
+==========================================================
+今天查了下，发现网上的没有一个sql语句写的好的。
+判断记录是否存在，要不是语句不够简洁，要不就是性能有很大问题。
+我进行了优化后，最简洁简单性能最优的的sql语句，用来判断表中的记录是否存在：
+select isnull((select top(1) 1 from tableName where conditions), 0) //sqlite无top函数, 在末尾加LIMIT 1实现
+结果为 1，则说明记录存在；结果为 0，则说明记录不存在。 
+网上的常见的有问题的语句：
+错误1：
+select COUNT(*) from tableName where conditions
+count(*) 计算会对聚集索引进行扫描和计算，reads 特别多，特别是 cpu 资源占用极大。
+
+错误2：
+if exists (select * from tableName where conditions) select '1' else select '0'
+这种方法稍微有点灵性，但是却很不简洁。
+同时由于 select * 前面有 exists ，所以该语句并没有性能问题，只是语法不够简洁
+
+=======================
+sqlite3 statement
+=======================
+http://www.sqlite.org/c3ref/stmt.html
+
+sqlite3_step():
+SQLITE_DONE means that the statement has finished executing successfully. 
+If the SQL statement being executed returns any data, then SQLITE_ROW is returned each time a new row of data is ready for processing by the caller. 
+
+sqlite3_exec = sqlite3_prepare + [sqlite3_bind] + sqlite3_step + sqlite3_finalize;
+
+我的成功解决方案:
+1. BlizzardHash. 特点有: (1). C++ Delphi混合开发; (2) Blizzard三级Hash; (3) Sqlite native use, no capsulations. (4) 使用了Transaction/stmt等高速优化方法.
+
+
+
+

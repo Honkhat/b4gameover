@@ -1,0 +1,5 @@
+dumpbin 可以查看dll中的所有导出函数;
+dumpbin /exports a.dll
+dumpbin /exports a.dll /out:b.txt
+
+

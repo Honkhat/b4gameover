@@ -2,3 +2,27 @@ Q:	什么时候窗口会显示在任务栏区域?
 A:	说下什么时候不会吧:child/owned/WS_EX_TOOLWIDOW风格的窗口。
 
 
+Q: 右键点击CListUI,为什么收不到DUI_MSGTYPE_CONTEXTMENU消息?
+A: 需要在创建完成这个CListUI后，显示设置SetContextMenuUsed(true).
+
+Q: 
+A: CTextUI在构造函里面就添加了DT_WORD_BREAK风格，CLabelUI则没有做。功能定位不同吧。
+
+
+2017/11/24
+BUG: 设置了如果字符数量太多就最后显示省略号的文本控件(endellipsis='true')，当文本中含有汉字时，有时结尾处会出现'?'.
+Anyalysis: 因为一个汉字占2个字符, 如果恰好把1个汉字从中间截断,显示出来就是'?';jian.he 2017/11/24 15:36;
+Solution: 1. 如果最后一个字符是>127的字符,前一个字符却是[0,127]的ASCII码,那么把最后这个"半个字"抛弃。
+	  2. 如果直接添加DT_WORD_BREAK风格，那么汉字确实能够正确截断，但是这样的字符"we aaaaaaaaaaaaaaaaaaaaaaaaaa"却很可能会显示为"we ...",即显示效果也不好。
+综合起来，采用第一种方法。
+
+--CRenderEngine::DrawHtmlText()--
+int cchSizeFixed = cchSize;				
+if( ((pstrText[cchSize-1] < 0) || (pstrText[cchSize-1] > 127)) && (cchSize-2 >= 0) && ((pstrText[cchSize-2] >= 0) && (pstrText[cchSize-2] < 128)) )
+	--cchSizeFixed;
+::TextOut(hDC, ptPos.x, ptPos.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, pstrText, cchSizeFixed);
+if( pt.x >= rc.right && (uStyle & DT_END_ELLIPSIS) != 0 ) 
+::TextOut(hDC, ptPos.x + szText.cx, ptPos.y, _T("..."), 3);
+
+
+
