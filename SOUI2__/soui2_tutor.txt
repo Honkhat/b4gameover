@@ -1,0 +1,63 @@
+从"uires.idx" "objattr"等字眼就能看出, 作者setoutsoft使用过迅雷的Bolt界面库。(结合Lua脚本)
+
+Bolt不开源, 暂从SOUI2的Source Code中absorb some nutrients.
+
+SOUI Compilation:
+	从Git上获取的源码, 含有.sln文件, 直接用vs2013.5打开, 编译即可。
+
+SOUI FIRST DEMO:
+	
+	链接器-->输入-->附加依赖项: utilitiesd.lib;souid.lib;
+	
+
+********************
+HELLO WORLD DEMO
+********************
+1. Win32应用程序-->勾选预编译头, 不勾选安全开发周期(SDL)检查;
+2. 工程配置:
+	字符集: UNICODE;
+	C++-->常规-->附加包含目录:
+		.;//这个是默认的,不加也没关系吧?
+		..\..\utilities\include;//soui的实用工具类;
+		..\..\soui\include;
+		..\..\components;//soui的渲染模块/lua脚本模块/多语言模块等;
+		..\..\config;//MAKE生成的工程编译配置(换了开发环境,是否需要修改? 查看内容, 理解后DIY教程!);
+		..\..\tools\mkspecs\win32-msvc2008;//QMAKE相关的编译配置;
+		([COMMENT]uitilities+soui+config是必加的,其它视情况而定)
+	C++-->预处理器-->预定义: 
+		_WINDOWS
+		_DEBUG(DEBUG模式) NDEBUG(RELEASE模式)
+		WIN32
+		_CRT_SECURE_NO_WARNINGS//stdafx.h中一般定义了它
+		QT_NO_DYNAMIC_CAST//未定义貌似也没问题
+		([COMMENT]不修改,直接使用默认的,可以吧? 按需添加)
+	C++-->代码生成-->运行时库: MTd(MT)
+		因为SOUI使用的是MTd编译配置(编译一份MDd的 try?), 
+	链接器-->常规-->附加库目录: ..\..\bin //soui的.lib/.dll文件生成目录;
+	链接器-->输入: utilitiesd.lib;souid.lib;
+	
+	hey,最后融入一SINOVISION PROJECT CONFIGURATION!!
+	dll内置的资源是RES_PE,文件定义的资源是RES_FILE;(duilib ZIPRES MEM) 明显这里可以指定相对路径;
+	CMainWnd():SHostWnd(_T("LAYOUT:XML_MAINWND")) 关联窗口类和xml文件，LAYOUT为父节点,XML_MAINWND为子节点, 可以定义相对路径吗?
+	REFLECT_NOTIFICATIONS_EX是干啥的 又复习WTL了 :)
+
+	拷贝souid.dll utilitiesd.dll到exe目录下;
+	只有root，拖动，闪烁太频繁，效率不好，需要优化！
+	崩溃问题 处在text标签中的属性设置!
+
+3. ([COMMENT]顺利起见,把uires目录建在.vcproj所在的目录)
+	创建uires目录;
+	xml注释前后2问号?
+	所有xml文件保存为UTF8 FORMAT;
+	标签定义Case Sensitive?
+	_skin.sys SOUI INTERNAL RES?
+	
+
+
+	ADD LOGO(IMITATE WITH 360PREVIEW)
+
+	soui的属性怎么设置, duilib是对应控件的SetAttribute()里面去看;
+	
+
+从360preview入口,剖析源码,然后编译自己的MDd UNICODE x64 dll 版本
+然后自己demo使用! 扩展模块 render-vkn, render-ogl;rapid-xml;postgres,sqlite codec;

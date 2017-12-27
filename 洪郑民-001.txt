@@ -1,0 +1,255 @@
+
+duilib类似bkwin中的imgframe的九宫格效果实现方法:
+
+bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RECT& rc, const RECT& rcPaint, 
+                                          LPCTSTR pStrImage, LPCTSTR pStrModify)
+
+file='aaa.jpg' res='' restype='0' dest='0,0,0,0' source='0,0,0,0' corner='0,0,0,0' 
+    // mask='#FF0000' fade='255' hole='false' xtiled='false' ytiled='false'
+mask的使用方法?
+
+
+
+Button上显示图片+文字的方法, 利用duilib支持的mini-html标签: text="<i file>text</i>"
+
+
+先找到UI对应的index
+
+Message_CheckBase* checkItem;
+   if(!(checkItem = FindCheckItem(index)))
+resultItemUI.lbContent->SetText(mjEntity.name.c_str());
+
+//更新内存数据
+Message_CheckAttachMj* obj = (Message_CheckAttachMj*)checkItem;
+		   obj->attachMj = mjEntity.value;
+		   obj->attachMjName = mjEntity.name;
+
+
+duilib UIManger.cpp提供了两个添加图像到duilib内部去的方法:
+	GetImage() GetImageEx()方法, 如何使用?
+	GetImageEx()如果不存在不会插入;GetImageEx()如果不存在会插入;
+	GetImageEx()相比AddImage()作了图片是否存在的判断, 正是外部调用的逻辑;
+
+为何不做成static方法，这样所有的窗口都可以访问所有的图像资源啊.（一个窗体对应一个PaintManager,也就说，一个窗体只能访问本窗体和祖先窗体的图像资源）
+
+
+无法识别的符号"TImageInfo"
+去掉CImageClipperUI class 声明和实现前面的namespace DuiLib;即可。
+
+
+组织通讯录关联的两个表USERINFO DEPTINFO 添加字段PRIORITY, 用于排序，之前的闪信版本逻辑上支持了排序，但是没有存储优先级值，所以实际上是随机排序的，相当于没有排序。
+软件启动的时总是先删除USERINFO DEPTINFO两个表(因为这类表中的数据每次启动后，服务端来的数据都会覆盖掉原来的数据);
+取数据的时候，SQL语句需要添加两个字段;
+
+修改的文件:
+	DBHelper.cpp
+	LoginDialog.cpp
+	IUserListModule.h
+	
+
+priority没读到 登陆用户的个人信息中没有order属性
+需要确定一下批量获取所有整个通讯录中是否包含有登陆用户自身  及 是否插入到DB中区了
+当前登陆的hejian02账户 realname 等在DB中无法正常显示，因为没有转化成utf8格式
+
+组织通讯录列表响应用户点击的方式，点击一级，展开一级；并排序
+批量插入人员数据的代码待测试！
+闪信组织通讯录: 部门ID是一个整型ID, 人员ID是一个email字符串。
+第一级组织"闪信组织2017"的部门ID是0? -1? 0.
+ChangeGroupMemberDialog + CreateGroupDialog +  DeviceManageWnd + MessageManageWnd 是含有组织通讯录列表的窗口;
+WideCharToMultiByte 返回0表示失败 GetLastError()获取原因;
+bool MakeRoundImage(std::wstring& sImgPath, int iCorner) DEMO!
+闪信窗口最大化的问题完美解决 DEMO!
+duilib中直接调用pControl->Invalidate()如果更换了bkimage，达不到刷新的效果。因为内部进行了关联: bkimagestr-->bitmap;
+	CDuiString sBk = m_pbtnMyFace->GetBkImage();
+	m_PaintManager.RemoveImage(sBk);
+	m_PaintManager.GetImageEx(sBk);
+	m_pbtnMyFace->Invalidate();
+改变大小:
+	oImgClip.Resample2(40,40,CxImage::IM_BICUBIC2,CxImage::OM_REPEAT,&oImgTmp);//Resample2比Resample效果更好.
+圆角MASK头像/绘制圆角
+		实现方法一: g.SetClip(RdRcPath); g.DrawImage(); 有锯齿,效果不好!
+		实现方法二: g.FillPath(pTextureBrush);完美无锯齿!
+duilib 子窗口在显示的情况下,owner窗口无法刷新;
+duilib窗口要想在屏幕中央正常显示, 只是CenterWindow是不可行的:
+	m_pInstance->CenterWindow();
+	m_pInstance->ShowWindow();
+	m_pInstance->BringToTop();
+重新ProcessMessage()?
+ShowModal()之后背后的窗体到底能不能更新? 不能. Owner可以。
+sprintf('%s') 直接传进去std::string类型的变量，会崩溃，必须为std::string .c_str();
+1、写法不同，一个是豖，一个是豕。
+2、读音不同：豖，chù，从豕（shi）。
+3、意思不同：
+豕：猪。
+豖：猪绊脚难行的样子。
+豸zhì
+ 犭 读音(quǎn) ◎ 同“犬”
+class 可以对应css中的样式，如果没有，就使用系统默认的，但是附带的一个好处是：使用jQuery可以批量获取对象;
+class 字符串不可包含'@' '.'等字眼;
+
+cef 强制从src刷新img标签 ?t=GetTickCount(); 即可;
+duilib中的CListContainerElementUI本身就是CHorizontalLayoutUI;所以xml中直接把ListContainerElement作为HorizontalLayout来使用即可, 多层冗余的HorizontalLayout可能会导致控件的自动位置调整机制不准确（作为一个待修改的BUG!）;
+使用duilib开发一个大多数人常犯的毛病就是: xml中的布局冗余。
+
+
+
+eclipse install
+
+
+
+整理成文档，并打包进一个文件夹。
+
+
+lein source code:git url
+
+
+
+
+
+更新所有头像相关的窗体，如果在启动过程中，那么不必更新；如果在软件运行过程中更新了，那么后台跑一个线程；
+1. 所有单聊/群聊; 都对应同一个CLASS: SessionLayout;
+2. 所有单聊会话对应的cef中头像;(cef已聊信息中的头像)
+3. 所有的单例窗口 CreateGroupDialog ChangeGroupMemberDialog DeviceManageWnd MessageManageWnd;
+cef中头像更新接口；(a<strippedemailid>vatar, class名称与变量名的要求一样，含特殊字符无效)
+
+出主窗体的组织树外，其它窗口的组织树的人员的头像不清晰的BUG;
+Solution: 主窗体40x40,其它窗体30x30.
+cef中增加更新头像的机制；
+
+
+当前正在进行：
+	cef中的音视频展示; 播放机制
+		
+	
+待测试:
+	
+	
+
+
+待进行:
+	
+	Split 效率提升! 利用sqlite? codec;	
+	
+
+
+开发支持存在的问题:
+	测试账号因为是公用的、且频繁更改密码，即使自己用时间长了也会记不清密码。
+	需要一个服务: 后台提供一个开放的url，返回所有测试账号的用户名、密码。（逻辑上是独立的，查询数据集返回，提供起来没什么难度）
+
+
+
+
+关于优化组织通讯录的点:
+	1. 从sql取出tree平面化的数据;
+	2. 一次在内存完成Tree型数据;
+	3. 其它含有组织通讯录的窗口直接构建UI即可.(因为不需要任何判断,闭着眼创建,所以应当很快);
+	4. UI上用户点击一级，打开一级；数据全在内存中；UI动态展现即可！既节省资源又节省时间！
+	5. 批量插入数据 为防止内存溢出 每千条数据插入一次
+
+USED: 298 4096
+	5000 68725
+
+头像验证 相关的UI是否及时更新！
+头像需要圆角MASK!
+
+
+sqlite support json
+SELECT json_extract(Content,\"$.content\") FROM chat
+dEMO!
+JSON CPP DEMO --> GIT
+HURRY UP IN THE DAY!!
+JSONCPP 解析value时 好像使用asCString()总是报错  而使用asString则没有问题   NANN DEMO NAI!没哟这回事 只是返回值不同罢了
+判断一个可以是否存在的方法: if(oNode["key"].isNull())
+	if(root.isObject() && !root["jpegphoto"].isNull())
+
+
+http://127.0.0.1/tx/reset_tx.php/modifyuserpic
+?user=hejian01@test.com&pic=头像数据&passkey=x.e10adc3949ba59abbe56e057f20f883e
+
+
+上传文件 是把二进制文件数据放到Content里面;
+POST方式当然也可以放在field里面;
+
+标准 C++/C 读写二进制数据;
+二进制数据转字符串有问题（因为会出现很多\0）,可以考虑转为BASE64编码。
+
+MD5 多少位?
+128位是指二进制位。二进制太长，所以一般都改写成16进制，每一位16进制数可以代替4位二进制数，所以128位二进制数写成16进制就变成了128/4=32位。
+https://www.cnblogs.com/swarmbees/p/5621586.html C/C++ 读取二进制文件
+
+
+http://blog.csdn.net/harvic880925/article/details/9115125 GDI REGION
+因为需要半透明的不规则形状，GDI对alpha支持不好，所以直接用GDI+;
+
+
+sqlite postgres blob operation
+
+对于DUILIB的CHorizontalLayout 或者 CVerticalLayoutUI来说，sepwidth为正表示可拖动边框在右侧，为负表示可拖动边框在左侧;
+
+https://www.ithome.com/html/android/338436.htm Google Android开发者大会2017
+
+DUI LIB最成功的就是web了: html + css + js;
+
+CControlUI* CPaintManagerUI::FindControl(POINT pt) const
+{
+    ASSERT(m_pRoot);
+    return m_pRoot->FindControl(__FindControlFromPoint, &pt, UIFIND_VISIBLE | UIFIND_HITTEST | UIFIND_TOP_FIRST);
+}
+
+设置了UIFLAG_SETCURSOR  才有用
+UINT CButtonUI::GetControlFlags() const
+	{
+		return (IsKeyboardEnabled() ? UIFLAG_TABSTOP : 0) | (IsEnabled() ? UIFLAG_SETCURSOR : 0);
+	}
+
+
+日志整理 什么时候大日志  目标：看日志就能定位崩溃原因
+
+std::find_last_of() find_first_of  反正是不好理解的  不是 rfind!
+
+//不使用std::string::replace()等方法,可能会遗漏转义字符;
+//直接从JsonObject中GetCString()即可; JSONCPP
+
+
+CXIMAGE如何裁剪图片，如何更改图片尺寸?
+120x120 30x30
+
+SOUI CXIMAGE 修改尺寸  缩放 剪辑 Demo
+
+expand 增加canvas的尺寸 并指定填充背景
+stretch 则是往目标DC上绘制
+
+resample 正解。dist直接创建一个CXImage对象即可。
+
+cximage 闪信使用的702版本 Git Skills!
+
+BPP: Bits Per Pixel
+
+用户头像更新后，需要更新的UI窗体:
+UserInfoDialog if visible
+MainFuncArea
+MainListLayout
+if(m_UserPhotoHttpParam->sUserID.compare(SystemConfig::GetDefUser()) == 0)
+		
+后台启动一个获取所有用户头像的线程
+
+duilib 如何让一张非矢量图，拉伸不变形?
+答案：九宫格。把不可拉伸的范围放入九宫格除中心区域外的区域。
+
+解决jpg转化为png格式后，有些失真的问题。
+////////////////////////////////////////////////////////////////////////////////
+/**
+ * Resizes the image. mode can be 0 for slow (bilinear) method ,
+ * 1 for fast (nearest pixel) method, or 2 for accurate (bicubic spline interpolation) method.
+ * The function is faster with 24 and 1 bpp images, slow for 4 bpp images and slowest for 8 bpp images.
+ */
+bool CxImage::Resample(int32_t newx, int32_t newy, int32_t mode, CxImage* iDst)
+{
+
+std::function register callback function demo!
+
+
+
+sqlite pg 对比着写
+sql regex 查询语言 proc
+python lua js

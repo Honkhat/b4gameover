@@ -1,0 +1,5 @@
+AUTHOR: Rich Hickey 2007;
+COVER: <<The Confidence Man>>
+FUNCTIONAL PROGGRAMMING; LARGE-SCALE DESIGN;
+Read,Eval,Print Loop;
+

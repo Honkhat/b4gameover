@@ -30,3 +30,12 @@ git status
 刪除文件:
 rm test.txt
 
+===========================
+添加一个已经存在的工程到Git
+===========================
+1. 进入这个工程目录, git init
+2. git add .
+3. git commit -m "initial commit"
+4. git remote add origin https://github.com/Honkhat/DuiLib_Bcer.git(事先从github创建好这个仓库)
+5. git push -u origin master
+

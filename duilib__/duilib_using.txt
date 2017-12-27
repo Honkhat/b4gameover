@@ -16,6 +16,11 @@ Solution: 1. Èç¹û×îºóÒ»¸ö×Ö·ûÊÇ>127µÄ×Ö·û,Ç°Ò»¸ö×Ö·ûÈ´ÊÇ[0,127]µÄASCIIÂë,ÄÇÃ´°Ñ×
 	  2. Èç¹ûÖ±½ÓÌí¼ÓDT_WORD_BREAK·ç¸ñ£¬ÄÇÃ´ºº×ÖÈ·ÊµÄÜ¹»ÕýÈ·½Ø¶Ï£¬µ«ÊÇÕâÑùµÄ×Ö·û"we aaaaaaaaaaaaaaaaaaaaaaaaaa"È´ºÜ¿ÉÄÜ»áÏÔÊ¾Îª"we ...",¼´ÏÔÊ¾Ð§¹ûÒ²²»ºÃ¡£
 ×ÛºÏÆðÀ´£¬²ÉÓÃµÚÒ»ÖÖ·½·¨¡£
 
+Q: duilibÊÇ·ñÖ§³Ö±³¾°ÑÕÉ«½¥±ä?
+A: Ö§³Ö¡£µ«Ö»Ö§³ÖÊúÖ±·½ÏòÉÏµÄÑÕÉ«½¥±ä, ÊôÐÔ·Ö±ðÎªbkcolor1  bkcolor2 bkcolor3, ¾ßÌå²é¿´UIControl.cpp.
+
+
+
 --CRenderEngine::DrawHtmlText()--
 int cchSizeFixed = cchSize;				
 if( ((pstrText[cchSize-1] < 0) || (pstrText[cchSize-1] > 127)) && (cchSize-2 >= 0) && ((pstrText[cchSize-2] >= 0) && (pstrText[cchSize-2] < 128)) )

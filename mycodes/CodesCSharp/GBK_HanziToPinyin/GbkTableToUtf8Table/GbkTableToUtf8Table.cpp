@@ -9,8 +9,11 @@
 #include <vector>
 #include <Stringapiset.h>
 #include <atlstr.h>
+#include <windows.h>
+#include <Psapi.h>
 
 #pragma comment(lib, "Shlwapi.lib")
+#pragma comment(lib, "psapi.lib")
 
 /*
 	@Pupose: 表GBK_Hanzi_Pub的主键是GBK VALUE, 现在改成UTF8类型的一个汉字字符.
@@ -22,6 +25,28 @@
 const std::string g_kHanziGbkTable = "HANZI_GBK";
 const std::string g_kHanziUtf8Table = "HANZI_UTF8";
 const int g_kBatchCount = 5000;
+bool g_bTestMemoryUse = true;
+__int64 g_iMemUseBefore = 0;
+__int64 g_iMemUseAfter = 0;
+
+void BeginMemoryTally()
+{
+	HANDLE handle = GetCurrentProcess();
+	//EmptyWorkingSet(handle);
+	PROCESS_MEMORY_COUNTERS pmc;
+	GetProcessMemoryInfo(handle, &pmc, sizeof(pmc));
+	g_iMemUseBefore = pmc.WorkingSetSize;
+}
+
+void EndMemoryTally()
+{
+	HANDLE handle = GetCurrentProcess();
+	//EmptyWorkingSet(handle);
+	PROCESS_MEMORY_COUNTERS pmc;
+	GetProcessMemoryInfo(handle, &pmc, sizeof(pmc));
+	g_iMemUseAfter = pmc.WorkingSetSize;
+	printf("USE: %I64d bytes\r\n", g_iMemUseAfter - g_iMemUseBefore);
+}
 
 std::string GB2312ToUTF8(const std::string& str)
 {
@@ -189,6 +214,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		//内存中的数据批量保存到HANZI_UTF8表中;
 		//=========================================
 
+		if (g_bTestMemoryUse)//批量插入前内存使用情况统计;
+			BeginMemoryTally();
+
 		//执行"BEGIN TRANSACTION;";
 		pStmt = nullptr;
 		sSql = "BEGIN TRANSACTION;";//sqlite3_exec = sqlite3_prepare + [sqlite3_bind] + sqlite3_step + sqlite3_finalize;
@@ -234,6 +262,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 		if (pStmt)
 			sqlite3_finalize(pStmt);
+
+		if (g_bTestMemoryUse)//批量插入触发前内存使用情况统计;
+			EndMemoryTally();
 
 		//执行"COMMIT;";
 		sSql = "COMMIT;";

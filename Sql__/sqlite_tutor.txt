@@ -4,61 +4,45 @@ System.Data.Sqlite(.NET Version)
 =============
 Compilation
 =============
-Q: ´Ósqlite¹ÙÍøÏÂÔØÏÂÀ´µÄbinary packageÖĞÖ»ÓĞsqlite3.def/sqlite3.dllÁ½¸öÎÄ¼ş, ÎÒ²»Ïë±àÒësqliteÔ´Âë,ÈçºÎÊ¹ÓÃ?
-A: 	×¢ÒâVS Command PromptµÄÖĞÎÄÃû³ÆÎª"Visual Studio [ver] ¿ª·¢ÈËÔ±ÃüÁîÌáÊ¾", ·ñÔòÊ¹ÓÃÁËÆäËüµÄTool, »áÌáÊ¾ÕÒ²»µ½LIBÃüÁî.
-	²»Í¬µÄVS°æ±¾, ÃüÁî²ÎÊı¿ÉÄÜ»áÓĞËù²îÒì, ËùÒÔ×îºÃÏÈ´ò¿ªVS Command Prompt Tool-->LIB /?
-	ËùÓĞÃüÁî:
-		lib /? 	//²é¿´µ±Ç°°æ±¾µÄVSÖ§³ÖµÄ²ÎÊı;
-		d: 	//ÇĞ»»µ½DÅÌ
-		cd D:\Kn0w13d9e\Cloud_Honkhat20\DevLib_\sqlite-dll-win32-x86-3210000	//ÇĞ»»µ½sqlite binaryÄ¿Â¼;
-		lib /def:sqlite3.def /out:sqlite3.lib /machine:x86			//Éú³Ésqlite3.libºÍsqlite3.exp;
+Q: ä»sqliteå®˜ç½‘ä¸‹è½½ä¸‹æ¥çš„binary packageä¸­åªæœ‰sqlite3.def/sqlite3.dllä¸¤ä¸ªæ–‡ä»¶, æˆ‘ä¸æƒ³ç¼–è¯‘sqliteæºç ,å¦‚ä½•ä½¿ç”¨?
+A: 	æ³¨æ„VS Command Promptçš„ä¸­æ–‡åç§°ä¸º"Visual Studio [ver] å¼€å‘äººå‘˜å‘½ä»¤æç¤º", å¦åˆ™ä½¿ç”¨äº†å…¶å®ƒçš„Tool, ä¼šæç¤ºæ‰¾ä¸åˆ°LIBå‘½ä»¤.
+	ä¸åŒçš„VSç‰ˆæœ¬, å‘½ä»¤å‚æ•°å¯èƒ½ä¼šæœ‰æ‰€å·®å¼‚, æ‰€ä»¥æœ€å¥½å…ˆæ‰“å¼€VS Command Prompt Tool-->LIB /?
+	æ‰€æœ‰å‘½ä»¤:
+		lib /? 	//æŸ¥çœ‹å½“å‰ç‰ˆæœ¬çš„VSæ”¯æŒçš„å‚æ•°;
+		d: 	//åˆ‡æ¢åˆ°Dç›˜
+		cd D:\Kn0w13d9e\Cloud_Honkhat20\DevLib_\sqlite-dll-win32-x86-3210000	//åˆ‡æ¢åˆ°sqlite binaryç›®å½•;
+		lib /def:sqlite3.def /out:sqlite3.lib /machine:x86			//ç”Ÿæˆsqlite3.libå’Œsqlite3.exp;
 
 ******
-Ñ¹Ëõ
+å‹ç¼©
 ******
-É¾³ısqlite dbÎÄ¼şÖĞ¼¸¸ötableºó£¬Äã»á·¢ÏÖdbÎÄ¼şµÄ´óĞ¡Ã»ÓĞ¸Ä±ä¡£
-ÈçºÎÑ¹Ëõ/ÊÍ·ÅÎŞÓÃµÄ¿Õ¼ä:
-1. VACUUMÃüÁî;
-2. Ê¹ÓÃSqlite Developer¹¤¾ß, ÓÒ¼ü-->Ñ¹ËõÊı¾İ¿â¼´¿É¡£
+åˆ é™¤sqlite dbæ–‡ä»¶ä¸­å‡ ä¸ªtableåï¼Œä½ ä¼šå‘ç°dbæ–‡ä»¶çš„å¤§å°æ²¡æœ‰æ”¹å˜ã€‚
+å¦‚ä½•å‹ç¼©/é‡Šæ”¾æ— ç”¨çš„ç©ºé—´:
+1. VACUUMå‘½ä»¤;
+2. ä½¿ç”¨Sqlite Developerå·¥å…·, å³é”®-->å‹ç¼©æ•°æ®åº“å³å¯ã€‚
 
 http://www.sqlite.org/lang_vacuum.html
 
 ============================
-¿çDatabaseÇ¨ÒÆÊı¾İ
+è·¨Databaseè¿ç§»æ•°æ®
 ============================
 1. ATTACH DATABASE.
-	1.1 Ê¹ÓÃGUI¹¤¾ß¡£ÔÚÄ¿±êdatabaseµÄAttached DatabaseÎÄ¼ş¼ĞÓÒ¼ü-->Attach Database, ä¯ÀÀÑ¡ÔñÔ´dbÎÄ¼ş;
-		1.1.1	µ±distÊı¾İ¿âÒÑ¾­´æÔÚtable1±í¸ñ, insert into table1(field1, field2, field3, fieldn) select field1, field2, field3, fieldn from source.table1;
-		1.1.2	µ±distÊı¾İ¿â²»´æÔÚtable1±íÊ±£¬create table table1 as  select field1, field2, fieldn from source.table1
- 		1.1.13	ÔÚdist±íÖĞµã»÷Detach Database ,Ğ¶ÔØÊı¾İ¿âsource¡£
-	1.2 Ê¹ÓÃATTACHÃüÁî, ×¢ÒâÖ¸¶¨µÄÊÇÎÄ¼ş(.dbÎÄ¼şÃû³Æ), ¶ø²»ÊÇ±ğÃû(alias).
-		ATTACH DATABASE 'DatabaseName' As 'Alias-Name';//×¢ÒâÒ»°ãĞèÒªÖ¸¶¨.dbÎÄ¼şµÄ¾ø¶ÔÂ·¾¶,·ñÔò»á±¨´í: NO SUCH DATABASE»òÕßNO SUCH TABLE..
-	2.3 ·ÖÀëÊı¾İ¿â
+	1.1 ä½¿ç”¨GUIå·¥å…·ã€‚åœ¨ç›®æ ‡databaseçš„Attached Databaseæ–‡ä»¶å¤¹å³é”®-->Attach Database, æµè§ˆé€‰æ‹©æºdbæ–‡ä»¶;
+		1.1.1	å½“distæ•°æ®åº“å·²ç»å­˜åœ¨table1è¡¨æ ¼, insert into table1(field1, field2, field3, fieldn) select field1, field2, field3, fieldn from source.table1;
+		1.1.2	å½“distæ•°æ®åº“ä¸å­˜åœ¨table1è¡¨æ—¶ï¼Œcreate table table1 as  select field1, field2, fieldn from source.table1
+ 		1.1.13	åœ¨distè¡¨ä¸­ç‚¹å‡»Detach Database ,å¸è½½æ•°æ®åº“sourceã€‚
+	1.2 ä½¿ç”¨ATTACHå‘½ä»¤, æ³¨æ„æŒ‡å®šçš„æ˜¯æ–‡ä»¶(.dbæ–‡ä»¶åç§°), è€Œä¸æ˜¯åˆ«å(alias).
+		ATTACH DATABASE 'DatabaseName' As 'Alias-Name';//æ³¨æ„ä¸€èˆ¬éœ€è¦æŒ‡å®š.dbæ–‡ä»¶çš„ç»å¯¹è·¯å¾„,å¦åˆ™ä¼šæŠ¥é”™: NO SUCH DATABASEæˆ–è€…NO SUCH TABLE..
+	2.3 åˆ†ç¦»æ•°æ®åº“
 		DETACH DATABASE 'Alias-Name';
-	²Î¿¼½Ì³Ì http://www.runoob.com/sqlite/sqlite-attach-database.html
+	å‚è€ƒæ•™ç¨‹ http://www.runoob.com/sqlite/sqlite-attach-database.html
 
 =============================
-sqlite ¶àÏß³Ì/²¢·¢´¦Àí
+sqlite å¤šçº¿ç¨‹/å¹¶å‘å¤„ç†
 ==============================
-²Î¿¼ http://www.sqlite.org/threadsafe.html
+å‚è€ƒ http://www.sqlite.org/threadsafe.html
 
-==========================================================
-QL Óï¾äÅĞ¶Ï¼ÇÂ¼ÊÇ·ñ´æÔÚ£¨×î¼ò½à¼òµ¥ĞÔÄÜ×îÓÅ£©
-==========================================================
-½ñÌì²éÁËÏÂ£¬·¢ÏÖÍøÉÏµÄÃ»ÓĞÒ»¸ösqlÓï¾äĞ´µÄºÃµÄ¡£
-ÅĞ¶Ï¼ÇÂ¼ÊÇ·ñ´æÔÚ£¬Òª²»ÊÇÓï¾ä²»¹»¼ò½à£¬Òª²»¾ÍÊÇĞÔÄÜÓĞºÜ´óÎÊÌâ¡£
-ÎÒ½øĞĞÁËÓÅ»¯ºó£¬×î¼ò½à¼òµ¥ĞÔÄÜ×îÓÅµÄµÄsqlÓï¾ä£¬ÓÃÀ´ÅĞ¶Ï±íÖĞµÄ¼ÇÂ¼ÊÇ·ñ´æÔÚ£º
-select isnull((select top(1) 1 from tableName where conditions), 0) //sqliteÎŞtopº¯Êı, ÔÚÄ©Î²¼ÓLIMIT 1ÊµÏÖ
-½á¹ûÎª 1£¬ÔòËµÃ÷¼ÇÂ¼´æÔÚ£»½á¹ûÎª 0£¬ÔòËµÃ÷¼ÇÂ¼²»´æÔÚ¡£ 
-ÍøÉÏµÄ³£¼ûµÄÓĞÎÊÌâµÄÓï¾ä£º
-´íÎó1£º
-select COUNT(*) from tableName where conditions
-count(*) ¼ÆËã»á¶Ô¾Û¼¯Ë÷Òı½øĞĞÉ¨ÃèºÍ¼ÆËã£¬reads ÌØ±ğ¶à£¬ÌØ±ğÊÇ cpu ×ÊÔ´Õ¼ÓÃ¼«´ó¡£
 
-´íÎó2£º
-if exists (select * from tableName where conditions) select '1' else select '0'
-ÕâÖÖ·½·¨ÉÔÎ¢ÓĞµãÁéĞÔ£¬µ«ÊÇÈ´ºÜ²»¼ò½à¡£
-Í¬Ê±ÓÉÓÚ select * Ç°ÃæÓĞ exists £¬ËùÒÔ¸ÃÓï¾ä²¢Ã»ÓĞĞÔÄÜÎÊÌâ£¬Ö»ÊÇÓï·¨²»¹»¼ò½à
 
 =======================
 sqlite3 statement
@@ -71,8 +55,88 @@ If the SQL statement being executed returns any data, then SQLITE_ROW is returne
 
 sqlite3_exec = sqlite3_prepare + [sqlite3_bind] + sqlite3_step + sqlite3_finalize;
 
-ÎÒµÄ³É¹¦½â¾ö·½°¸:
-1. BlizzardHash. ÌØµãÓĞ: (1). C++ Delphi»ìºÏ¿ª·¢; (2) BlizzardÈı¼¶Hash; (3) Sqlite native use, no capsulations. (4) Ê¹ÓÃÁËTransaction/stmtµÈ¸ßËÙÓÅ»¯·½·¨.
+
+==========================
+BATCH INSERT(é«˜æ•ˆæ‰¹é‡æ’å…¥)
+==========================
+BEGIN TRANSACTION;
+	sqlite3_prepare_v2();
+	while()
+		sqlite3_bind();
+		sqlite3_step();
+		sqlite3_reset(pStmt);
+	end while();
+COMMIT;
+
+C#ç‰ˆæœ¬çš„bindç¤ºä¾‹:
+using System.Data;
+using System.Data.Common;
+using System.Data.SQLite;
+
+// åˆ›å»ºæ•°æ®åº“æ–‡ä»¶
+File.Delete("test1.db3");
+SQLiteConnection.CreateFile("test1.db3");
+
+DbProviderFactory factory = SQLiteFactory.Instance;
+using (DbConnection conn = factory.CreateConnection())
+{
+  // è¿æ¥æ•°æ®åº“
+  conn.ConnectionString = "Data Source=test1.db3";
+  conn.Open();
+
+  // åˆ›å»ºæ•°æ®è¡¨
+  string sql = "create table [test1] ([id] INTEGER PRIMARY KEY, [s] TEXT COLLATE NOCASE)";
+  DbCommand cmd = conn.CreateCommand();
+  cmd.Connection = conn;
+  cmd.CommandText = sql;
+  cmd.ExecuteNonQuery();
+
+  // æ·»åŠ å‚æ•°
+  cmd.Parameters.Add(cmd.CreateParameter());
+  
+  // å¼€å§‹è®¡æ—¶
+  Stopwatch watch = new Stopwatch();
+  watch.Start();
+  
+  DbTransaction trans = conn.BeginTransaction(); // <-------------------
+  try 
+  {
+    // è¿ç»­æ’å…¥1000æ¡è®°å½•
+    for (int i = 0; i < 1000; i++)
+    {
+      cmd.CommandText = "insert into [test1] ([s]) values (?)";
+      cmd.Parameters[0].Value = i.ToString();
+
+      cmd.ExecuteNonQuery();
+    }
+
+    trans.Commit(); // <-------------------
+  }
+  catch
+  {
+    trans.Rollback(); // <-------------------
+    throw; // <-------------------
+  }
+
+  // åœæ­¢è®¡æ—¶
+  watch.Stop();
+  Console.WriteLine(watch.Elapsed);
+}
+
+=================
+sqlite å¤åˆ¶è¡¨
+=================
+sqliteä¸æ”¯æŒç±»ä¼¼sqlserverä¸­çš„select into è¯­æ³•ã€‚
+åœ¨SQL Serverä¸­ï¼Œæˆ‘ä»¬è¦å°†ä¸€ä¸ªè¡¨ä¸­çš„æ•°æ®å¤åˆ¶åˆ°ä¸€ä¸ªæ–°è¡¨ä¸­ï¼Œå¯ä»¥è¿™æ ·å†™ï¼š
+	SELECT * INTO newtable FROM oldtable;
+SQLiteä¸æ”¯æŒä»¥ä¸Šè¯­æ³•ï¼Œæ›¿ä»£çš„è¯­å¥æ˜¯è¿™æ ·ï¼š
+	CREATE TABLE newtable AS SELECT * FROM oldtable
+
+
+*******************************
+æˆ‘çš„æˆåŠŸè§£å†³æ–¹æ¡ˆ:
+*******************************
+1. BlizzardHash. ç‰¹ç‚¹æœ‰: (1). C++ Delphiæ··åˆå¼€å‘; (2) Blizzardä¸‰çº§Hash; (3) Sqlite native use, no capsulations. (4) ä½¿ç”¨äº†Transaction/stmtç­‰é«˜é€Ÿä¼˜åŒ–æ–¹æ³•.
 
 
 

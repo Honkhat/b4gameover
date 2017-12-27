@@ -1,0 +1,11 @@
+map最快的是Hash Map, STL中为std::unordered_map;
+
+字符串搜索, 最快: Boyer Moore  > Knuth
+
+字符串排序, 最快: qsort
+
+排好序的数组搜索,最快: binary search.
+
+dijkstra算法
+最短路径 还有另一个 查看算法导论
+

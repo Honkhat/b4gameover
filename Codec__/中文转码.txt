@@ -10,4 +10,72 @@ UTF8-->UNICODE-->GB2312.
 MultiByteToWideChar(CP_ACP, ...)第一个参数指的是源字符串使用的编码表;
 WideCharToMultiByte(CP_UTF8,...)第一个参数指的是目标字符串使用的编码表。
 
-具体代码:
+具体代码: (参考CodesCSharp\\GBK_HanziToPinyin\\GbkTableToUtf8Table)
+std::string GB2312ToUTF8(const std::string& str)
+{
+	std::string retStr;
+	if (str.length() > 0)
+	{
+		int nwLen = ::MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
+		wchar_t * pwBuf = new wchar_t[nwLen + 1];//一定要加1，不然会出现尾巴
+		wmemset(pwBuf, 0, nwLen + 1);
+		//GB2312-->UNICODE;
+		::MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, pwBuf, nwLen + 1);
+
+		int nLen = ::WideCharToMultiByte(CP_UTF8, 0, pwBuf, -1, NULL, NULL, NULL, NULL);
+		char * pBuf = new char[nLen + 1];
+		memset(pBuf, 0, nLen+1);
+		//UNICODE-->UTF8;
+		::WideCharToMultiByte(CP_UTF8, 0, pwBuf, -1, pBuf, nLen + 1, NULL, NULL);
+		
+		retStr = pBuf;
+
+		delete[]pwBuf;
+		delete[]pBuf;
+	}
+
+	return retStr;
+}
+
+std::string UTF8ToGB2312(const std::string& str)
+{
+	std::string retStr;
+	if (str.length() > 0)
+	{
+		int nwLen = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
+		wchar_t * pwBuf = new wchar_t[nwLen + 1];//一定要加1，不然会出现尾巴
+		wmemset(pwBuf, 0, nwLen+1);
+		//UTF8-->UNICODE;
+		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, pwBuf, nwLen);
+
+		int nLen = WideCharToMultiByte(CP_ACP, 0, pwBuf, -1, NULL, NULL, NULL, NULL);
+		char * pBuf = new char[nLen + 1];
+		memset(pBuf, 0, nLen+1);
+		//UNICODE-->GB2312;
+		WideCharToMultiByte(CP_ACP, 0, pwBuf, -1, pBuf, nLen+1, NULL, NULL);
+
+		retStr = pBuf;
+
+		delete[]pBuf;
+		delete[]pwBuf;
+	}
+
+	return retStr;
+}
+
+void Gbk_IntToStr(unsigned int uGbkVal, std::string& sGbk)
+{
+	//GBK汉字占两个byte的空间;
+	unsigned int u = uGbkVal;
+	char ch1 = (u >> 8) & 0x00ff;
+	char ch2 = uGbkVal & 0x00ff;//可能直接ch2 = uGbkVal截断也能达到效果;
+	sGbk.clear();
+	sGbk += ch1;
+	sGbk += ch2;
+}
+
+void GbkIntToUtf8Str(unsigned int uGbkVal, std::string& sUtf8)
+{
+	Gbk_IntToStr(uGbkVal, sUtf8);//借用下sUtf8变量;
+	sUtf8 = GB2312ToUTF8(sUtf8);
+}

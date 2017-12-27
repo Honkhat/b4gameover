@@ -1,0 +1,25 @@
+==========================================================
+SQL 语句判断记录是否存在（最简洁简单性能最优）
+==========================================================
+今天查了下，发现网上的没有一个sql语句写的好的。判断记录是否存在，要不是语句不够简洁，要不就是性能有很大问题。
+我进行了优化后，最简洁简单性能最优的的sql语句，用来判断表中的记录是否存在：
+	select PID FROM [table_name] WHERE [condition] LIMIT 1;//sqlite无top函数, 在末尾加LIMIT 1实现
+	返回结果不为空, 表示存在;空,不存在。
+网上的常见的有问题的语句：
+	错误1：
+	select COUNT(*) from tableName where conditions
+	count(*) 计算会对聚集索引进行扫描和计算，reads 特别多，特别是 cpu 资源占用极大。
+错误2：
+	if exists (select * from tableName where conditions) select '1' else select '0'
+	这种方法稍微有点灵性，但是却很不简洁。同时由于 select * 前面有 exists ，所以该语句并没有性能问题，只是语法不够简洁。
+
+
+=====================
+UNION 和 UNION ALL
+=====================
+UNION用来合并不同的值, UNION ALL则会合并所有的值。
+SELECT E_Name FROM Employees_China
+UNION ALL
+SELECT E_Name FROM Employees_USA
+
+

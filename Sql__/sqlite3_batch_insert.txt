@@ -1,0 +1,102 @@
+来自http://www.cnblogs.com/stephen-liu74/archive/2012/03/07/2341480.html
+在给出操作步骤之前先简单说明一下批量插入的概念，以帮助大家阅读其后的示例代码。事实上，批量插入并不是什么新的概念，在其它关系型数据库的C接口API中都提供了一定的支持，只是接口的实现方式不同而已。纵观众多流行的数据库接口，如OCI(Oracle API)、MySQL API和PostgreSQL API等，OCI提供的编程接口最为方便，实现方式也最为高效。SQLite作为一种简单灵活的嵌入式数据库也同样提供了该功能，但是实现方式并不像其他数据库那样方便明显，它只是通过一种隐含的技巧来达到批量插入的目的，其逻辑如下：
+    1). 开始一个事物，以保证后面的数据操作语句均在该事物内完成。在SQLite中，如果没有手工开启一个事物，其所有的DML语句都是在自动提交模式下工作的，既每次操作后数据均被自动提交并写入磁盘文件。然而在非自动提交模式下，只有当其所在的事物被手工COMMIT之后才会将修改的数据写入到磁盘中，之前修改的数据都是仅仅驻留在内存中。显而易见，这样的批量写入方式在效率上势必会远远优于多迭代式的单次写入操作。
+    2). 基于变量绑定的方式准备待插入的数据，这样可以节省大量的sqlite3_prepare_v2函数调用次数，从而节省了多次将同一SQL语句编译成SQLite内部识别的字节码所用的时间。事实上，SQLite的官方文档中已经明确指出，在很多时候sqlite3_prepare_v2函数的执行时间要多于sqlite3_step函数的执行时间，因此建议使用者要尽量避免重复调用sqlite3_prepare_v2函数。在我们的实现中，如果想避免此类开销，只需将待插入的数据以变量的形式绑定到SQL语句中，这样该SQL语句仅需调用sqlite3_prepare_v2函数编译一次即可，其后的操作只是替换不同的变量数值。
+    3). 在完成所有的数据插入后显式的提交事物。提交后，SQLite会将当前连接自动恢复为自动提交模式。
+    
+    下面是示例代码的实现步骤：
+    1). 创建测试数据表。
+    2). 通过执行BEGIN TRANSACTION语句手工开启一个事物。
+    3). 准备插入语句及相关的绑定变量。
+    4). 迭代式插入数据。
+    5). 完成后通过执行COMMIT语句提交事物。
+    6). 删除测试表。
+//6. 构建基于绑定变量的插入数据。
+ 56    constchar* insertSQL = "INSERT INTO TESTTABLE VALUES(?,?,?)";
+ 57    sqlite3_stmt* stmt3 = NULL;
+ 58    if (sqlite3_prepare_v2(conn,insertSQL,strlen(insertSQL),&stmt3,NULL) != SQLITE_OK) {
+ 59        if (stmt3)
+ 60            sqlite3_finalize(stmt3);
+ 61        sqlite3_close(conn);
+ 62        return;
+ 63    }
+ 64    int insertCount = 10;
+ 65    constchar* strData = "This is a test.";
+ 66    //7. 基于已有的SQL语句，迭代的绑定不同的变量数据
+ 67    for (int i = 0; i < insertCount; ++i) {
+ 68        //在绑定时，最左面的变量索引值是1。
+ 69        sqlite3_bind_int(stmt3,1,i);
+ 70        sqlite3_bind_double(stmt3,2,i * 1.0);
+ 71        sqlite3_bind_text(stmt3,3,strData,strlen(strData),SQLITE_TRANSIENT);
+ 72        if (sqlite3_step(stmt3) != SQLITE_DONE) {
+ 73            sqlite3_finalize(stmt3);
+ 74            sqlite3_close(conn);
+ 75            return;
+ 76        }
+ 77        //重新初始化该sqlite3_stmt对象绑定的变量。
+ 78        sqlite3_reset(stmt3);
+ 79        printf("Insert Succeed.\n");
+ 80    }
+ 81    sqlite3_finalize(stmt3);
+ 82 
+ 83    //8. 提交之前的事物。
+ 84    constchar* commitSQL = "COMMIT";
+ 85    sqlite3_stmt* stmt4 = NULL;
+ 86    if (sqlite3_prepare_v2(conn,commitSQL,strlen(commitSQL),&stmt4,NULL) != SQLITE_OK) {
+ 87        if (stmt4)
+ 88            sqlite3_finalize(stmt4);
+ 89        sqlite3_close(conn);
+ 90        return;
+ 91    }
+ 92    if (sqlite3_step(stmt4) != SQLITE_DONE) {
+ 93        sqlite3_finalize(stmt4);
+ 94        sqlite3_close(conn);
+ 95        return;
+ 96    }
+ 97    sqlite3_finalize(stmt4);
+ 98 
+//6. 执行SELECT语句查询数据。
+ 57    constchar* selectSQL = "SELECT * FROM TESTTABLE";
+ 58    sqlite3_stmt* stmt3 = NULL;
+ 59    if (sqlite3_prepare_v2(conn,selectSQL,strlen(selectSQL),&stmt3,NULL) != SQLITE_OK) {
+ 60        if (stmt3)
+ 61            sqlite3_finalize(stmt3);
+ 62        sqlite3_close(conn);
+ 63        return;
+ 64    }
+ 65    int fieldCount = sqlite3_column_count(stmt3);
+ 66    do {
+ 67        int r = sqlite3_step(stmt3);
+ 68        if (r == SQLITE_ROW) {
+ 69            for (int i = 0; i < fieldCount; ++i) {
+ 70                //这里需要先判断当前记录当前字段的类型，再根据返回的类型使用不同的API函数
+ 71                //获取实际的数据值。
+ 72                int vtype = sqlite3_column_type(stmt3,i);
+ 73                if (vtype == SQLITE_INTEGER) {
+ 74                    int v = sqlite3_column_int(stmt3,i);
+ 75                    printf("The INTEGER value is %d.\n",v);
+ 76                } elseif (vtype == SQLITE_FLOAT) {
+ 77                    double v = sqlite3_column_double(stmt3,i);
+ 78                    printf("The DOUBLE value is %f.\n",v);
+ 79                } elseif (vtype == SQLITE_TEXT) {
+ 80                    constchar* v = (constchar*)sqlite3_column_text(stmt3,i);
+ 81                    printf("The TEXT value is %s.\n",v);
+ 82                } elseif (vtype == SQLITE_NULL) {
+ 83                    printf("This value is NULL.\n");
+ 84                }
+ 85            }
+ 86        } elseif (r == SQLITE_DONE) {
+ 87            printf("Select Finished.\n");
+ 88            break;
+ 89        } else {
+ 90            printf("Failed to SELECT.\n");
+ 91            sqlite3_finalize(stmt3);
+ 92            sqlite3_close(conn);
+ 93            return;
+ 94        }
+ 95    } while (true);
+ 96    sqlite3_finalize(stmt3);
+
+
+注意, sqlite3_step()不仅可以用于INSERT操作, 也可以用于SELECT操作. 如果step一次返回值为SQLITE_ROW那么表示获取了一个记录, 直到SQLITE_DONE(表示不再有数据).
+但是，理论上来说，这样的效率不如sqlite3_get_table().

@@ -1,0 +1,46 @@
+*******************************
+Clojure开发环境搭建
+*******************************
+1. 安装包准备: JDK(SE,非EE), Leiningen, CounterClockwise(独立IDE,非Eclipse Plugin);(本地+百度云15652240737)
+	jdk-8u151-windows-x64.exe;leiningen-installer-1.0.exe;Counterclockwise-0.35.1.STABLE001-win32.win32.x86_64.zip;
+2. 具体安装过程:
+	2.1 JDK的安装
+		实际安装了JDK和JRE, 注意保持JDK和JRE在并列层次的目录下, 一般默认的都在C:\Program Files\Java下(C:\Program Files\Java\jdk1.8.0_151, C:\Program Files\Java\jre1.8.0_151);
+	2.2 JDK的配置
+		计算机-->属性-->高级系统设置-->环境变量:
+		系统变量新建JAVA_HOME,值为JDK的安装目录,举例:C:\Program Files\Java\jdk1.8.0_151
+		系统变量新建CLASSPATH(运行过程中的库目录), 值为:.;%JAVA_HOME%\lib\tools.jar;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\jre\lib\rt.jar;
+		系统变量编辑PATH, 追加:%JAVA_HOME%\bin
+	2.3 lein的安装
+		双击leiningen-installer-1.0.exe, 默认安装目录为: C:\Users\Bcer\.len\;
+		如果可以翻墙,那么会自动下载leiningen-2.8.1-standalone.jar到self-installs目录下;
+		如果不可以翻墙,需要手动搜索下载leiningen-2.8.1-standalone.jar, 放到self-installs目录下, 并且修改bin\lein.bat中的"set LEIN_VERSION=2.8.1"中的版本号(2.8.1对应leiningen-2.8.1-standalone.jar中间的版本字段, lein.bat会自动匹配);
+		一般安装完成后, 可以选择"启动REPL". (这里我安装失败好像是网络代理问题)
+	2.4 CounterClockwise(独立IDE版本)的安装
+		解压Counterclockwise-0.35.1.STABLE001-win32.win32.x86_64.zip后,即可完成安装.(与Eclipse的安装方式一样,解压后即可使用)
+	2.5 使用CounterClockwise创建第一个clojure工程(是为了唤醒Lein,前面不是安装失败了么)
+		双击里面的CounterClockwise.exe-->创建Clojure工程(第一次配置时间较长,需要准备JVM LEINI等,需要耐心等待);
+		在src\core.clj文件中, 在自动生成的代码后面追加:(println (foo "Clojure"))-->RUN.(Leiningen会启动一个REPL,可以根据提示进行交互式开发)
+	2.6 CMD-->lein repl发现REPL居然也可以启动了!
+		其它一些小测试:
+		lein version
+		lein repl
+		*ns* //查看当前默认的namespace
+		"Clojure!"
+		"Lein!"
+		"CounterClockwise!"
+		(println (str *3,*2,*1))
+		(println (+ 4,2))
+3. 安装完毕，发现当前Windows用户Bcer的环境变量增加了:
+	LEIN_JAVA_CMD	C:\Program Files\Java\jdk1.8.0_151\bin\java.exe
+	PATH		C:\Users\Bcer\.lein\bin
+4. referrence
+	https://www.liaoxuefeng.com/article/0014171500694729a42a2c8b7f245e0bd54612c88d78a03000 廖雪峰的Clojure从安装到开发
+	https://www.w3cschool.cn/clojure/ W3CSchool的clojure教程
+	http://doc.ccw-ide.org/documentation.html CounterClockwise官网
+	https://djpowell.github.io/leiningen-win-installer/ Leiningen Windows Installer
+	https://github.com/technomancy/leiningen/ Leiningen GitHub Source Code
+	https://github.com/technomancy/leiningen/downloads lein standalone package(github名字后面+downloads)
+	http://wiki.fnil.net/index.php?title=leiningen%E6%95%99%E7%A8%8B%E4%B8%AD%E6%96%87%E7%89%88
+	http://blog.csdn.net/tonylee0329/article/details/40393059  http-proxy lein problem
+	lein的 "SNAPSHOT" 字眼表示开发中的版本;
