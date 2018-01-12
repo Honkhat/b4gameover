@@ -1,0 +1,65 @@
+IDE: Eclipse, Google官方已经明确表示不再支持. 果断选择Android Studio.
+
+http://www.open-open.com/lib/view/open1433387390635.html Android安装/配置教程
+http://www.open-open.com/lib/view/open1418604288089.html 
+
+1. 安装JDK JRE;(参见Clojure环境配置)
+2. 运行androidstudio_2.3.3.0.exe;
+	AndroidStudio默认安装目录: C:\Program Files\Android\Android Studio
+	AndroidStudio SDK默认安装目录: C:\Users\Bcer\AppData\Local\Android\sdk
+	安装过程中勾选AS SDK(如果你没有事先单独安装), 不勾选Android Virtual Device(太慢!);
+3. 分岔口.
+A.3 安装最后一步勾选"Start Android Studio", 直接启动AS.
+	"Unable to access Android SDK add-on list"-->Setup Proxy-->Manual proxy configuration:
+		Host: mirrors.neusoft.edu.cn
+		Port: 80
+		"OK".
+	关于mirrors.neusoft.edu.cn，实际上是大连东软信息学院的一个开源镜像网站.
+
+B.3 安装最后一步不勾选"Start Android Studio", 这里需要更改下配置, 使得AS第一次启动不会自动去更新AS SDK(被墙).
+	AS安装目录下bin找到idea.properties文件, 在文件最后追加: disable.android.first.run=true, 保存(WINDOWS可能需要管理员权限).
+	运行AS-->create a new project, 提示没有配置AS SDK, 点击Configure-->Project Defaults-->Project Structure-->把上面的SDK路径粘贴过来(因为AppData是隐藏目录,不可见).
+	继续create a new application-->设置workspace-->一路默认next即可。
+B.4 我不喜欢IDE自动更新, 卡且浪费空间, 设置禁止自动更新:
+	菜单栏-->File-->Settings-->Appearance&Behavior-->System Settings--> Updates:
+		取消勾选Automatically check updates;
+		取消勾选Use Secure connection(这一步是断绝它仍然自动更新的念想)
+	这里完成的是禁止AS自动更新。
+B.5 如何禁止Android SDK自动更新?
+	貌似AS只会在第一次启动时尝试去更新Android SDK,如果这样的话, 我们已经通过设置disable.android.first.run=true完成了.
+
+6. 更新AS的显示风格.
+	File-->Settings-->Appearance&Behavior-->Apperance: Theme:Darcula.
+7. AS默认的字号太小, 更改字号: Editor-->Color&Fonts-->Font: 先点击"SaveAs"-->保存成一个你的style, 然后Size改成16即可.
+8. File-->Settigns-->Plugin: Repositories-->搜索GenyMotion, 安装GenyMotion AVD.
+	点击菜单栏中的Genymotion图标, 弹出需要设置Genymotion的安装路径的页面, 但是死活C盘下找不到"geny"字眼的安装目录!
+	因为AS只是一个关联的插件(C:\Users\Bcer\.AndroidStudio2.3\config\plugins\genymotion-idea-plugin-20151209.jar), 你还需要安装Genymotion的windows客户端.
+	Genymotion是收费的.Genymotion支持Windows、Linux和Mac OS等操作系统.
+	https://www.52pojie.cn/thread-608928-1-1.html crack lesson
+	默认安装目录:C:\Program Files\Genymobile\Genymotion
+	安装步骤:
+	1. 先安装Vbox(有集成VBox的Genymotion版本,但是我也跑linux虚拟机,所以索性安装一个) 下载地址 http://download.virtualbox.org/v ... 1.22-115126-Win.exe 
+	2. 再安装 Genymotion,对应百度云中的genymotion-2.10.0.exe;
+	3.覆盖文件到安装目录  genymotion.exe genyshell.exe player.exe;
+	4.帐号登录  worksdata@163.com/genymotion#123 下载选择的系统镜像,建立AVD.
+
+
+9. "Failed to open zip file. Gradle's dependencyh cache may be corrupt"
+	网上搜索答案: 发现解决方案基本都是去官网下载一个,替换进去。
+	发现默认是下载了一个Gradle的,在目录C:\Documents and Settings\bcer\.gradle\wrapper\dists\gradle-3.3-all\55gk2rcmfc6p2dg9u9ohc3hw9(此目录是隐藏目录,直接双击Documents and Setting拒绝访问), 需要直接粘贴跳过这级目录的地址到地址栏转到.
+	http://services.gradle.org/distributions/ 我下载了AS自动关联的gradle-3.3-all.zip.替换进去. 点击错误下面的"re-sync"link. OK.	
+	可能是文件损坏了? 反正替换了就好了。
+10. 
+
+
+
+//下面的内容暂时没有测试????????????????????????????????
+工程依赖的gradle版本不匹配时也会自动重新下载
+gradle也可以手动离线下载好放在对应目录下
+
+项目的gradle-wrapper.properties:
+	"distributionUrl": 应该是启动AS后，如果本地找不到对应的Gradle的版本会自动去下载的地址;
+
+下载后的gradle应该放的位置是：AndroidStudio/Gradle/gradle-3.4.zip?
+
+AndroidStudio-->Setting-->Gradle-->Gradle Home: 设置

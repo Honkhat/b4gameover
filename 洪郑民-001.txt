@@ -86,25 +86,94 @@ sprintf('%s') 直接传进去std::string类型的变量，会崩溃，必须为s
  犭 读音(quǎn) ◎ 同“犬”
 class 可以对应css中的样式，如果没有，就使用系统默认的，但是附带的一个好处是：使用jQuery可以批量获取对象;
 class 字符串不可包含'@' '.'等字眼;
+gradation	英[grəˈdeɪʃn] 美[ɡreˈdeʃən]
+n.	等级; （从一事物到另一事物的） 渐变; （事物划分的） 阶段; 刻度;
+[例句]But TV images require subtle gradations of light and shade.
 
 cef 强制从src刷新img标签 ?t=GetTickCount(); 即可;
 duilib中的CListContainerElementUI本身就是CHorizontalLayoutUI;所以xml中直接把ListContainerElement作为HorizontalLayout来使用即可, 多层冗余的HorizontalLayout可能会导致控件的自动位置调整机制不准确（作为一个待修改的BUG!）;
 使用duilib开发一个大多数人常犯的毛病就是: xml中的布局冗余。
+js中只有Math.pow()方法,无开n次方的方法,究其原因, 是因为开n次方即正向1/n次方。
+var obj = {};
+obj['obj1'] = new Plugin();
+obj['obj2'] = new Plugin();//这是对象内部建立的KEY-VALUE映射,类似MAP/DICTIIONARY;
+var obj = new Array();
+obj[0] = new Plugin();
+obj[1] = new Plugin();//这是JS里面的数组;
 
+new function()内部的this应该和C++中的概念一样了吧???????????????TEST
+function()调用内部的this看调用上下文;
 
+if(typeof(value)=="undefined"){
+alert("undefined"); 
+}
+js 单引号 双引号 都可用
+JS获取窗口可视区域的大小:
+if (window.innerWidth)
+	winWidth = window.innerWidth;
+else if ((document.body) && (document.body.clientWidth))
+	winWidth = document.body.clientWidth;
+关于元素间留白:
+	1. <a> font-size:0;
+	2. container一定要写display:flex;否则子控件默认不认为自己在flex布局中!
+flex控件重叠问题:
+	1. 使用absolute(内部就修改了dispaly:flex; relative不可以);
+	2. 添加一个canvas，自绘;
 
-eclipse install
+flex 与 position是相互独立的? 只影响display;
+	不是相互独立的. position:relative;不会影响flex布局;position:absolut;会跳出flex布局(内部可能把display的值修改成了非flex)
+控件使用absolute, 如何知道哪一个是父元素?
+absolute：相对于 static 定位以外的第一个父元素进行定位。 
+          也就是父元素的position取值可以是：absolute fixed relative inherit 
+          显然，最可能和常用的取值是 relative
+relative是相对于自身原来的位置而言;
+absolute是相对于父窗口的位置而言;
+js: obj.style.width()//是必须在style中显示写出来才能获取; 自适应的不能调整? 测试！！
+    obj.clientWidth; //自适应的也能获取；
+jquery obj.width(); //自适应的也没问题。
+注意了如果要让canvas自适应父元素, 那么不能设置width:100%;height:100%;否则自绘的内容会被拉伸！
+	只能通过脚本手动设置canvas的大小;
+	因为默认大小300X150;然后按照这个比例拉伸了!
+	你通过css设置的width height设置的是clientWidth/clientHeight;实际上应该设置document.getElementById('canvas').width/height = 400;才有效!
+	width clientWidth各自有独特的用途!
+如果使用img标签通过background-position设置图片的局部区域;必须设置src="",放大后会显示损坏的图像（CHROME）;
+div则不会有这种情况。
 
+weixinVideo:
+	1div+1canvas+disabled;(这里的disabled相当于自定义的一个变量,因为只对button标签有效);
 
+直接在html中写onclick="func()"; func()内部的this是window;
+jquery:
+	$("#canvas1").click(function onVideoPreviewClick(){
+			if(this.disabled)
+				alert("1");
+		});//内部的this是控件自身;
+JS里面的引用类型须是var obj={"m1":0};
+js 大小写敏感;
+http://blog.csdn.net/sarkuya/article/details/49793531 arc arcTo draw round rect
+关于图片圆角化的方法:
+	一般来说，尤其GDI+, CLIP方式 不如 TextureBrush方式 绘制的更圆滑;
+	TextureBrush/PatternFillStyle方式的不足之处是:作为背景的图片不能缩放，只能原样往画布上平铺;
+	CLIP方式则可以随意缩放图像,但是有锯齿。即使是web canvas比GDI+表现要好很多,但是有时候也有轻微锯齿。
+	完美解决方案:
+		先缩放图像绘制到画布上，然后把画布上的东西保存起来!最后以这张缩放后的图像为src作为pattern brush.
+		http://blog.csdn.net/jia20003/article/details/8948005
+		http://www.webhek.com/post/save-canvas-to-image.html
+		https://www.2cto.com/kf/201612/577926.html
 
-整理成文档，并打包进一个文件夹。
-
-
-lein source code:git url
-
-
-
-
+		https://www.cnblogs.com/kenkofox/p/4624362.html
+		
+自绘:
+	GDI/GDI+/D2D/D3D/OGL/VULKAN/CANVAS/SVG/WEBGL
+DUI:
+	BKWIN/DUILIB/SOUI/BOLT/VGSCENE/DXSCENE/H5/ELECTRON
+url(D:\)//汉字要是UTF8格式,只认路径中的左斜杠,右斜杠无法识别!
+	D:\workspace_any\安宁邮信项目\bin\Debug\users\hejian\cachefiles\thumb_ra482087d188347b1940ac05dcfa165b9.jpeg
+	D:/workspace_any/安宁邮信项目/bin/Debug/users/hejian/cachefiles/thumb_ra482087d188347b1940ac05dcfa165b9.jpeg
+std::regex
+Delphi: Integer(99); C++ (int)'A';
+delphi 不使用override
+www.wanandroid.com 张鸿洋
 
 更新所有头像相关的窗体，如果在启动过程中，那么不必更新；如果在软件运行过程中更新了，那么后台跑一个线程；
 1. 所有单聊/群聊; 都对应同一个CLASS: SessionLayout;
@@ -116,21 +185,263 @@ cef中头像更新接口；(a<strippedemailid>vatar, class名称与变量名的�
 Solution: 主窗体40x40,其它窗体30x30.
 cef中增加更新头像的机制；
 
+修复闪信启动后HOME页面展示不出来的BUG;
+修复登陆用户的部门信息乱码BUG;
 
+***************
+心得与总结
+***************
+Q: 请问为什么在CSS里面给img background图像的时候是带有border的，而且border：none去不掉，直接在HTML的img src里面就没有border，保有CSS代码，要怎样才可以去掉border呢？
+KEY:设置src="",并且在css class中不能设置background-size.(只设置width/height/background-position)
+Q: <a><img /></a>会发现元素留白，如何去掉?
+A: 设置a的font-size:0;即可;
+
+	https://www.cnblogs.com/libin-1/p/5903350.html -webkit-tap-highlight-color
+	http://www.w3school.com.cn/cssref/pr_class_display.asp display inline block none
+	<span> 一行内可以被 <span> 划分成好几个区域
+	https://zhidao.baidu.com/question/311666643.html class空格分隔多个
+	http://www.w3school.com.cn/cssref/pr_pos_overflow.asp overflow hidden scroll
+	http://www.w3school.com.cn/tags/tag_audio.asp audio 如果没有设置controls="controls"就什么也不会显示
+	height:500px; "500" "px"之间不能有空格,否则无效!
+	background-color: #555555; 需要在width height都有有效值才能看到效果；
+background可以定义背景的一切内容，包括颜色、图片、图片位置等东西
+	background-color只能定义颜色，别的都不行
+	比如说这么写是正确的：
+	background:#FFFFFF url(1.png) no-repeat center top
+	background-color:#FFFFFF;
+	background-image:url(1.png);
+	background-repeat:no-repeat;
+	background-position:center top	
+css class 与 大括号之间必须有空格!!
+top left right bottom设置的是相对于原来位置的偏移量, 后面的控件会相对前面控件的原位置定位, 所以要分清什么时候用margin什么时候用偏移量.
+
+
+	div是块元素,span是行内元素; 但是都可以通过display改变显示方式;
+	position:relative;后,在display:inline或者流式布局的控件中width height设置无效? top left则是相对原位置的偏移量?
+	margin/padding top right  bottom left; (duilib left top right bottom)
+	float在css中是相对布局的对齐方式(position:relative;float:left;); duilib则是绝对布局;float="true"
+	.audio_area没有设置height属性, 靠内部的控件"撑"起来;
+	icon_audio_playing 初始化display:none;所以只显示icon_audio_default;
+	audio_length 没有设置display:inline-block;则browser会根据文字长度自适应宽度;
+	audio_progress使用绝对布局, 修改width:100%可看到效果. (css的绝对布局是相对容器的边距来确定的,这点和duilib直接指定position不同(细想其实也一样))
+	css 父容器float="right"  子控件也默认右对齐吗????
+	css 中不支持//作为注释, 只接受/**/
+	左右对齐, 使用float:left/right;顶底对齐,使用position:absolute;bottom:0px;
+	**float指的是自身的对齐方式 (duilib中也是指自身)
+		具有float控件的容器具有包裹性,即如果不设定宽高,则根据内容的宽高自适应;
+		postion:relative;的控件也可以设置float属性,顾名思义,"浮在上面", 其它容器会无视它的存在位置,控件不会;
+	**position:relative的控件会把position:absolute的控件忽视;?? 不会吧
+		如果设置了absolute, 那么参考点可以通过指定4个方向的任一边距来确定而不必显式指定float;
+		比如head_img就是这种情况。
+	**关于class
+		多个class,平级之间不能加空格, 不同级之间必须加空格!
+	设置了float display自动就变成了block;
+
+Q: 多个CEF, 某个CEF中调用C++方法, C++方法做下载工作, 回调Js方法更新下载进度, 如何知道调用哪个CEF->ExecuteJavaScript()?
+A: CEF调用C++方法的时候, 传出来一个SessionID后者其它能够唯一标识一个CEF的ID, C++回调Js的时候通过这个ID来定位对应的CEF.(这个CEF ID应该在CEF完成初始化后设置进去;或者特定地在闪信中,通过MsgID找到FromID, 这个FromID就是SessionID)
+
+Q: 一个Web Page调用的.js文件中的全局变量在多个页面间是相互独立的吗?
+A: YES. 从这个角度来说，1个Web Page就相当于1个 Native进程。
+
+JavaScript单引号、双引号可以混合使用, same with Delphi.
+
+Q: 文字截断 ellipsis
+A: http://blog.csdn.net/liwenfei123/article/details/69666880
+
+***************
+#闪信#开发文档
+***************
+Q: 多个CEF, 某个CEF中调用C++方法, C++方法做下载工作, 回调Js方法更新下载进度, 如何知道调用哪个CEF->ExecuteJavaScript()?
+A: CEF调用C++方法的时候, 传出来一个SessionID后者其它能够唯一标识一个CEF的ID, C++回调Js的时候通过这个ID来定位对应的CEF.
+   在闪信中,通过MsgID找到FromID, 这个FromID就是SessionID.
+
+Q: 闪信SessionID的定义规则是? 代码位置?
+A: "非我". 不论谁跟谁聊, 对方是SessionID.对于群, FromID是群ID, Session是群ID, TalkerID是说话的群成员,ToID是除"我"外的每一个群成员.
+   void MainListLayout::_CreatSessionDialog(IN UIIMList* pList, IN CControlUI* pMsgSender);
+
+Q: 如何判断当前存在的Video Cache是不是完整的? 大小可能是不可靠的.
+A: 下载的时候无后缀名".mp4", 下载完成添加后缀".mp4". 判断的时候使用带后缀的来判断.
+
+Q: 自定义消息ID冲突!
+A: >WM_USER的自定义消息一定要集中定义.
+
+Q: 展示一幅图片,如何保持宽高比缩放展示?
+A: 1. 将图片作为div的背景, js计算保持宽高比后的宽高,设置width/height,设置background-size:contain;
+   2. <img>设置max-width;自动保持宽高比缩放！
+
+Q: HTML 绘制一条直线.
+A: 水平直线 <hr> http://blog.csdn.net/lance_lot1/article/details/7921441 可以部分半透明
+   border-right:1px solid #000000
+   
+********************
+Forked Projects 
+********************
+	http://warpcgd.github.io/webchataudio/src/demo.html 仿微信的音频播放器
+	"db": display block	
+	state_send  那个转圈的gif是如何设置进去的?
+	instead of stop() you could try with:
+		sound.pause();
+		sound.currentTime = 0;//this should have the desired effect
+
+	https://www.cnblogs.com/1996zy/p/7675232.html 原生js写的音乐播放器
+	https://zhidao.baidu.com/question/369805663128500964.html js控制播放
+
+********************
 当前正在进行：
+********************
+位置增加点击事件,弹出AnyWebBrowser.
+C++ json中添加 locTitle locCoTitle
+css .miji01 --> .mjLevel
+.videoLength单聊中不必在canvas中绘制;
+整理 总结 Article Blog --> Git!
+音频时间长度不对 5秒变成了25''!
+video length format C++
+发送视频-->显示[图片] BUG! 
+发送位置-->显示[图片] BUG!
+群聊Video Style暂时未显示成员名称!
+群聊视频的播放时长作为userdata2;
+视频对应的下载URL不合法 或者 下载失败, 应给予提示. "下载失败"  "视频已过期" 等字眼,恰好富余留了一个state控件！
+{
+   "attachs" : [
+      {
+         "cid" : "",
+         "filename" : "D:\\workspace_any\\安宁邮信项目\\bin\\Debug\\users\\hejian\\cachefiles\\thumb_raeed4fcb552e4625bd9dead3401681b9.jpeg",
+         "mj" : 0,
+         "playtime" : 2,
+         "position" : -1,
+         "size" : -44056576,
+         "sourcefile" : "",
+         "title" : "",
+         "type" : "jpeg",
+         "url" : "http://221.192.133.32/app/kx.php/view/7159f31655a8523e830c0dc5fecd7779"
+      }
+   ],
+   "content" : "&$#@~^@[{:D:\\workspace_any\\安宁邮信项目\\bin\\Debug\\users\\hejian\\cachefiles\\thumb_raeed4fcb552e4625bd9dead3401681b9.jpeg:}]&$~@#@",
+   "feature" : 0,
+   "mj" : 0,
+   "talkerid" : "wangqian@anymacro.com",
+   "validate" : 0
+}
+
+{"longitude":116.286986,"latitude":39.908013,"address":"北京市海淀区复兴路辅路甲65号靠近中国民生银行(北京万寿路支行)","titlename":"中国民生银行(北京万寿路支行)"}
+
+//PostMessage,打开视频播放窗口!!
+//下载完毕  清理DownloadMap!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+void* GetSessionDialogByID(std::string sSessionID);
+void* GetSessionDialogByID(std::string sSessionID)
+{
+
+}
+
+	userinfo 头像修改时间比较机制
+	上传头像改为直角
+	audio max width: body width*
+	点击非登陆用户的头像BUTTON,应该弹出ImageBrowser,而非头像编辑窗口. BUG!
+	查看更多-->音频消息定义的msgtype等要统一起来!
+	"系统九部" 全拼可以搜出来, 简拼搜索不出来.
 	cef中的音视频展示; 播放机制
+	消息体需要添加的成员: audiosrc 
+	注意更新cef中的css/html后,C++代码中需要改动的地方:(一改多改,表明代码需要优化了!!!!)
+		BOOL SessionLayout::_DisplayMsgToIE(IN MessageEntity msg);
+		BOOL SessionLayout::_DisplayMsgToIE(IN MessageEntity msg, Json::Value& value);
+		BOOL SessionLayout::_DisplayUnreadMsg();
+		void SessionLayout::_DisplayHistoryMsgToIE(IN UInt32 nMsgCount,BOOL scrollBottom);
+		void SessionLayout::DoDisplayHistoryMsgToIE(std::vector<MessageEntity>& msgList, BOOL scrollBottom, int hisBtnStatus);
+		BOOL CMessageManageWnd::_DisplayMsgToIE(MessageEntity& msg);
 		
+
+
+	tpl_grp_me_message3 没有arrow 难道没有使用这个template? 或者 动态又创建了?
+	群聊不用显示密级(因为都是非密)
+	1. 宽度用百分比表示,这样当窗口大小改变后，能够自动相应地改变大小;（）
+	2. 音频在preload就要获取宽度;
+	3. float控件如何没有设置width,就会自动应用"包裹性";(设置audio宽度百分比,前提是父控件的宽度是可计算的,不能使包裹的, 否则因为无法计算导致设置的audio的宽度百分比无效)
+	4. 互斥播放Audio机制;
+	js对象方法不支持自身递归;
+	js在不播放的前提下获取audio长度的方法为递归调用自身（一般在第二次才能正确获取）;
+	小喇叭UI方向反了;
+	微信视频SIZE: 137*226;(后期给定一个最大的BOX, 然后保持视频宽高比缩放)
+
+	chat.html
+	left:-55px; 现在的位置左移55px;
+	width:80% 相对父容器的宽度,如果实际填充内容小于这个长度，则取小的;(流式布局自动调整)相当于max-width,但是第一级div貌似是严格按照百分比设置位置的，下面的就不是了。写个Demo!!!!!!!!
+	class:befoe在每个class标记的元素的内容之前插入新内容：
+	background:url(img/secret.png) 0 10px  no-repeat;// 0 10px是backgroundPosition属性; 所以SecretLevel图才会有空白区域
 	
+*************
 待测试:
-	
-	
+*************
+	module-msgview.js 中的方法 直接用function定义一个再return的时候调用一下不行吗? 不必非得写成var funcName = function()吧? 但是有啥区别? funcName都作为函数的操作符。
 
+	音频展现  视频展现 位置展现
+	以下哪种效率更高? sql 先过滤再关联 还是 先关联再过滤 
+		理论上先过滤再联接效率更高, 但是sql解释器可能会内部优化，导致效率一样.
+		闪信中,WebSocket在消息发送阶段，负责监听，比如A给B发了一条消息，websocket监听到之后，通知B你有一条新消息，然后B去取消息;
+		
+	设置flex后,clip:rect(top right bottom left);不起作用, 必须position:absolute? CSS的clip属性只在position:absolute/fixed的元素上才会生效.
+.mijiico {background-image:url(img/secret.png);width:15px;height:17px;background-repeat:no-repeat;}
+.miji01.mijiico {background-position: 0px 0px;}
+不同的密级能正常展示吗?
+Video Length Format;
 
+*************
 待进行:
+*************
+	凭什么我的生命要由别人来主宰?!
 	
-	Split 效率提升! 利用sqlite? codec;	
+	https://www.cnblogs.com/xiaoqi/p/weex-hackernews-code-part1.html weex demo
+	http://blog.csdn.net/isaisai/article/details/43023163 CSS 波浪选择器
+	http://www.w3school.com.cn/cssref/css_selectors.asp CSS所有的选择器
+	sqlite3/postgres json http://www.sqlite.org/json1.html
+	像微信那样,把图片和视频的浏览器集成在一起，实现策略之一是:把当前这个Session的所有的缩略图都加载到内存, 浏览到某个图片/视频时采取下载! 下载在这个浏览中进行! 也会有一个进度展示?
+	BaseLayout* SessionDialogManager::findSessionDialogBySId(IN const std::string& sId);//sessionList居然使用std::list,使用std::unordered_map!
+	pan.baidu.com 网盘Tab下Scroll Bar是自定制的! HOW?
+	pan.baidu.com能够启动windows客户端，如何做到的?
+	http://www.ruanyifeng.com/blog/2015/03/react.html react native
+	Qt VS reactNative http://www.reactnative.com/a-deep-dive-into-react-native/  https://softwareengineering.stackexchange.com/questions/88685/why-arent-more-desktop-apps-written-with-qt/88689
+	https://www.cnblogs.com/think_fish/p/3800241.html JS冷门技巧  成熟的UI Front（NATIVE Web各自前行，无统一标准，且规模小，圆角锯齿等需要自绘技巧）
+	https://www.cnblogs.com/henw/archive/2011/12/19/2293585.html js window client width height
+	http://www.html5tricks.com/cool-useful-css3-tab-menu.html css tab control;
+	像微信那样的：圆角也是图片的一部分，而非纯色。
+		思路之一：web canvas自绘, Texture Brush;
+	http://www.jiawin.com/css-before-after
+	https://www.zhihu.com/question/27818548
+	http://www.myexception.cn/HTML-CSS/2016458.html
+	控件使用了float之后, 即使div即使设置了display:block; 也不会换行了, 只有在放不下的时候才会自动换行;
+	默认的标准流式布局(float="none"),块级元素的宽度自动伸展,所以会有换行的效果;设置了float之后,宽度不再自动扩展,所以就不会自动换行了.
+	https://www.jianshu.com/p/067b1be1271a
+	一改多改,表明代码需要优化了!!!! _DisplayMesssageToIE();
+	input type="file"
+	学习这个weixinAudio jQuery对象的封装方法;
+	js: new function();创建了一个对象;
+	js 多线程 SetTimerOut(); 有没有类似Java/C++等的多线程?
+	http://www.ruanyifeng.com/blog/2012/07/three_ways_to_define_a_javascript_class.html js class
+	https://www.cnblogs.com/ellisonDon/archive/2012/08/12/2634503.html JQUERY 给对象扩展方法
+	UIIMEdit Caret闪烁频繁;
+	Image Browser左右箭头需要点两次才响应一次BUG;(充分利用sql)
+	Split 效率提升! 利用sqlite? codec;
+	VMWARE 3 NETWORK CONFIG
+	GitHub - weolar/miniblink49 wke的升级版 miniblink
+	http://blog.csdn.net/yunchao_he/article/details/41697489 BLINK
+	http://blog.csdn.net/weolar/article/details/52456886 VC6编译才是王道
+	soui2 text控件的属性 pos text等设置;
+	soui %ver% 如何使用? 在哪里定义?
+	soui如何区分控件不同类型的消息? soui除了用name还可以用id处理事件吗? (duilib 可以用pSender msgtype来区分)
+	非对称公钥体制
+	nmake cmake makefile
+	https://mp.weixin.qq.com/s?__biz=MjM5MDE3OTk2Ng==&mid=2657433218&idx=3&sn=8b4a3cc48ad8ee6ec9e90e8a1b0697b5&chksm=bdd921938aaea885038930d3a0355ec32d39fb5095b1cb7972b7377e3db77fadc7f5e99d0d3d&scene=0#rd
+	查看下微信网页版的实现源码  webapp可以做的这么流畅 NATIVE
+	http://web.jobbole.com/85083/ class:before :after
+	https://www.cnblogs.com/ILYljhl/p/3171320.html before after
+	https://zhidao.baidu.com/question/139363143.html   什么是内联对象
+	https://zhidao.baidu.com/question/650846897098593885.html?qbl=relate_question_4&word=%C4%DA%C1%AA%B6%D4%CF%F3 inline-block
+	http://www.zhangxinxu.com/wordpress/2010/11/%E6%8B%9C%E6%8B%9C%E4%BA%86%E6%B5%AE%E5%8A%A8%E5%B8%83%E5%B1%80-%E5%9F%BA%E4%BA%8Edisplayinline-block%E7%9A%84%E5%88%97%E8%A1%A8%E5%B8%83%E5%B1%80/ inline-block list
+	https://jingyan.baidu.com/article/7f41ececcf637a593d095cfd.html !important
+	https://zhidao.baidu.com/question/311666643.html 两个类的选中
+	https://www.zhihu.com/question/26880548 <i> 斜体 用作 icon
 	
-
 
 开发支持存在的问题:
 	测试账号因为是公用的、且频繁更改密码，即使自己用时间长了也会记不清密码。
@@ -176,6 +487,7 @@ POST方式当然也可以放在field里面;
 MD5 多少位?
 128位是指二进制位。二进制太长，所以一般都改写成16进制，每一位16进制数可以代替4位二进制数，所以128位二进制数写成16进制就变成了128/4=32位。
 https://www.cnblogs.com/swarmbees/p/5621586.html C/C++ 读取二进制文件
+
 
 
 http://blog.csdn.net/harvic880925/article/details/9115125 GDI REGION
@@ -253,3 +565,101 @@ std::function register callback function demo!
 sqlite pg 对比着写
 sql regex 查询语言 proc
 python lua js
+
+sql进阶教程 pdf 图灵
+http://blog.csdn.net/lucienduan/article/details/38233147 VMWARE 3 KINS OF NETWORK WAY
+https://www.2cto.com/database/201505/402743.html SQL WITHAS
+http://blog.csdn.net/yongan1006/article/details/11205787 SQL TREE
+https://www.cnblogs.com/infozr/archive/2012/12/27/2835084.html SQL TREE
+http://blog.csdn.net/jmppok/article/details/18794623 CXIMAGE COMPILATION
+http://blog.sina.com.cn/s/blog_4a4a511d0102e2e0.html 五笔记忆
+http://music.163.com/#/playlist?id=962637148 节奏 寂静岭2
+https://www.liaoxuefeng.com/article/0014171500694729a42a2c8b7f245e0bd54612c88d78a03000 廖雪峰 Clojure
+http://blog.csdn.net/onafioo/article/details/36635231  当前进程占用的内存
+http://blog.csdn.net/anda0109/article/details/40075925 整个内存的使用情况
+http://www.mamicode.com/info-detail-1454109.html C++ %I64d
+http://web.jobbole.com/86734/ Web Front大牛必读书籍
+http://www.hankcs.com/nihongonote/ 码农日语大牛
+
+
+***********
+Five Slash!
+***********
+《满庭芳》
+满
+　　一、收集书中妙言诗句挑选如下，请选用：
+　　1、开篇诗：
+　　混沌未分天地乱，茫茫渺渺无人见。
+　　自从盘古破鸿蒙，开辟从兹清浊辨。
+　　覆载群生仰至仁，发明万物皆成善。
+　　欲知造化会元功，须看西游释厄传。
+　　2、第一回中描写水帘洞的五律：
+　　一派白虹起，千寻雪浪飞；海风吹不断，江月照还依。
+　　冷气分青嶂，馀流润翠微；潺湲名瀑布，真似挂帘帷。
+　　3、第一回中《满庭芳》
+　　观棋柯烂，伐木丁丁，云边谷口徐行。卖薪沽酒，狂笑自陶情。
+　　苍径秋高，对月枕松根，一觉天明。认旧林，登崖过岭，持斧断枯藤。
+　　收来成一担，行歌市上，易米三升。更无些子争竞，时价平平。
+　　不会机谋巧算，没荣辱，恬淡延生。相逢处，非仙即道，静坐讲《黄庭》。
+　　4、第三回中七律：
+　　炮云起处荡乾坤，黑雾阴霾大地昏。江海波翻鱼蟹怕，山林树折虎狼奔。
+　　诸般买卖无商旅，各样生涯不见人。殿上君王归内院，阶前文武转衙门。
+　　千秋宝座都吹倒，五凤高楼幌动根。
+　　5、第八回中《苏武慢》
+　　试问禅关，参求无数，往往到头虚老。
+　　磨砖作镜，积雪为粮，迷了几多年少？
+　　毛吞大海，芥纳须弥，金色头陀微笑。
+　　悟时超十地三乘，凝滞了四生六道。
+　　谁听得绝想崖前，无阴树下，杜宇一声春晓？
+　　曹溪路险，鹫岭云深，此处故人音杳。
+　　千丈冰崖，五叶莲开，古殿帘垂香袅。
+　　那时节，识破源流，便见龙王三宝。
+　　6、第八回中《福诗》
+　　福星光耀世尊前，福纳弥深远更绵。福德无疆同地久，福缘有庆与天连。
+　　福田广种年年盛，福海洪深岁岁坚。福满乾坤多福荫，福增无量永周全。
+　　7、第八回中《禄诗》
+　　禄重如山彩凤鸣，禄随时泰祝长庚。禄添万斛身康健，禄享千钟世太平。
+　　禄俸齐天还永固，禄名似海更澄清。禄恩远继多瞻仰，禄爵无边万国荣。
+　　8、第八回中《寿诗》
+　　寿星献彩对如来，寿域光华自此开。寿果满盘生瑞霭，寿花新采插莲台。
+　　寿诗清雅多奇妙，寿曲调音按美才。寿命延长同日月，寿如山海更悠哉。
+　　9、第九回中《蝶恋花》
+　　烟波万里扁舟小，静依孤篷，西施声音绕。涤虑洗心名利少，闲攀蓼穗蒹葭草。
+　　数点沙鸥堪乐道，柳岸芦湾，妻子同欢笑。一觉安眠风浪俏，无荣无辱无烦恼。
+　　10、第九回中《蝶恋花》
+　　云林一段松花满，默听莺啼，巧舌如调管。红瘦绿肥春正暖，倏然夏至光阴转。
+　　又值秋来容易换，黄花香，堪供玩。迅速严冬如指拈，逍遥四季无人管。
+　　11、第九回中《鹧鸪天》
+　　仙乡云水足生涯，摆橹横舟便是家。活剖鲜鳞烹绿鳖，旋蒸紫蟹煮红虾。
+　　青芦笋，水荇芽。
+　　12、第九回中《鹧鸪天》
+　　崔巍峻岭接天涯，草舍茅庵是我家。腌腊鸡鹅强蟹鳖，獐把兔鹿胜鱼虾。
+　　香椿叶，黄楝芽，竹笋山茶更可夸。紫李红桃梅杏熟，甜梨酸枣木樨花。
+　　13、第九回中《天仙子》
+　　一叶小舟随所寓，万迭烟波无恐惧。
+　　垂钩撒网捉鲜鳞，没酱腻，偏有味，老妻稚子团圆会。
+　　鱼多又货长安市，换得香醪吃个醉。
+　　蓑衣当被卧秋江，鼾鼾睡，无忧虑，不恋人间荣与贵。
+　　14、第九回中《天仙子》
+　　茆舍数椽山下盖，松竹梅兰真可爱。
+　　穿林越岭觅干柴，没人怪，从我卖，或少或多凭世界。
+　　将钱沽酒随心快，瓦钵磁瓯殊自在。
+　　窍菘醉了卧松阴，无挂碍，无利害，不管人间兴与败。
+　　15、第九回中《西江月》
+　　红蓼花繁映月，黄芦叶乱摇风。碧天清远楚江空，牵搅一潭星动。
+　　入网大鱼作队，吞钩小鳜成丛。得来烹煮味偏浓，笑傲江湖打哄。
+　　16、第九回中《西江月》
+　　败叶枯藤满路，破梢老竹盈山。女萝干葛乱牵攀，折取收绳杀担。
+　　虫蛀空心榆柳，风吹断头松楠。采来堆积备冬寒，换酒换钱从俺。
+　　17、第九回中《临江仙》
+　　潮落旋移孤艇去，夜深罢棹歌来。
+　　蓑衣残月甚幽哉，宿鸥惊不起，天际彩云开。
+　　困卧芦洲无个事，三竿日上还捱。
+　　随心尽意自安排，朝臣寒待漏，争似我宽怀？
+　　18、第九回中《临江仙》
+　　苍径秋高拽斧去，晚凉抬担回来。
+　　野花插鬓更奇哉，拨云寻路出，待月叫门开。
+　　稚子山妻欣笑接，草床木枕欹捱。
+　　蒸梨炊黍旋铺排，瓮中新酿熟，真个壮幽怀！”
+　　二、扩展知识：《西游记》简介
+　　《西游记》这本书出自明代小说家吴承恩之手，出版署名：华阳洞天主人。是中国古典四大名著之一、中国古代第一部浪漫主义长篇神魔小说，深刻描绘了社会现实，是魔幻现实主义的开创作品。主要描写了孙悟空、猪八戒、沙僧三人保护唐僧西行取经，唐僧从投胎到取经八十一受难，一路降妖伏魔，九九归一，终于上了西天见到如来佛祖。取材于《大唐西域记》和民间传说、元杂剧。宋代《大唐三藏取经诗话》（本名《大唐三藏取经记》）是西游记故事见于说话文字的最早雏形。自《西游记》问世以来在民间广为流传，各式各样的版样层出不穷，明代刊本有六种，清代刊本、抄本也有七种，典籍所记已佚版本十三种。鸦片战争以后，中国古典文学作品大量被译为西文，西渐欧美，已有英、法、德、意、西、世（世界语）、斯（斯瓦希里语）、俄、捷、罗、波、日、朝、越等文种。并发表了不少研究论文和专著，对这部小说作出了极高的评价。

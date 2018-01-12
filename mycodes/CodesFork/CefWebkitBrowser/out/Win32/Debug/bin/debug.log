@@ -27,3 +27,5 @@
 [1102/153949:ERROR:angle_platform_impl.cc(33)] ANGLE Display::initialize error 5: DXGI 1.2 required to present to HWNDs owned by another process.
 [1102/153949:ERROR:gl_surface_egl.cc(513)] eglInitialize D3D11 failed with error EGL_NOT_INITIALIZED, trying next display type
 [1102/153949:ERROR:proxy_service_factory.cc(136)] Cannot use V8 Proxy resolver in single process mode.
+[0108/092542:ERROR:proxy_service_factory.cc(136)] Cannot use V8 Proxy resolver in single process mode.
+[0108/092619:ERROR:proxy_service_factory.cc(136)] Cannot use V8 Proxy resolver in single process mode.

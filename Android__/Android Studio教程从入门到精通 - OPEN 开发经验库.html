@@ -1,0 +1,979 @@
+
+<!DOCTYPE HTML>
+<html>
+<head  lang="cn">
+	<title>Android Studio教程从入门到精通  - OPEN 开发经验库</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta name=keywords content="Android Studio,Android Studio开发工具">
+	<meta name=description content="目标：Android Studio新手–&gt;下载安装配置–&gt;零基础入门–&gt;基本使用–&gt;调试技能–&gt;构建项目基础–&gt;使用AS应对常规应用开发 
+
+">
+	<link rel="shortcut icon" href="/lib/favicon.ico">
+	<link rel=copyright href="http://www.open-open.com/">
+
+	<link href="//cdn.bootcss.com/highlight.js/9.2.0/styles/idea.min.css" rel="stylesheet">
+	<link href="//cdn.bootcss.com/jqueryui/1.11.4/jquery-ui.min.css" rel="stylesheet">
+	
+	<link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+	<link href="//cdn.bootcss.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="/lib/css/jquery-confirm.css" rel="stylesheet">
+	<link href="http://www.open-open.com/resource/styles.css" rel="stylesheet">
+
+	<style type="text/css" media="screen, projection">
+		/*<![CDATA[*/
+		@import "/lib/css/common.css";
+		@import "/lib/css/main.css";
+		@import "/lib/css/jGrowl.css";
+		/*]]>*/
+		.articleIndex li.active a {
+			color: #0099ff;
+		}
+	</style>
+	<style type="text/css">
+		.topheader h1{font-size: 24px;margin: 0;}
+		.crumbs{padding-bottom: 5px;font-size: 11px;}.crumbs,.crumbs a,.meta{color: #bbb;}
+		#tag-list{margin-top: 10px;}
+		#tag-list a{background: #fff;padding: 2px 10px;text-decoration: none;}
+		#tag-list a:hover{background: #c5e2ff;color: #0099ff;}
+		.crumbs a:hover{color: #0099ff;}
+		#readercontainer{background: #fff;padding: 40px 89px;}
+
+		.post-nav ul{
+			margin: 0;
+		}
+		.post-nav>ul>li a{
+			padding-left: 10px;
+		}
+		.post-nav>ul>li>ul>li a{
+			padding-left: 30px;
+		}
+		.post-nav>ul>li>ul>li>ul>li a{
+			padding-left: 50px;
+		}
+		.post-nav ul li.active a{
+			border-left: 2px solid #0099ff;
+		}
+
+		.aside-fixed {
+			left: 50%;
+			margin-left: 310px;
+			position: fixed;
+			top: 65px;
+			width: 260px;
+		}
+		.bdsharebuttonbox {
+			background: #eee none repeat scroll 0 0;
+			margin-top: 10px;
+			padding: 10px;
+			width: 100%;
+		}
+
+	</style>
+
+	<script type="text/javascript">
+		if(window.location.toString().indexOf('pref=padindex') != -1){
+		}else{
+			if(/AppleWebKit.*Mobile/i.test(navigator.userAgent) || (/MIDP|SymbianOS|NOKIA|SAMSUNG|LG|NEC|TCL|Alcatel|BIRD|DBTEL|Dopod|PHILIPS|HAIER|LENOVO|MOT-|Nokia|SonyEricsson|SIE-|Amoi|ZTE/.test(navigator.userAgent))){
+				if(window.location.href.indexOf("?mobile")<0){
+					try{
+						if(/Android|Windows Phone|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)){
+							window.location.href="http://m.open-open.com/m/lib/view/1433387390635.html";
+						}else if(/iPad/i.test(navigator.userAgent)){
+							window.location.href="http://m.open-open.com/m/lib/view/1433387390635.html"
+						}else{
+							window.location.href="http://m.open-open.com/m/lib/view/1433387390635.html"
+						}
+					}catch(e){}
+				}
+			}
+		}
+	</script>
+
+
+	<script type="text/javascript">
+		var rooturl="/lib";
+		var wgDocKey='1433387390635';
+		var wgDocTitle='Android Studio教程从入门到精通 ';
+		var wgDocStatusFlag='';
+		var wgUserFolders=null;
+		var wgDownFrame=null;
+		var wgCostByUser=null;
+		var wgDocFavoriteByUser=false;
+		var wgDocScoreByUser=null;
+		var wgUserLogined=0;
+		var tb_pathToImage = "/lib/images/loadingAnimation.gif";
+
+
+	</script>
+
+
+
+
+</head>
+<body id=view>
+
+
+<style>
+	.global-tags{background: #333;color: #ababab;height: 30px;line-height: 30px;width: 100%;}
+	.global-tags .container{position: relative;}
+	.global-tags ul{ height: 30px; margin: 0; overflow: hidden;}
+	.global-tags a{color:#ababab;padding: 5px; }
+	.global-tags a:hover{color:#e0e0e0; }
+	.global-tags li { display: inline-block; padding: 0; }
+	.global-tags  .more { background-color: #333; height: 30px; position: absolute; right: 0; top: 0; width: 30px; }
+	.global-tags  .more:before { background-image: linear-gradient(90deg, rgba(0, 95, 60, 0), #333); background-size: 100% auto; content: ""; height: 100%; left: -20px; position: absolute; top: 0; width: 20px; }
+
+	/* menu */
+	.all-sort{z-index: 100;position: absolute;left: 15px;top: 30px;display: none;}
+	.all-sort-head{background: #ff3c00; color: #fff; margin-right: 20px; text-align: center; width: 160px;float: left;}
+	.all-sort-head a{color: #fff;}
+	.item-list .subitem{float:left;padding:20px;}
+	.all-sort-list{position:relative;width:160px;border:2px solid #393939;border-top:none;background:#393939;float: left;z-index: 100;}
+	.all-sort-list .item .parent{font-weight: 700;border: none;width: 120px;text-align: right;margin-right: 2px;}
+	.all-sort-list .item .parent i{font: 400 9px/14px consolas; height: 14px; margin-left: 10px; width: 4px;}
+	.all-sort-list .item.bo{border-top:none;}
+	.all-sort-list .item h3{height:40px;line-height:40px;font-size:14px;font-weight:normal;width:158px;overflow:hidden; color:#ffffff;margin: 0;}
+	.all-sort-list .item h3 a{color: #ffffff;}
+	.all-sort-list .item:hover h3,.all-sort-list .item:hover span,.all-sort-list .item:hover h3 a,.all-sort-list .item .active ,.all-sort-list .item .active a,.all-sort-list .item .active span{color:#E4393C;}
+	.all-sort-list .item span{padding:0px 5px;color:#ffffff;font-family:"\5B8B\4F53";}
+	.all-sort-list .item a{text-decoration:none;}
+	.all-sort-list .subitem a{ float: left;  margin:5px 20px 5px 0;border-left:1px solid #eee;line-height: 14px;height: 20px;}
+	.all-sort-list .item a:hover{color:#E4393C;}
+	.all-sort-list .item:hover h3,.all-sort-list .item .active{position:relative;z-index:13;background:#FFF;border-color:#DDD;border-width:1px 0px;border-style:solid;}
+	.all-sort-list .item-list{ display:none; position:absolute; width:705px; min-height:360px; _height:360px; background:#FFF; left:157px;  border:1px solid #DDD; top:0; z-index:10; }
+
+</style>
+
+
+<header class="site-header">
+	<div class="header-top ">
+		<div class="header-top-inner">
+			<div class="" style="margin: 0 30px;">
+				<div class="row">
+					
+						<div class="header-talet pull-left">
+							<a  href="http://www.open-open.com/">首页</a> &nbsp;
+							<a class="" href="http://www.open-open.com/code/">代码</a> &nbsp;
+							<a class="" href="http://www.open-open.com/doc/">文档</a> &nbsp;
+							<a title='OPEN论坛频道' href="http://www.open-open.com/solution/">问答</a> &nbsp;
+							<a title="OPEN资讯" class="" href="http://www.open-open.com/news/">资讯</a> &nbsp;
+							<a title="OPEN经验库" class="active" href="http://www.open-open.com/lib/" >经验</a> &nbsp;
+							<a title="GitHub日报" class="" href="http://www.open-open.com/github/">GitHub日报</a>
+							&nbsp;|&nbsp;
+							<a  class="active" title=" 安卓开发专栏" target="_blank" href="http://www.open-open.com/lib/list/177">安卓开发专栏</a>
+							&nbsp;|&nbsp;
+							<a class="active" href="/lib/tag/开发者周刊"  target="_blank"  rel="tag">开发者周刊</a>&nbsp;|&nbsp;
+							<a class="active" href="http://www.open-open.com/lib/view/open1475497562965.html"  target="_blank"  rel="tag">Android Studio 使用推荐</a>&nbsp;|&nbsp;
+							<a class="active" href="http://www.open-open.com/lib/view/open1475497355674.html"  target="_blank"  rel="tag">Android开发推荐</a>
+							
+						</div>
+					
+						<div class="user-info pull-right" id="Personal">
+							
+								<a href="#" title="登录OPEN经验库" class="login">登录</a>&nbsp;&nbsp;
+								<a href="#" title="注册新的账号" class="register">注册</a>
+							
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<nav class="navbar ">
+		<div class="container">
+			<div class="navbar-header" style="margin-right: 30px;">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+						aria-expanded="false" aria-controls="navbar">
+					<span aria-hidden="true" class="glyphicon glyphicon-menu-hamburger"></span>
+					<span aria-hidden="true" class="glyphicon glyphicon-menu-up"></span>
+				</button>
+				<a class="top-logo" href="//www.open-open.com/lib"><span>www.open-open.com/lib</span></a>
+				<span style="font-size: 26px;color: #db6d4c">OPEN经验</span>
+				<span style="font-size: 12px;color: #b5b5b5"></span>
+			</div>
+
+			<div class="pull-right" style="padding: 20px;">
+				<button class="btn btn-info br40" id="upload" type="button">投稿</button>
+			</div>
+			<div id="search">
+				<form onsubmit="document.charset='utf-8';" accept-charset="utf-8" method="post" action="/lib/query" name="sf">
+					<input type="hidden" value="all" name="site">
+					<div class="input-group">
+						<input type="text" x-webkit-speech="" placeholder="经验搜索" class="form-control" name="q" id="kw">
+                      <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                      </span>
+
+					</div>
+				</form>
+
+				<!-- /input-group -->
+
+			</div>
+
+		</div>
+	</nav>
+	<div class="global-tags">
+		<div class="container">
+			<div class="all-sort-head"><a href="/lib/list/all">全部经验分类</a>&nbsp;<i aria-hidden="true" class="fa fa-toggle-down"></i></div><div class="all-sort"><div class="all-sort-list"><div data-submenu-id="submenu1" class="item bo"><h3><span>·</span><a href="/lib/list/1">软件开发</a></h3><div id="submenu1" class="item-list clearfix"><div class=" subitem"><a href="/lib/list/405">VR</a><a href="/lib/list/2">Web框架</a><a href="/lib/list/3">GUI开发框架</a><a href="/lib/list/4">图表/报表制作</a><a href="/lib/list/5">搜索引擎</a><a href="/lib/list/6">模板引擎</a><a href="/lib/list/7">缓存组件</a><a href="/lib/list/8">Ajax框架</a><a href="/lib/list/9">XML操作类库</a><a href="/lib/list/10">HTML操作类库</a><a href="/lib/list/12">文件上传</a><a href="/lib/list/347">3D图形处理库</a><a href="/lib/list/14">图形/图像处理</a><a href="/lib/list/15">常用工具包</a><a href="/lib/list/16">JSON开发包</a><a href="/lib/list/353">OAuth开发包</a><a href="/lib/list/17">PDF工具包</a><a href="/lib/list/18">Flex开发</a><a href="/lib/list/19">Office文档处理</a><a href="/lib/list/20">日志处理</a><a href="/lib/list/21">网络工具包</a><a href="/lib/list/22">多媒体处理</a><a href="/lib/list/23">WEB服务/RPC/SOA</a><a href="/lib/list/24">RSS/ATOM相关</a><a href="/lib/list/25">持久层框架</a><a href="/lib/list/26">作业调度框架</a><a href="/lib/list/27">工作流引擎</a><a href="/lib/list/28">业务规则引擎</a><a href="/lib/list/29">面向方面AOP/IoC</a><a href="/lib/list/30">JEE框架</a><a href="/lib/list/31">安全相关</a><a href="/lib/list/32">OpenID/单点登录SSO</a><a href="/lib/list/34">条形码/二维码开发包</a><a href="/lib/list/35">验证码(Captcha)</a><a href="/lib/list/96">网络爬虫</a><a href="/lib/list/214">OSGi</a><a                            href="/lib/list/237">网络技术</a><a href="/lib/list/324">Google相关API</a><a href="/lib/list/328">Swing开发包</a><a href="/lib/list/332">HTML编辑器</a><a href="/lib/list/337" style="color:#FF3C00">JavaScript开发工具包</a><a href="/lib/list/352">TTS/语音合成和处理</a><a href="/lib/list/367">游戏开发</a><a href="/lib/list/370">加密/解密软件包</a><a href="/lib/list/374">源代码语法着色</a><a href="/lib/list/376">WebSocket 开发</a><a href="/lib/list/381">MathML显示与编辑</a><a href="/lib/list/383">计算机视觉库/人脸识别</a><a href="/lib/list/385">XML-RPC 开发</a><a href="/lib/list/386">Markdown处理库</a><a href="/lib/list/387">神经网络</a><a href="/lib/list/389">多媒体播放器</a><a href="/lib/list/391">推荐引擎</a><a href="/lib/list/394">机器学习</a><a href="/lib/list/401">算法</a></div><div class="cat-right"></div></div></div><div data-submenu-id="submenu2" class="item "><h3><span>·</span><a href="/lib/list/36">开发语言与工具</a></h3><div id="submenu2" class="item-list clearfix"><div class=" subitem"><a href="/lib/list/406">R语言</a><a href="/lib/list/37" style="color:#FF3C00">Java开发</a><a href="/lib/list/38">.NET开发</a><a href="/lib/list/39">PHP开发</a><a href="/lib/list/40">C/C++开发</a><a href="/lib/list/42">Ruby开发</a><a href="/lib/list/43">Python开发</a><a href="/lib/list/148">ActionScript开发</a><a href="/lib/list/145" style="color:#FF3C00">JavaScript开发</a><a href="/lib/list/44">Perl开发</a><a href="/lib/list/263">Delphi开发</a><a href="/lib/list/243">Erlang开发</a><a href="/lib/list/211">Google Go/Golang开发</a><a href="/lib/list/201">Scala开发</a><a href="/lib/list/240">Lua开发</a><a href="/lib/list/392">Apple Swift开发</a><a href="/lib/list/301">Objective-C开发</a><a href="/lib/list/45">BUG跟踪管理</a><a href="/lib/list/294">Lisp开发</a><a href="/lib/list/46">项目构建</a><a href="/lib/list/41">移动开发</a><a href="/lib/list/47">单元测试</a><a href="/lib/list/48">测试工具</a><a href="/lib/list/49">性能测试和优化</a><a href="/lib/list/50">程序调试</a><a href="/lib/list/51">代码混淆和加密</a><a href="/lib/list/52">UML/模型工具</a><a href="/lib/list/53">安装制作</a><a href="/lib/list/54">代码分析/审查/优化</a><a href="/lib/list/55">前端技术</a><a href="/lib/list/179">Eclipse开发工具</a><a href="/lib/list/205">IntelliJ IDEA</a><a href="/lib/list/281">NetBeans</a><a href="/lib/list/349">程序文档工具</a><a href="/lib/list/361">语法/词法分析器</a><a href="/lib/list/362">脚本/动态语言</a><a href="/lib/list/364">持续集成系统</a><a href="/lib/list/375">Web开发工具</a><a href="/lib/list/388">Node.js 开发</a><a href="/lib/list/395">中文分词</a><a href="/lib/list/399" style="color:#FF3C00">Android Studio开发工具</a></div><div class="cat-right"></div></div></div><div data-submenu-id="submenu3" class="item "><h3><span>·</span><a href="/lib/list/57">网站系统</a></h3><div id="submenu3" class="item-list clearfix"><div class=" subitem"><a href="/lib/list/58">论坛系统BBS</a><a href="/lib/list/59">建站系统CMS</a><a href="/lib/list/60">电子商务/商城</a><a href="/lib/list/61">SNS社交网络/交友平台</a><a href="/lib/list/62">百科系统Wiki</a><a href="/lib/list/63">门户平台Portal</a><a href="/lib/list/64">网络会议/视频会议</a><a href="/lib/list/65">相册/照片/多媒体系统</a><a href="/lib/list/66">微博工具/系统</a><a href="/lib/list/363">博客系统</a><a href="/lib/list/379">开源问答系统</a></div><div class="cat-right"></div></div></div><div data-submenu-id="submenu4" class="item "><h3><span>·</span><a href="/lib/list/67">企业应用</a></h3><div id="submenu4" class="item-list clearfix"><div class=" subitem"><a href="/lib/list/68">ERP/CRM</a><a href="/lib/list/69">OA办公/协作平台</a><a href="/lib/list/70">WebMail系统</a><a href="/lib/list/71">地理信息系统GIS</a><a href="/lib/list/72">数据挖掘</a><a href="/lib/list/73">文档管理</a><a href="/lib/list/74">项目/任务管理</a><a href="/lib/list/333">教学科研相关</a><a href="/lib/list/357">开源SIP项目</a><a href="/lib/list/368">计算机辅助设计CAD/CAM</a></div><div class="cat-right"></div></div></div><div data-submenu-id="submenu5" class="item "><h3><span>·</span><a href="/lib/list/75">服务器软件</a></h3><div id="submenu5" class="item-list clearfix"><div class=" subitem"><a href="/lib/list/76">应用服务器</a><a href="/lib/list/77">Web服务器</a><a href="/lib/list/78">FTP服务器</a><a href="/lib/list/79">邮件服务器</a><a href="/lib/list/80">缓存服务器</a><a href="/lib/list/81">版本控制系统</a><a href="/lib/list/82">路由器/防火墙</a><a href="/lib/list/83">电话/通讯/IM聊天</a><a href="/lib/list/84">集群/负载均衡</a><a href="/lib/list/85">流媒体服务器</a><a href="/lib/list/86">消息系统</a><a href="/lib/list/220">分布式/云计算/大数据</a><a href="/lib/list/298">企业服务总线ESB</a><a href="/lib/list/321">建站服务器套件</a><a href="/lib/list/348">虚拟化</a><a href="/lib/list/355">目录服务LDAP</a><a href="/lib/list/393">容器系统</a></div><div class="cat-right"></div></div></div><div data-submenu-id="submenu6" class="item "><h3><span>·</span><a href="/lib/list/87">插件和扩展</a></h3><div id="submenu6" class="item-list clearfix"><div class=" subitem"><a href="/lib/list/88">Eclipse插件</a><a href="/lib/list/89">jQuery插件</a><a href="/lib/list/331">Node.js扩展</a><a href="/lib/list/338">jQuery分页插件</a><a href="/lib/list/346">Prototype扩展</a><a href="/lib/list/356">Chrome插件/扩展</a></div><div class="cat-right"></div></div></div><div data-submenu-id="submenu7" class="item "><h3><span>·</span><a href="/lib/list/90">数据库相关</a></h3><div id="submenu7" class="item-list clearfix"><div class=" subitem"><a href="/lib/list/91">数据库服务器</a><a href="/lib/list/92">数据库管理工具</a><a href="/lib/list/93">数据库驱动程序</a><a href="/lib/list/94">数据库建模</a><a href="/lib/list/122">数据库连接池</a><a href="/lib/list/154">SQL</a><a href="/lib/list/307">NoSQL数据库</a></div><div class="cat-right"></div></div></div><div data-submenu-id="submenu8" class="item "><h3><span>·</span><a href="/lib/list/155">操作系统</a></h3><div id="submenu8" class="item-list clearfix"><div class=" subitem"><a href="/lib/list/156">Linux</a><a href="/lib/list/182">CentOS</a><a href="/lib/list/183">Ubuntu</a><a href="/lib/list/224">UNIX</a><a href="/lib/list/251">Fedora</a><a href="/lib/list/274">FreeBSD</a><a href="/lib/list/310">Solaris</a><a href="/lib/list/311">openSUSE</a><a href="/lib/list/312">Debian</a><a href="/lib/list/313">OpenBSD</a></div><div class="cat-right"></div></div></div><div data-submenu-id="submenu9" class="item "><h3><span>·</span>其他分类</h3><div id="submenu9" class="item-list clearfix"><div class=" subitem"><p class="clearfix"><a href="/lib/list/159" class="parent">软件开发管理<i>></i></a><a href="/lib/list/174">敏捷开发</a><a href="/lib/list/178">项目管理</a><a href="/lib/list/196">软件架构</a><a href="/lib/list/296">软件测试</a></p><p class="clearfix"><a href="/lib/list/319" class="parent">管理和监控<i>></i></a><a href="/lib/list/320">系统监控</a><a href="/lib/list/360">日志分析和统计</a><a href="/lib/list/366">备份工具</a></p><p class="clearfix"><a href="/lib/list/322" class="parent">应用工具<i>></i></a><a href="/lib/list/323">磁盘/光驱工具</a><a href="/lib/list/359">文档/文本编辑</a><a href="/lib/list/384">终端/远程登录</a></p><p class="clearfix"><a href="/lib/list/329" class="parent">游戏相关<i>></i></a><a href="/lib/list/330">网页游戏</a></p></div><div class="cat-right"></div></div></div></div></div>
+			<ul class="nav__list">
+				<li class="nav__item " >
+
+				</li>
+				<li class="nav__item"><i class="fa fa-tags"></i></li>
+
+				<li class="nav__item"><a href="/lib/tag/Android"  rel="tag">Android</a></li>
+				<li class="nav__item"><a href="/lib/tag/IOS"  rel="tag">IOS</a></li>
+				<li class="nav__item"><a href="/lib/tag/JavaScript"  rel="tag">JavaScript</a></li>
+				<li class="nav__item"><a href="/lib/tag/HTML5"  rel="tag">HTML5</a></li>
+				<li class="nav__item"><a href="/lib/tag/CSS"  rel="tag">CSS</a></li>
+				<li class="nav__item"><a href="/lib/tag/jQuery"  rel="tag">jQuery</a></li>
+				<li class="nav__item"><a href="/lib/tag/Python"  rel="tag">Python</a></li>
+				<li class="nav__item"><a href="/lib/tag/PHP"  rel="tag">PHP</a></li>
+				<li class="nav__item"><a href="/lib/tag/NodeJS"  rel="tag">NodeJS</a></li>
+				<li class="nav__item"><a href="/lib/tag/Java"  rel="tag">Java</a></li>
+				<li class="nav__item"><a href="/lib/tag/Spring"  rel="tag">Spring</a></li>
+				<li class="nav__item"><a href="/lib/tag/MySQL"  rel="tag">MySQL</a></li>
+				<li class="nav__item"><a href="/lib/tag/MongoDB"  rel="tag">MongoDB</a></li>
+				<li class="nav__item"><a href="/lib/tag/Redis"  rel="tag">Redis</a></li>
+				<li class="nav__item"><a href="/lib/tag/NOSQL"  rel="tag">NOSQL</a></li>
+				<li class="nav__item"><a href="/lib/tag/Vim"  rel="tag">Vim</a></li>
+				<li class="nav__item"><a href="/lib/tag/C++"  rel="tag">C++</a></li>
+				<li class="nav__item"><a href="/lib/tag/C#"  rel="tag">C#</a></li>
+				<li class="nav__item"><a href="/lib/tag/JSON"  rel="tag">JSON</a></li>
+				<li class="nav__item"><a href="/lib/tag/Ruby"  rel="tag">Ruby</a></li>
+				<li class="nav__item"><a href="/lib/tag/Linux"  rel="tag">Linux</a></li>
+				<li class="nav__item"><a href="/lib/tag/Nginx"  rel="tag">Nginx</a></li>
+				<li class="nav__item"><a href="/lib/tag/Docker"  rel="tag">Docker</a></li>
+				<li class="more"></li>
+
+			</ul>
+
+		</div>
+	</div>
+</header>
+
+
+
+<div class="topheader" style="background: #eee;padding: 10px 0 30px;">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-9">
+				<div class="crumbs">
+					<a href="/lib/list/all">所有分类</a>
+					
+						&nbsp;&gt;&nbsp;
+						<a href="/lib/list/36">开发语言与工具</a>
+					
+						&nbsp;&gt;&nbsp;
+						<a href="/lib/list/399">Android Studio开发工具</a>
+					
+				</div>
+				<h1 id="articleTitle" >Android Studio教程从入门到精通 </h1>
+				<div class="meta" style="margin-top: 10px;">
+					<span id="tag-list">
+					
+						<a href="/lib/tag/Android Studio">Android Studio</a>
+					
+					</span>&nbsp;
+
+					<span class=item>2015-06-04 11:23:43 发布</span>
+				</div>
+
+
+			</div>
+			<div  class="col-md-3">
+				<table>
+					<tbody>
+					<tr>
+						<td><strong>您的评价</strong>:</td>
+						<td>
+							<div id=rate class=rate-container><span id=star1 class=star-big-off title=很差>&nbsp;</span><span id=star2 class=star-big-off title=较差>&nbsp;</span><span id=star3 class=star-big-off title=还行>&nbsp;</span><span
+									id=star4 class=star-big-off title=不错>&nbsp;</span><span id=star5 class=star-big-off title=力荐>&nbsp;</span></div>
+						</td>
+						<td width=30>
+							<span id=score-num>4.7</span>
+						</td>
+						<td width=30>
+							<div id=rate-tip></div>
+						</td>
+
+					</tr>
+					</tbody>
+				</table>
+				<div id="favorite-container"><a id="favorite" href="javascript:void(0)" class="btn btn-default">收藏</a>&nbsp;&nbsp;&nbsp;&nbsp;
+					<span class=item>80收藏</span>
+					<div id=favorite-box>
+						<table>
+							<tbody>
+							<tr>
+								<td width=70 align=right>文件夹</td>
+								<td><select id=fav_folderlist name=folder>
+									<option selected value=0>请选择...</option>
+									<option id=newfolder-sp disabled value="">-------------</option>
+									<option value=-1>新增文件夹...</option>
+								</select></td>
+							</tr>
+							<tr style="display: none" id=newfolder-input>
+								<td align=right>新增文件夹</td>
+								<td><input id=fav_newfolder maxlength=50 type=text name=newfolder></td>
+							</tr>
+							<tr>
+								<td align=right>标签</td>
+								<td><input id=fav_tags maxlength=135 size=20 type=text name=tags></td>
+							</tr>
+							<tr>
+								<td></td>
+								<td colspan=2>(多个标签用逗号分隔)</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+<div class="container">
+<div class="row">
+
+		<div id="readercontainer"  class="col-md-9">
+				<article>
+					<html>
+ <head></head>
+ <body>
+  <p><strong>最新2.0系列文章参考：</strong></p> 
+  <p><a href="http://www.open-open.com/lib/view/open1468118887690.html">Android Studio2.0 教程从入门到精通Windows版 - 安装篇</a><br> <a href="http://www.open-open.com/lib/view/open1468121363300.html">Android Studio2.0 教程从入门到精通Windows版 - 入门篇</a><br> <a href="http://www.open-open.com/lib/view/open1468121618489.html">Android Studio2.0 教程从入门到精通Windows版 - 提高篇</a></p> 
+  <p><a href="http://www.open-open.com/lib/view/open1466430392743.html">Android Studio2.0 教程从入门到精通MAC版 - 安装篇</a><br> <a href="http://www.open-open.com/lib/view/open1466732896151.html">Android Studio2.0 教程从入门到精通MAC版 - 入门篇</a><br> <a href="http://www.open-open.com/lib/view/open1466732917214.html">Android Studio2.0 教程从入门到精通MAC版 - 提高篇</a></p> 
+  <p>目标：Android Studio新手–&gt;下载安装配置–&gt;零基础入门–&gt;基本使用–&gt;调试技能–&gt;构建项目基础–&gt;使用AS应对常规应用开发</p> 
+  <h2>AS简介</h2> 
+  <p>经过2年时间的研发，Google终于正式发布了面向Android开发者的集成开发环境Android Studio 1.2（稳定版）。Android Studio是Google开发的一款面向Android开发者的IDE，支持Windows、Mac、Linux等操作系统，基于流行的Java语言集成开发环境IntelliJ搭建而成。该IDE在2013年5月的Google I/O开发者大会上首次露面，当时的测试版各种莫名其妙的Bug，但是14年12月8日发布的版本是稳定版。Android Studio 1.0推出后，Google官方将逐步放弃对原来主要的Eclipse ADT的支持，并为Eclipse用户提供了工程迁移的解决办法。不过相信作为Developer的你上手AS 1.0以后你再也不愿意使用原来苦逼的Eclipse+ADT了，你会被AS的各种强大所吸引。</p> 
+  <h2>下载安装</h2> 
+  <p>下载AS前先说下，AS安装包分为含SDK版本和不含SDK版本下载，如果你有SDK，那么完全可以下载不含SDK版本；不过下载了含SDK版本也没事，安装时选择自定义SDK也可以，安装后重新指定SDK路径也可以，总之看个人爱好喽。先吐槽下天朝的强大吧，不得不拜服天朝的墙。如果你有梯子请去 Android Developer下载最新版的AS安装包，如果你没有梯子那也有个办法，就是去Android Studio中文社区官网下载你的平台需要的安装包。</p> 
+  <p>下载下来以后安装的过程可以忽略了吧，能安装的都是程序猿吧，所以安装这点就不说了，注意已经正确安装配置了JDK。</p> 
+  <p>安装好了以后首次运行AS可能一直停在Fetching Android SDK component information。如下界面：</p> 
+  <p><img alt="AS" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110503_395.png"></p> 
+  <p>这是因为天朝的墙真的太高太厚把首次运行更新SDK给墙了。解决办法就是关闭安装向导，如果无法关闭可以在任务管理器中手动关掉进程（Ctrl+Alt+Del启动任务管理器），然后打开AS安装目录下的bin目录里面的idea.properties文件，添加一条禁用开始运行向导的配置项：</p> 
+  <pre>
+disable.android.first.run=true</pre> 
+  <p>然后再启动程序就会打开项目向导界面，这个时候如果点击Start a new Android Studio project是没有反应的，并且在Configure下面的SDK Manager是灰色的，这是因为没有安装Android SDK的缘故。这时候一般有两种做法：</p> 
+  <p>然后再启动程序就会打开项目向导界面，这个时候如果点击Start a new Android Studio project是没有反应的，并且在Configure下面的SDK Manager是灰色的，这是因为没有安装Android SDK的缘故。这时候一般有两种做法：</p> 
+  <ol> 
+   <li> <p>自己没有SDK，需要从网络下载；打开向导的Configure-Settings，在查找框里面输入proxy，找到下面的HTTP Proxy，设置代理服务器，并且将Force https://… sources to be fetched using http://选中，然后退出将上面在idea.properties配置文件中添加的那条配置项注释掉重新打开Android Studio等刚开始的向导把Android SDK下载安装完成就可以了。</p> </li> 
+   <li> <p>自己有SDK，重新指定SDK路径；打开向导的Configure-&gt;Project Defaults-&gt;Project Structure，在此填入你已有的SDK路径。</p> </li> 
+  </ol> 
+  <p>此时重启AS就可以在向导里新建Android工程喽。至此整个安装过程结束。</p> 
+  <h2>基本使用介绍</h2> 
+  <p>首先新建工程，输入工程名和主包名和存储路径；点击next到如图步骤：</p> 
+  <p><img alt="AD" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110605_920.png"></p> 
+  <p>上图中首先你可选择你的App要适配的设备是Wear还是Mobile还是TV。在你新建App选择最低适配版本时，强大的AS会给你一些有用的统计提示，如图描述了当前版本的用户情况，点击Help me choose后弹出如下更加形象的分布图表描述：</p> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110638_314.png"></p> 
+  <p>爱不释手的亮点就是这么一步一步比Eclipse强大的，这只是一些不值得一提的小点而已，强大的功能还在后面。继续点击Next选择形象友好的GUI模板，点击完成进入工程初始化过程。</p> 
+  <p>第一次安装工程初始化时由于需要联网下载gradle会比较慢，不过有时候不是第一也会慢，工程依赖的gradle版本不匹配时也会自动重新下载；我的初始化很快，原因是我本地的gradle-2.2-all.zip之前已经下载OK的。至于啥时gradle后文会有说明。这儿只是告诉你若果你看到卡一会儿时正常的。</p> 
+  <p>接下来进入到了工程界面下：</p> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110650_536.png"></p> 
+  <p>这个创建过程可比Eclipse上长的多。主要是因为从gradle上下载。gradle也可以手动离线下载好放在对应目录下。工程的结构和 Eclipse上的不同，src下分为java和res。AS是基于idea，而idea和eclipse有大的区别，有好处也有不好的地方，在一段时间里，idea被认为是开发java最好用强大的ide工具，所以AS新建的时候有new application和new module开发。idea没有工作空间这样的说法。这就是Eclipse用户切换过来第一个比较不适应的地方。</p> 
+  <p>具体说就是：</p> 
+  <ol> 
+   <li>android studio是单工程的开发模式</li> 
+   <li>android studio中的application相当于eclipse里的workspace概念</li> 
+   <li>android studio中的module相当于eclipse里的project概念</li> 
+  </ol> 
+  <p>有了如上三条概念自己手动创建摸索下，相信聪明的你自然就明白咋回事了吧。</p> 
+  <p>接下来看一些工欲善其事必先利其器的基本高频率实用设置：</p> 
+  <ol> 
+   <li> <p>中文乱码—–在窗口中，找到IDE Settings-&gt;Appearance，在右侧勾选上“Override default fonts by”，然后在第一个下拉框中选择字体为“simsun”，然后apply，重启IDE，就好了。</p> </li> 
+   <li> <p>设置快捷键—–在settings窗口中，找到IDE Settings-&gt;keymap，右侧打开的就是快捷键了。右键单击要修改的快捷键，会弹出一个菜单，选择“Add keyboard shortcut”就可以修改快捷键了。删除的话，在弹出的菜单中选择remove XXX即可。特别说明，在AS的快捷键设置里可以直接设置使用Eclipse快捷键还是别的IDE快捷键。如果你热衷Eclipse那么也可设置成Eclipse的快捷键。</p> </li> 
+   <li> <p>修改主题—–在IDE Settings-&gt;Appearance，右侧的Theme选择自己喜欢的主题即可。个人比较喜欢Darcula主题，也就是如上截图样式。</p> </li> 
+   <li> <p>如何将Eclipse工程导入AS使用—–选择File-&gt;Import Project，在弹出的菜单中选择要导入的工程即可，选择好以后就直接next，在第二个窗口中也选择默认的第一个选项就可以。需要注意的是，在AS中，有两种工程，一个是Project，一个是Module，上面已经细说过了。</p> </li> 
+   <li> <p>导入jar包—–选择File-&gt;Projcet Structure，在弹出的窗口中左侧找到Libraries并选中，然后点击“+”，并选择Java就能导入Jar包了。或者直接拷贝jar文件到项目的libs文件夹下，然后运行：Sync Project with Gradle Files。然后clean project重新编译。</p> </li> 
+   <li> <p>删除项目—–AS对工程删除做了保护机制，默认你在项目右键发现没有删除选项。你会发现你的module上面会有一个小手机，这是保护机制。删除的第一步就是去掉保护机制，也就是让手机不见，具体做法就是鼠标放在工程上右键-&gt;open module setting，或者F4进入如图界面，选中你要删除的module，然后点击减号，这样就取消了保护机制，然后回到项目工程右键就可发现删除选项。注意：删除会将源文件删除。</p> </li> 
+  </ol> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110703_19.png"></p> 
+  <h2>入门总结</h2> 
+  <p>到此为止AS的基本情况相信你已经有个大致了解了。具体比Eclipse的优势体现在如下几点：</p> 
+  <ol> 
+   <li> <p>AS是Google专门为Android基于IntelliJ IDEA打造的利器。亲生的永远是最好的，只是现在还在成长中而已。</p> </li> 
+   <li> <p>AS在速度上不管哪一个方面都比Eclipse快。</p> </li> 
+   <li> <p>Darcula主题UI简直就是极客范，帅爆了。</p> </li> 
+   <li> <p>强大的智能提示补全功能在写代码时简直比Eclipse高效率N倍。</p> </li> 
+   <li> <p>智能保存，不需要Ctrl + S。效率会大大提升。</p> </li> 
+   <li> <p>整合Gradle构建工具，Gradle集合了Ant和Maven的优点，不管是配置、编译、打包都非常牛逼。</p> </li> 
+   <li> <p>UI编辑器简直比Eclipse高效N倍，自带了多设备的实时预览，简直是神器。多语言适配点击地球直接输入，再也不用比较那个string没有翻译了。</p> </li> 
+   <li> <p>内置终端直接替代cmd命令行，一个IDE全部搞定。</p> </li> 
+   <li> <p>完善的插件系统，如Git、Markdown、Gradle等，直接搜索下载。</p> </li> 
+   <li> <p>版本控制系统，安装的时候就自带GitHub, Git, SVN等流行的版本控制系统，可以直接check out你的项目，边写代码边右键可以直接具备BCompare功能与其他版本进行对比修改。</p> </li> 
+  </ol> 
+  <p>总之就一句话，相信我，若果你和我一样是Eclipse用户切换过来，那么你绝对不会再切换回去，你会爱上AS的。</p> 
+  <h2>Android Studio目录结构</h2> 
+  <p>新建工程项目后AS的Product目录结构如下所示：</p> 
+  <pre>
+    .idea：//AS生成的工程配置文件，类似Eclipse的project.properties。
+    app：//AS创建工程中的一个Module。
+    gradle：//构建工具系统的jar和wrapper等，jar告诉了AS如何与系统安装的gradle构建联系。
+    External Libraries：//不是一个文件夹，只是依赖lib文件，如SDK等。</pre> 
+  <p>&nbsp;</p> 
+  <p>新建工程项目后AS的Module目录结构如下所示：</p> 
+  <p>&nbsp;</p> 
+  <pre>
+    build：//构建目录，相当于Eclipse中默认Java工程的bin目录，鼠标放在上面右键Show in Exploer即可打开文件夹，
+        编译生成的apk也在这个目录的outs子目录，不过在AS的工程里是默认不显示out目录的，就算有编译结果也
+        不显示，右键打开通过文件夹直接可以看。
+    libs：//依赖包，包含jar包和jni等包。
+    src：//源码，相当于eclipse的工程。
+    main：//主文件夹 
+        java：//Java代码，包含工程和新建是默认产生的Test工程源码。 
+        res：//资源文件，类似Eclipse。
+            layout：//App布局及界面元素配置，雷同Eclipse。
+            menu：//App菜单配置，雷同Eclipse。 
+            values：//雷同Eclipse。
+                dimens.xml：//定义css的配置文件。 
+                strings.xml：//定义字符串的配置文件。 
+                styles.xml：//定义style的配置文件。
+                ......：//arrays等其他文件。
+            ......：//assets等目录
+        AndroidManifest.xml：//App基本信息（Android管理文件） 
+        ic_launcher-web.png：//App图标 
+    build.gradle：//Module的Gradle构建脚本</pre> 
+  <p>&nbsp;</p> 
+  <p>&nbsp;</p> 
+  <p>&nbsp;</p> 
+  <h2>Android Studio开发调试使用</h2> 
+  <p>Android Studio调试其实也非常方便，一般问题直接通过AS的DDMS的Logcat就可以搞定。AS支持类似Eclipse的DDMS的所有功能。这里要说的是疑难问题的调试方式，即断点调试。</p> 
+  <p>首先先编译好要调试的程序。</p> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110725_719.png"></p> 
+  <p>如上图2所示在行号处点击设置断点。然后如1所示点击开启调试会话。</p> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110736_926.png"></p> 
+  <p>如上图所示，IDE下方出现Debug视图，1指向的是现在调试程序停留的代码行，2区域是程序的方法调用栈区。在这个区域中显示了程序执行到断点处所调用过的所用方法，越下面的方法被调用的越早。由此顺序想必有些Android深入功底了解一点Android系统启动流程的就知道这几个方法咋回事，怎么到Activity的onCreate的。哈哈，说到系统了。不扯了。3是一些调试按钮，快捷键放在上面直接会显示。4和5是一些变量观察区。</p> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110751_535.png"></p> 
+  <p>上图中：</p> 
+  <p>点击1指向的按钮，程序向下执行一行，如果当前行有方法调用，这个方法将被执行完毕返回，然后到下一行。</p> 
+  <p>点击2指向的按钮，程序向下执行一行。如果该行有自定义方法，则运行进入自定义方法（不会进入官方类库的方法）。</p> 
+  <p>点击3钮在调试的时候能进入任何方法。</p> 
+  <p>点击4的作用是如果在调试的时候你进入了一个方法(如debugFunc)，并觉得该方法没有问题，你就可以使用4跳出该方法，返回到该方法被调用处的下一行语句。值得注意的是，该方法已执行完毕。</p> 
+  <p>点击5指向的按钮后，你将返回到当前方法的调用处重新执行，并且所有上下文变量的值也回到那个时候。只要调用链中还有上级方法，可以跳到其中的任何一个方法。</p> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110804_257.png"></p> 
+  <p>如上图设置多个断点，开启调试。想跨断点移动到下一个断点，点击如下图1箭头，程序将运行一个断点到下一个断点之间需要执行的代码。如果后面代码没有断点，再次点击该按钮将会执行完程序。点击箭头2指向的按钮，可以查看你曾经设置过的断点并可设置断点的一些属性，如下图所示。调试开始后，在 Variables区域可以给指定的变量赋值（鼠标左键选择变量，右键弹出菜单选择setValue…）。这个功能可以更加快速的检测你的条件语句和循环语句。点击箭头3加号或者在调试的代码变量上右键添加watcher即可查看跟踪变量值。</p> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110819_931.png"></p> 
+  <p>上图箭头1指向的是你曾经设置过的断点，箭头2可以设置条件断点（满足某个条件的时候，暂停程序的执行，如 index==5）。结束调试后，应该在箭头1处把所设的断点删除(选择要删除的断点后，点击上方的红色减号）。</p> 
+  <p>以上便是AS的一些调试使用技巧。</p> 
+  <h2>Android Studio构建系统基础</h2> 
+  <p>基础知识</p> 
+  <p>项目创建成功后会自动下载Gradle，这个过程特别慢，建议科学上网。下载的Gradle在Windows平台会默认在 C:\Documents and Settings\&lt;用户名&gt;.gradle\wrapper\dists目录，这个目录下有个gradle-x.xx-all的文件夹,。也可以自己手动到Gradle官网下载对应的版本，然后将下载的.zip文件(也可以解压)复制到上述的gradle-x.xx-all 文件夹下。</p> 
+  <p>每一个Module都需要有一个gradle配置文件，语法都是一样，唯一不同的是开头声明的是apply plugin。注意区分不同位置的build.gradle文件。</p> 
+  <p>AS的工程根目录下的build.gradle文件：</p> 
+  <pre>
+    buildscript {       //设置脚本的运行环境
+        repositories {  //支持java依赖库管理（maven/ivy等）,用于项目的依赖
+            //mavenCentral()    //仅仅是不同的网络仓库而已
+            jcenter()           //推荐使用这个仓库
+        }
+        //依赖包的定义。支持maven/ivy、远程、本地库、单文件，前面定义了repositories{}jcenter库，使用jcenter的依赖只需要按照
+        //类似于com.android.tools.build:gradle:1.0.0-rc2，gradle就会自动的往远程库下载相应的依赖。
+        dependencies {  
+            classpath 'com.android.tools.build:gradle:1.0.0-rc2'
+
+            // NOTE: Do not place your application dependencies here; they belong
+            // in the individual module build.gradle files
+        }
+    }
+    //多项目的集中配置，多数构建工具，对于子项目的配置，都是基于继承的方式。Gradle除了提供继承方式设置子项目，还提供这种配置
+    allprojects {
+        repositories {
+            jcenter()
+        }
+    }</pre> 
+  <p>&nbsp;</p> 
+  <p>AS的工程根目录下的settings.gradle文件：</p> 
+  <p>&nbsp;</p> 
+  <pre>
+include ':app' //module  include ':my_lib' //module(build as lib)</pre> 
+  <p>AS的工程根目录下的Module的build.gradle文件（此处以一个简单的Lib module的gradle为例）：</p> 
+  <pre>
+    //plugin在AS里取值一般为'com.android.library'或者'com.android.application'
+    apply plugin: 'com.android.library' //构建为lib
+
+    android {
+        compileSdkVersion 17            //编译需要SDK版本
+        buildToolsVersion "19.1.0"      //SDK Manager确定本地安装该版本才可以
+
+        defaultConfig {
+            minSdkVersion 8         //最小版本
+            targetSdkVersion 17     //目标版本
+        }
+
+        buildTypes {                //编译项
+            release {
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            }
+        }
+    }
+
+    dependencies {                  //依赖支持
+        compile 'com.android.support:support-v4:18.+'
+    }</pre> 
+  <p>&nbsp;</p> 
+  <p>Gradle打包APP签名</p> 
+  <p>默认情况下，debug被配置成使用一个debug keystory。debug keystory使用了默认的密码和默认key及默认的key密码。debug构建类型会自动使用debug签名配置。在你的Module的build.gradle文件中添加：</p> 
+  <pre>
+    android {
+        ......
+        signingConfigs {
+           myConfig{
+             storeFile file("yanbober.keystore")
+                storePassword "gradle"
+                keyAlias "gradle"
+                keyPassword "gradle"
+            }
+        }
+
+       buildTypes{
+         release {
+            runProguard true
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            signingConfig  signingConfigs.myConfig
+         } 
+       }
+    }</pre> 
+  <p>&nbsp;</p> 
+  <p>虽然经常使用项目根目录的相对路径作为keystore的路径，但是也可以使用绝对路径，尽管这并不推荐（除了自动创建出来的debug keystore）。运行gradle clean gradle build即可生成签名混淆对齐的app。</p> 
+  <p>&nbsp;</p> 
+  <p>Gradle构建Android应用多渠道包（批量打包）</p> 
+  <p>Android应用的发布需要面对各种各样的市场，我们称之为渠道。通常作为开发者我们需要知道应用是从哪个渠道下载的。这种统计信息一般常用的是百度统计或者友盟统计。这里举例时使用友盟统计为例说明问题。原理是Gradle的Manifest Merger。</p> 
+  <p>在AndroidManifest.xml里配置所谓的PlaceHolder。</p> 
+  <pre>
+&lt;meta-data android:name="CHANNEL" android:value="${CHANNEL_VALUE}" /&gt;</pre> 
+  <p>在模块build.gradle文件的defaultConfig加上PlaceHolder，作用是声明CHANNEL_VALUE是可替换值的PlaceHolder，同时为其设置yanbober默认值。</p> 
+  <pre>
+    android {
+        ......
+
+        defaultConfig {
+            ......
+            manifestPlaceholders = [ CHANNEL_VALUE:"yanbober" ]
+        }   
+    }</pre> 
+  <p>&nbsp;</p> 
+  <p>在模块的build.gradle文件里添加ProductFlavors配置。ProductFlavors其实就是可定义的product特性，与Manifest Merger使用就可以在一次编译过程中产生多个具有自己特性配置的版本。下面这个配置的作用就是为每个渠道包产生不同的CHANNEL_VALUE的值。</p> 
+  <p>&nbsp;</p> 
+  <pre>
+    android {
+        ......
+
+        defaultConfig {
+            ......
+            manifestPlaceholders = [ CHANNEL_VALUE:"yanbober" ]
+        }   
+        productFlavors {
+            yanbober{}
+            wandoujia{}
+            xiaomi{}
+            baidu{}
+        }
+        productFlavors.all { flavor -&gt;
+            flavor.manifestPlaceholders = [ CHANNEL_VALUE:name ]
+        }
+    }</pre> 
+  <p>&nbsp;</p> 
+  <p>批量生成多渠道包：进入工程目录下运行gradlew assembleRelease。可以看到编译一共产生了4个apk，分别对应在productFlavors段定义的4个渠道。反编译打开 AndroidManifest.xml就会发现CHANNEL这一段的配置已经被修改。</p> 
+  <p>&nbsp;</p> 
+  <p>生成单个渠道包：打开AS的Gradle Tasks面板模块有很多任务，直接双击对应的耽搁渠道任务生成对应的apk。用命令行单独生成xiaomi渠道使用gradlew assemblexiaomiRelease就好了。</p> 
+  <p>好了，Gradle的基本情况就说到这，具体可以阅读官网或者查阅其他资料，Gradle的使用需要经验的积累。</p> 
+  <h2>Android Studio插件安装及使用Genymotion模拟器</h2> 
+  <p>Android Studio自带的模拟器速度已经比Eclipse插件的快一点了，但是还不够暴力，不够爽。现在来说说最暴力的Genymotion模拟器如何结合AS 使用。首先上Genymotion官网下载安装Genymotion，同时你需要在Genymotion官网官网上注册一个账号，这样你才能正常的使用 Genymotion。</p> 
+  <p>进入AS的Settings界面左侧找到Plugins，点击下图箭头Button（也就是在线安装）：</p> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110844_5.png"></p> 
+  <p>顺便说下上图界面也就是AS安装插件的通用方法，可以看见当前已经安装了的插件，选择在线安装或者从硬盘安装，即针对你已经下载好了的插件，可通过这项选择到你下好的插件，进行安装。</p> 
+  <p>如下图所示在1区输入插件名字，2区选中，3区下载安装，然后返回后在AS工具栏上可以看见Genymotion小图标，也就是箭头4指的那个玩意，说明安装OK。</p> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110859_503.png"></p> 
+  <p>接下来就是设置下Genymotion，新建一个虚拟机设备，这是Genymotion的东西，至于怎么弄Step by Step就行，没啥难度。完事点击AS上模拟器图标就可以启动使用了，运行AS程序选择模拟器就可以在模拟器看见自己程序了，下图就是 Genymotion启动起来的界面。</p> 
+  <p><img alt="这里写图片描述" src="http://static.open-open.com/lib/uploadImg/20150604/20150604110911_797.png"></p> 
+  <p>至此快速模拟器Genymotion已经搞定，提升你的速度。其他的插件安装也就触类旁通了。</p> 
+  <h2>其他</h2> 
+  <p>其他的也就是快捷键啥玩意的了。这东西就得自己积累慢慢整了，纯属积累熟练。诡异的问题就自行google和度娘了。其实到现在版本的AS还是有一些Bug的，但是满足基本需求了，遇见Bug查阅修改绕过或者使用大招—-重启AS一般就能解决，其他的诡异问题欢迎讨论共同成长。</p> 
+  <p>PS：其他问题上AD就行了，这文章基本也就是AD的翻译版加上自己遇到的蛋疼问题的汇总了。</p> 
+  <p>总之你会爱上他的。</p> 
+  <h2>Android Studio总结</h2> 
+  <p>到此你已经可以顺利使用Android Studio进行应用程序开发。其他的问题相信聪明的您使用Google可以搞定，祝你好运！总之AS的强大需要你自己去慢慢探索，你会发现不知不觉你会爱上他的。<br> <br> 来自：<a href="http://blog.csdn.net/yanbober/article/details/45306483">http://blog.csdn.net/yanbober/article/details/45306483</a></p> 
+ </body>
+</html>
+				</article>
+
+
+
+
+		
+
+
+
+		</div>
+
+
+
+	<div  class="col-md-3">
+		<div class="bdsharebuttonbox">
+			<a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+			<a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+			<a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博"></a>
+			<a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网"></a>
+			<a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+
+		</div>
+		<script>document.write('<div style="margin-top: 20px;" class=" side-box"><a href="http://cloud.qy.com.cn/68?a=openopen" target="_blank"><img src="http://www.open-open.com/gg_images/cloud_qy_com_cn_313_250.gif" width="100%"></a></div>') </script>
+
+		<div class=" side-box" style="margin-top: 20px;">
+				<div class="title"><h3>同类热门经验</h3></div>
+				<ol class="hot">
+					
+						<li>
+							<a title=最强 Android Studio 使用小技巧和快捷键 href="/lib/view/open1458715872710.html"><span class=title>最强 Android Studio 使用小技巧和快捷键</span></a>
+						</li>
+					
+						<li>
+							<a title=最全面的Android Studio使用教程 href="/lib/view/open1416883124753.html"><span class=title>最全面的Android Studio使用教程</span></a>
+						</li>
+					
+						<li>
+							<a title=Android Studio - 基于IntelliJ IDEA全新的Android开发工具 href="/lib/view/open1368686066578.html"><span class=title>Android Studio - 基于IntelliJ IDEA全新的Android开发工具</span></a>
+						</li>
+					
+						<li>
+							<a title=Android Studio项目目录结构介绍 href="/lib/view/open1436323668817.html"><span class=title>Android Studio项目目录结构介绍</span></a>
+						</li>
+					
+						<li>
+							<a title=Android Studio 新手完全指引 href="/lib/view/open1434029865551.html"><span class=title>Android Studio 新手完全指引</span></a>
+						</li>
+					
+						<li>
+							<a title=Android Studio 入门指南 href="/lib/view/open1429521748151.html"><span class=title>Android Studio 入门指南</span></a>
+						</li>
+					
+
+				</ol>
+			</div>
+		<p class="aiBar"></p>
+		<div class=" side-box post-nav" style="margin-top: 20px;">
+			<div class="title"><h3>阅读目录</h3></div>
+			<ul class="articleIndex"></ul>
+		</div>
+	</div>
+
+
+
+</div>
+	</div>
+
+<div class="container">
+<script type="text/javascript">
+    var cpro_id = "u2690846";
+</script>
+<script type="text/javascript" src="http://cpro.baidustatic.com/cpro/ui/c.js"></script>
+
+	<div class="row">
+		<div class="col-md-9">
+			<table width='100%'><tr>
+				<td valign='top' width="33%" class="Relatedb">
+					<div style="border-bottom: 1px #ccc solid;margin-top: 5px"><strong>相关文档</strong> 　—　<a href="http://www.open-open.com/doc" rel="nofollow" target="_blank">更多</a></div>
+					<ul >
+						
+							<li><a  href="http://www.open-open.com/doc/view/db3e041cc65c4a2d98dae06e4669ea3e" rel="nofollow" target="_blank" title="Android Studio 入门指南 .pdf">Android Studio 入门指南 .pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/17f4eb99b1604884b26e6ef1ca91c909" rel="nofollow" target="_blank" title="android-studio详细教程.pdf">android-studio详细教程.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/72727aa7ab274ae0b039124d46bf6227" rel="nofollow" target="_blank" title="史上最详细的android-studio系列教程.pdf">史上最详细的android-studio系列教程.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/14527c569b0344f3b65105d39449b541" rel="nofollow" target="_blank" title="史上最详细的android studio系列教程.pdf">史上最详细的android studio系列教程.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/53903e5360ba44f2998544b393060ef5" rel="nofollow" target="_blank" title="Android Studio开发精要 .pdf">Android Studio开发精要 .pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/fa57693acead46afa68d86f8e6ed7c05" rel="nofollow" target="_blank" title="Android Studio Application  Development.pdf">Android Studio Application  Development.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/4b0a75867b534742a69c7ef5fe548ff1" rel="nofollow" target="_blank" title="Android Studio Development 精髓.pdf">Android Studio Development 精髓.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/db8b73b5b8074605b25137cf052c4ee9" rel="nofollow" target="_blank" title="Android Studio 游戏开发理念与设计.pdf">Android Studio 游戏开发理念与设计.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/9aa5ce9995be47f1bc77cc588db7dc6e" rel="nofollow" target="_blank" title="Android Studio 使用指南.pdf">Android Studio 使用指南.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/96a12850816a450fb87c84a4d78860bc" rel="nofollow" target="_blank" title="Android Studio 使用手册.pdf">Android Studio 使用手册.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/8267829b0caa4cb5be9d108bf393d64e" rel="nofollow" target="_blank" title="android studio 操作手册 - v1.1.pdf">android studio 操作手册 - v1.1.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/b5cfb51a05eb4eaaab65ea68a5759d69" rel="nofollow" target="_blank" title="Android Studio 使用指南(v0.1).pdf">Android Studio 使用指南(v0.1).pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/9cedc384c41842aa990a903f9f3adee0" rel="nofollow" target="_blank" title="Android Studio使用指南v0.1.pdf">Android Studio使用指南v0.1.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/01da38aa65dc4d2ea53b05e95a5c8c78" rel="nofollow" target="_blank" title="Android Studio 使用指南v0.1.pdf">Android Studio 使用指南v0.1.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/037eb14cda3e47ea80f6068cabe37792" rel="nofollow" target="_blank" title="Android编程实战.pdf">Android编程实战.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/fa50871cd56f4e478b9c8d2bd45d18f2" rel="nofollow" target="_blank" title="Android Studio 使用手册.pdf">Android Studio 使用手册.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/7eabc92c04d64fe4b2cbe6735c4bb874" rel="nofollow" target="_blank" title="Android Studio 使用指南(v0.2).pdf">Android Studio 使用指南(v0.2).pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/afe72b7eef574bfc9226198684e53e44" rel="nofollow" target="_blank" title="gradle_recipes_for_android.pdf">gradle_recipes_for_android.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/104ea129ac414e5dbfdd1d198c7b5413" rel="nofollow" target="_blank" title="android基础入门教程.pdf">android基础入门教程.pdf</a></li>
+						
+							<li><a  href="http://www.open-open.com/doc/view/8ce232e34c2644d1846756bec88cf748" rel="nofollow" target="_blank" title="C#开发Android应用实战.pdf">C#开发Android应用实战.pdf</a></li>
+						
+					</ul>
+				</td>
+				<td valign='top' width="33%" class="Relatedb">
+					<div style="border-bottom: 1px #ccc solid;margin-top: 5px"><strong>相关经验</strong> 　—　<a href="http://www.open-open.com/lib" rel="nofollow" target="_blank">更多</a></div>
+					<ul >
+						
+							<li >
+								<a title=Android Studio2.0 教程从入门到精通Windows版 - 安装篇 href="/lib/view/open1468118887690.html" target=_blank><span
+										class=title>Android Studio2.0 教程从入门到精通Windows版 - 安装篇</span></a>
+
+							</li>
+						
+							<li >
+								<a title=Android Studio2.0 教程从入门到精通Windows版 - 提高篇 href="/lib/view/open1468121618489.html" target=_blank><span
+										class=title>Android Studio2.0 教程从入门到精通Windows版 - 提高篇</span></a>
+
+							</li>
+						
+							<li >
+								<a title=Android Studio2.0 教程从入门到精通MAC版 - 安装篇 href="/lib/view/open1466430392743.html" target=_blank><span
+										class=title>Android Studio2.0 教程从入门到精通MAC版 - 安装篇</span></a>
+
+							</li>
+						
+							<li >
+								<a title=Android Studio2.0 教程从入门到精通Windows版 - 入门篇 href="/lib/view/open1468121363300.html" target=_blank><span
+										class=title>Android Studio2.0 教程从入门到精通Windows版 - 入门篇</span></a>
+
+							</li>
+						
+							<li >
+								<a title=Android Studio2.0 教程从入门到精通MAC版 - 入门篇 href="/lib/view/open1466732896151.html" target=_blank><span
+										class=title>Android Studio2.0 教程从入门到精通MAC版 - 入门篇</span></a>
+
+							</li>
+						
+							<li >
+								<a title=Android Studio2.0 教程从入门到精通MAC版 - 提高篇 href="/lib/view/open1466732917214.html" target=_blank><span
+										class=title>Android Studio2.0 教程从入门到精通MAC版 - 提高篇</span></a>
+
+							</li>
+						
+							<li >
+								<a title=Android Studio JNI开发入门教程 href="/lib/view/open1470560501408.html" target=_blank><span
+										class=title>Android Studio JNI开发入门教程</span></a>
+
+							</li>
+						
+							<li >
+								<a title=Android Studio 入门到精通 href="/lib/view/open1447139999522.html" target=_blank><span
+										class=title>Android Studio 入门到精通</span></a>
+
+							</li>
+						
+							<li >
+								<a title=如何自学Android编程 href="/lib/view/open1453443335761.html" target=_blank><span
+										class=title>如何自学Android编程</span></a>
+
+							</li>
+						
+							<li >
+								<a title=拥抱 Android Studio 之一：从 ADT 到 Android Studio href="/lib/view/open1449042857686.html" target=_blank><span
+										class=title>拥抱 Android Studio 之一：从 ADT 到 Android Studio</span></a>
+
+							</li>
+						
+							<li >
+								<a title=Android Studio 新手完全指引 href="/lib/view/open1434029865551.html" target=_blank><span
+										class=title>Android Studio 新手完全指引</span></a>
+
+							</li>
+						
+							<li >
+								<a title=拥抱Android Studio：从Eclipse到Android Studio的完美迁徙  href="/lib/view/open1452320531401.html" target=_blank><span
+										class=title>拥抱Android Studio：从Eclipse到Android Studio的完美迁徙 </span></a>
+
+							</li>
+						
+							<li >
+								<a title=Android Studio使用教程图文详解怎么用Android Studio href="/lib/view/open1434591422958.html" target=_blank><span
+										class=title>Android Studio使用教程图文详解怎么用Android Studio</span></a>
+
+							</li>
+						
+							<li >
+								<a title=Android Studio 入门指南 href="/lib/view/open1429521748151.html" target=_blank><span
+										class=title>Android Studio 入门指南</span></a>
+
+							</li>
+						
+					</ul>
+				</td>
+				<td valign='top' width="33%" class="Relatedb">
+					<div style="border-bottom: 1px #ccc solid;margin-top: 5px"><strong>相关讨论</strong> 　—　<a href="http://www.open-open.com/solution" rel="nofollow" target="_blank">更多</a></div>
+					<ul >
+						
+							<li >
+								<a title=Android Studio 快捷键使用总结 href="http://www.open-open.com/solution/view/1420701888328" rel="nofollow" target=_blank><span class=title>Android Studio 快捷键使用总结</span></a>
+							</li>
+						
+							<li >
+								<a title=Android 开发的昨天、今天和明天 href="http://www.open-open.com/solution/view/1425959113326" rel="nofollow" target=_blank><span class=title>Android 开发的昨天、今天和明天</span></a>
+							</li>
+						
+							<li >
+								<a title=Android studio快捷键  href="http://www.open-open.com/solution/view/1409715785963" rel="nofollow" target=_blank><span class=title>Android studio快捷键 </span></a>
+							</li>
+						
+							<li >
+								<a title=Android Studio常用快捷键  href="http://www.open-open.com/solution/view/1434186708442" rel="nofollow" target=_blank><span class=title>Android Studio常用快捷键 </span></a>
+							</li>
+						
+							<li >
+								<a title=Android的类库Picasso有哪些特性？ href="http://www.open-open.com/solution/view/1436521317380" rel="nofollow" target=_blank><span class=title>Android的类库Picasso有哪些特性？</span></a>
+							</li>
+						
+							<li >
+								<a title=介绍几款比较新颖的移动开发调试工具，支持android studio,eclipse href="http://www.open-open.com/solution/view/1450947761417" rel="nofollow" target=_blank><span class=title>介绍几款比较新颖的移动开发调试工具，支持android studio,eclipse</span></a>
+							</li>
+						
+							<li >
+								<a title=Android 简介 href="http://www.open-open.com/solution/view/1318854628046" rel="nofollow" target=_blank><span class=title>Android 简介</span></a>
+							</li>
+						
+					</ul>
+				</td>
+			</tr></table>
+		</div>
+
+	</div>
+
+</div>
+
+
+
+
+
+<style>
+	footer{background-color: #fff;
+		border-top: 1px solid rgba(230, 230, 230, 0.75);
+		margin-top: 20px;
+		padding: 20px 0;}
+</style>
+<footer>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4 col-xs-4" style="line-height: 60px;">
+				<span>&copy;2006-2016 深度开源 </span>
+			</div>
+			<div class="col-md-4 col-xs-4 text-center"><span>
+				<a rel="nofollow" href="http://www.open-open.com/" class="brightbox-logo"><img src="http://www.open-open.com/resource/logo-icon.png"  ></a>
+			</span></div>
+			<div class="col-md-4 col-xs-4"  style="line-height: 60px;">
+				 <a target="_blank" href="http://www.miibeian.gov.cn/">浙ICP备09019653号-31</a>
+				<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257892335'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s95.cnzz.com/z_stat.php%3Fid%3D1257892335' type='text/javascript'%3E%3C/script%3E"));</script>
+			</div>
+		</div>
+	</div>
+</footer>
+
+<script src="//cdn.bootcss.com/jquery/1.12.1/jquery.min.js"></script>
+<script type="text/javascript" src="/lib/js/jquery-confirm.js"></script>
+<script type="text/javascript" src="/lib/js/app.js?1603300956"></script>
+<script type="text/javascript" src="/lib/js/scrolltopcontrol.js"></script>
+<!-- the jScrollPane script -->
+<script type="text/javascript" src="/lib/js/jquery.contentcarousel.js"></script>
+
+<script type="text/javascript">
+	var rooturl="/lib";
+	var tb_pathToImage = "/lib/images/loadingAnimation.gif";
+	var jc = {};
+	$(function (){
+		$('#ca-container').contentcarousel();
+		$('.login').on('click', function () {
+			jc = $.dialog({
+				title: '&nbsp;',
+				content: '<iframe id="dialog" scrolling="no" style="width:100%;border:none;height:300px;" src="/lib/members/login?keepThis=true&TB_iframe=true&height=177&width=280"></iframe>',
+				animation: 'top',
+				columnClass: 'col-md-5 col-md-offset-3',
+				closeAnimation: 'top',
+				backgroundDismiss: true
+			});
+		});
+		$('.register').on('click', function () {
+			jc = $.dialog({
+				title: '&nbsp;',
+				content: '<iframe id="dialog" scrolling="no" style="width:100%;border:none;height:460px;" src="/lib/members/register?keepThis=true&TB_iframe=true&height=460&width=460"></iframe>',
+				animation: 'top',
+				columnClass: 'col-md-6 col-md-offset-3',
+				closeAnimation: 'top',
+				backgroundDismiss: true
+			});
+		});
+
+
+	});
+
+
+</script>
+
+<script src="//cdn.bootcss.com/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/lib/js/scrolltopcontrol.js"></script>
+<script type="text/javascript" src="/lib/js/view.js?1603300911"></script>
+
+<script type="text/javascript" src="/lib/js/jquery.jgrowl_minimized.js"></script>
+
+<script type="text/javascript">
+	scrolltotop.offset(95,165);
+	scrolltotop.init();
+</script>
+<script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();
+
+	(function(){
+		var c = new contentIndex();
+		c("article", ".articleIndex");
+		setAIActive();
+
+
+		$(window).scroll(function () {
+			if ($(window).scrollTop() > $(".aiBar").offset().top) {
+				$(".post-nav").addClass("aside-fixed");
+//          console.log($(window).scrollTop());
+			} else {
+//           console.log($(window).scrollTop());
+				$(".post-nav").removeClass("aside-fixed");
+			}
+		});
+		$("#readercontainer img").each(function(index, element) {
+			var $width=$("#readercontainer article").width();
+			if ( this.width>$width) {
+
+				this.height = this.height*$width/this.width;
+				this.width=$width;
+			}
+		});
+
+	})();
+</script>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+<script>
+	(function(){
+		var bp = document.createElement('script');
+		bp.src = '//push.zhanzhang.baidu.com/push.js';
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(bp, s);
+	})();
+</script>
+
+</body>
+</html>

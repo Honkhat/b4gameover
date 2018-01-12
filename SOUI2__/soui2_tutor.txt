@@ -46,18 +46,30 @@ HELLO WORLD DEMO
 	崩溃问题 处在text标签中的属性设置!
 
 3. ([COMMENT]顺利起见,把uires目录建在.vcproj所在的目录)
+
+	
+*********************
+xml文件的功能分发
+*********************
+uiresidx 文件映射(xml .png)
+init.xml 全局的资源(string font skin style objattr)
+
+
+***********
+SOUI FAQ
+***********
+EVENT_NAME_COMMAND 宏 都是用字符串类型的name来分发处理, 效率肯定没有ID高啊, 而且如何区分不同类型的事件?
 	创建uires目录;
 	xml注释前后2问号?
 	所有xml文件保存为UTF8 FORMAT;
 	标签定义Case Sensitive?
 	_skin.sys SOUI INTERNAL RES?
-	
-
-
 	ADD LOGO(IMITATE WITH 360PREVIEW)
-
 	soui的属性怎么设置, duilib是对应控件的SetAttribute()里面去看;
-	
-
+	font资源如何索引? style文件人如何share?(duilib style share demo-sinovision)
+	如何给窗体增加圆角？圆角有锯齿吗? 把Texture加进去! VGScene可能就是用的这种技术! PS可能也用的这种技术!
+	如何给窗体增加阴影?
+	Window标签是干啥用的? 源码定义文件
+	有Text控件,有Label控件吗? 它们之间关系(duilib CTextUI:public CLabelUI,感觉继承反了，这样导致的后果就是Text控件基本不被使用)
 从360preview入口,剖析源码,然后编译自己的MDd UNICODE x64 dll 版本
 然后自己demo使用! 扩展模块 render-vkn, render-ogl;rapid-xml;postgres,sqlite codec;
