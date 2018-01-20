@@ -49,7 +49,14 @@ B.5 如何禁止Android SDK自动更新?
 	发现默认是下载了一个Gradle的,在目录C:\Documents and Settings\bcer\.gradle\wrapper\dists\gradle-3.3-all\55gk2rcmfc6p2dg9u9ohc3hw9(此目录是隐藏目录,直接双击Documents and Setting拒绝访问), 需要直接粘贴跳过这级目录的地址到地址栏转到.
 	http://services.gradle.org/distributions/ 我下载了AS自动关联的gradle-3.3-all.zip.替换进去. 点击错误下面的"re-sync"link. OK.	
 	可能是文件损坏了? 反正替换了就好了。
-10. 
+10. Q: Android Studio每次创建一个新的工程或者导入一个工程,都会尝试"refreshing sdk", 如何禁止?
+    A: 断网,禁用本地连接即可. AS会自动不再尝试refreshing sdk.
+
+11. Q: 如果创建工程的时候不使用现成的模板（创建过程中不勾选模板）, 如何创建一个作为Launcher的MainActivity?
+    A: Android Studio是单工程开发模式(VS则是多工程、多解决方案开发模式), 严谨起见, 还是在目标级别右键-->Create Activity-->Empty Activity, 不勾选自动生成.xml文件, 勾选As Launcher Activity即可.
+
+
+
 
 
 

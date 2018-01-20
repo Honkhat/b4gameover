@@ -248,6 +248,44 @@ JavaScript单引号、双引号可以混合使用, same with Delphi.
 Q: 文字截断 ellipsis
 A: http://blog.csdn.net/liwenfei123/article/details/69666880
 
+Q: 展示一幅图片,如何保持宽高比缩放展示?
+A: 1. 将图片作为div的背景, js计算保持宽高比后的宽高,设置width/height,设置background-size:contain;
+   2. <img>设置max-width;自动保持宽高比缩放！
+
+Q: HTML 绘制一条直线.
+A: 水平直线 <hr> http://blog.csdn.net/lance_lot1/article/details/7921441 可以部分半透明
+   border-right:1px solid #000000
+   
+Q: Delphi Virtual Dynamic关联字的异同.
+A: 都是为了实现多态性。virtual关键字声明的方法在每个基类对象和派生对象的虚函数表中都有一份，dynamic则只在本类的对象中的虚函数表中。
+   virtual牺牲内存换取速度,dynamic牺牲速度换取内存.
+
+Q: css 缩进文本
+A: text-indent
+
+Q: JS发生错误可能的问题。
+A: 函数大小写;标签未结束;变量名重复;
+
+Q: Audio播放完毕的事件.
+A:
+<!DOCTYPE HTML>
+<html>
+<body>
+
+<audio id="audio" controls="true" autoplay="true">
+  <source src="/i/song.ogg" type="audio/ogg">
+  <source src="/i/song.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+<script>
+var audio = document.getElementById("audio"); 
+audio.loop = false;
+audio.addEventListener('ended', function () {  
+    alert('over');
+}, false);
+</script> 
+</body>
+</html>
 ***************
 #闪信#开发文档
 ***************
@@ -265,14 +303,22 @@ A: 下载的时候无后缀名".mp4", 下载完成添加后缀".mp4". 判断的�
 Q: 自定义消息ID冲突!
 A: >WM_USER的自定义消息一定要集中定义.
 
-Q: 展示一幅图片,如何保持宽高比缩放展示?
-A: 1. 将图片作为div的背景, js计算保持宽高比后的宽高,设置width/height,设置background-size:contain;
-   2. <img>设置max-width;自动保持宽高比缩放！
+Q: 每个用户对应的头像的文件何时在哪里生成? 命名规则?
+A: UserInfo::getAvatarPath();
 
-Q: HTML 绘制一条直线.
-A: 水平直线 <hr> http://blog.csdn.net/lance_lot1/article/details/7921441 可以部分半透明
-   border-right:1px solid #000000
-   
+Q: duilib限制CEditUI输入字符串的长度的属性.
+A: maxchar.
+
+Q: ReceiveMsgManage里的消息是哪里来的?
+A: 
+
+	void SessionModule_Impl::sessionMsgNotify(IN std::string userid, IN std::string notifyTime);
+	
+
+
+可以被审核的账号: wrp08@test.com/admin_1234
+
+
 ********************
 Forked Projects 
 ********************
@@ -289,18 +335,210 @@ Forked Projects
 ********************
 当前正在进行：
 ********************
-位置增加点击事件,弹出AnyWebBrowser.
-C++ json中添加 locTitle locCoTitle
+#BUG:
+	优化(复用)与CEF 交互的C++代码; 第一步 先把重复的代码提出来复用；第二步 理清功能 优化代码执行流程 清除无用代码
+	Solution: 
+#BUG:
+	浏览图像时，cef自动调整为图片的大小;
+	Solution: 加载一个ImageBrowser.html后, 调用CSS设置<img>的src(css使用flex布局).
+
+#BUG:
+	位置的历史消息文字丢失
+	Solution:没有保存到DB中去, std::string MessageEntity::getMessageJsonContent()//for DB.
+
+#BUG:
+	发送视频-->显示[图片] BUG! 
+	发送位置-->显示[图片] BUG!
+	Solution: void SessionModule_Impl::updateSessionEntityByMsg(IN const MessageEntity& msg);
+
+#BUG:
+	群的名称在ENTITY_PINYIN表中是乱码.
+	Solution: 注释掉utils::Utf8ToString();
+	Reason: GroupHttpOperation已经把群名称从UTF8格式转化为ANSI格式了.
+
+#Optimizz:
+	搜索拼音同样匹配邮箱前缀
+	Expand/Collapse处理
+	PHOTO 40X40
+	如果将来要在搜索结果人名后添加部门名称，那么部门名称须保存到ENTITY_PINYIN中去, 反正不能在加载时去查询, 太慢！
+	搜索关键字 限制长度30bytes
+
+#Problem: 搜索机制慢!(含有SearchLayout的窗体有:MainWnd CreateGroupDialog ChangeGroupDialog MessageManageWnd DeviceManageWnd...)
+	优化策略:
+		1. DB TABLE给FULL_PY FIRST_PY添加INDEX;(无效，因为搜索不是按照整个字段来进行的!)
+		2. 异步搜索更新机制;
+		3. 匹配规则限制;
+		4. 输入规则限制: >2个字符才自动搜索;
+		5. 尽量在Main UI线程中做最小耗时的操作, 后台创建一个ListUI对象,先添加到这个UI上, 然后在Main UI中替换这个ListUI(挂载Parent)!
+		6. 尽量不再查找，直接把DB中的搜索数据插入到UI!
+
+	调试发现: 瓶颈在于更新UI, 不在于查询DB, 所以异步就没啥意义，关键在于更新UI这块!
+		1. 搜索部门后, 还是得展开啊
+		2. List Item 复用(不释放), 分为CategoryListItem/LeafListItem;
+		3. 如果是目录(比如部门), 点击之后再去更新!
+		4. 不排序!
+		5. 
+	目前已采用的优化策略:
+		1. 如果是目录(比如部门), 点击之后再去更新!
+		2. 直接把DB中的搜索数据插入到UI! 不做其他信息的查找！
+		3. 1个字符不自动搜索;
+
+	UI需求:
+		1. 获取ID、Name、Avatar; 优化UIIMList!
+		2. 有些地方只搜索人员，有些地方也搜索群和部门;（做成二进制标志位，可组合使用）
+		要优化，UI部分就重新实现一遍, 让世界见识一下duilib真正的速度!
+		duilib是不是原生支持expandable? 暂不支持! bool CListElementUI::Expand(bool /*bExpand = true*/);bool CListContainerElementUI::Expand(bool /*bExpand = true*/);写了架子,但是没有实现! 实现它!
+		3. CExpandableListUI
+			(1) 暂不支持滚动平滑减速;(待做!!)
+			(2) Expandable采用Insert机制, 从int CContainerUI::GetItemIndex(CControlUI* pControl) const可以看出,目前搜索子控件不会递归嵌套搜索;为了好的兼容性, 采用Insert机制实现Expandable;
+				况且UI与数据独立, UI ITEM根据tag找到对应的Data;
+	修改设计到的窗体:
+		ChangeGroupMemberDialog CreateGroupDialog MainDialog SearchLayout
+		（1）1个字符不自动搜索;
+		(2) maxchar="30"
+		(3) utils::Utf8ToString();
+		
+	其它进一步优化:
+		UIIMList --> CHighPerfListUI;
+		
+#BUG: 审核界面展示含多个图片的消息时，重复展示第一张图片。
+	CodeLocation: void MainListLayout::OnAuditListItemSelect(CListContainerElementUI* pSelItem);
+	Reason: 只支持解析图文混排中含有一张图片的消息;
+	Solution: anEmailLib接收消息的时候每次都使用一个新的UUID(GenerateUUID()).
+		receiveEmailMsgWithPop3(); anEmailLib.cpp;
+
+
+#: coes.liu
+	left join..on
+	原因: 不区分大小写，严格排序，小写字母肯定在大写字母的后面。
+	拼音优化：多线程生成；(如何判断windows系统下开启多少个线程效率最高?)
+		ENTITY_PINYIN FULLPY FIRSTPY 创建字段的时候指定COLLATE NOCASE;(使用了COLLATE NOCASE之后sqlite不会更改字段值但是ORDER BY这个字段的时候，自动不区分大小写排序;但是如果联表之后再按这个字段排序,那么排序仍不会区分大小写;但是如果该字段可能为空, 使用case when使用其他字段替代比较，则排序仍会区分大小写!)
+		但是联表之后, 如果被排序的字段使用了case when替代语句, 那么排序又会区分大小写了; 解决方法:FULLPY不空!
+
+闪信优化点：直接把固定的表组装成.db文件，从server上下载;
+	本地另外一个DB,只保存配置、动态信息;
+	密级什么的都可以只请求一次，不必反复请求，浪费带宽；
+	GBK编码库生成模块可配置大小写;
+	
+
+
+排序效果是不一样的:
+
+//如果全拼为空,则使用名称作为排序比对的字符串;
+SELECT USERID,GENDER,ALIASNAME,REALNAME,AVATAR,ANYUSERMJ,WORKID,PHONE,EMAIL,DEPARTNAME,PRIORITY,ENTITY_PINYIN.FULLPY FROM (SELECT USERID,GENDER,ALIASNAME,REALNAME,AVATAR,ANYUSERMJ,WORKID,PHONE,EMAIL,DEPARTNAME,PRIORITY FROM USERINFO WHERE ISVISIBLE=1 AND DEPARTID=830) LEFT JOIN ENTITY_PINYIN ON USERID=ENTITYID ORDER BY PRIORITY ASC, (CASE FULLPY WHEN '' THEN REALNAME ELSE FULLPY END) ASC;
+//如果全拼相等，则使用名称排序;(区别在于只重排 全拼相等的记录的相对顺序，前者则全局排序)
+SELECT USERID,GENDER,ALIASNAME,REALNAME,AVATAR,ANYUSERMJ,WORKID,PHONE,EMAIL,DEPARTNAME,PRIORITY,ENTITY_PINYIN.FULLPY FROM (SELECT USERID,GENDER,ALIASNAME,REALNAME,AVATAR,ANYUSERMJ,WORKID,PHONE,EMAIL,DEPARTNAME,PRIORITY FROM USERINFO WHERE ISVISIBLE=1 AND DEPARTID=830) LEFT JOIN ENTITY_PINYIN ON USERID=ENTITYID ORDER BY PRIORITY ASC, FULLPY ASC,REALNAME ASC;
+
+注意联合查询时要排序的字段如果不都是COLLATE NOCASE，那么有可能达不到效果;
+SELECT * FROM ENTITY_PINYIN ORDER BY FULLPY ASC,ENTITYNAME ASC;//测试创建时指定了COLLATE NOCASE的字段排序效果;
+
+如果想排序的时候不区分大小写，最高效的方法是在创建表时给这个字段加上COLLATE NOCASE;
+如果想匹配的时候不区分大小写, 最高效的方法是:SAME.
+也就是说, 创建表的时候给字段加上COLLATE NOCASE, 会影响该字段的排序、匹配均不区分大小写。
+
+
+http://blog.csdn.net/atco/article/details/8268349 collate nocase
+
+
+sql 查询不区分大小写如何写?
+ select * from sqlite_master where type='table' and tbl_name='project' and like ('%name%',sql)>0 COLLATE NOCASE; 通过.
+
+修正方法:
+	1. FULLPY FIRSTPY ENTITYNAME在创建的表的时候这些字段COLLATE NOCASE;
+	2. FULLPY即使ENTITYNAME一样,也保存一份，为了按照这个字段排序;
+
+#BUG: 1min左右的音频无法获取时长，无法播放。
+	Reason: 使用标准MP3剪切1min左右能正常播放，但是快信生成的就不行。文件保存问题。mp3文件可能不完整。
+	Solution: string SaveAudioFile();anEmailLib.cpp;主要是把C保存文件的方式改成了VMIME封装的方式.
+
+	userinfo 头像修改时间比较机制
+	上传头像改为直角
+
+
+sqlite的条件判断语句: ifnull nullif case..when
+除了IF NOT EXISTS, 还有 where not exists呢！ 还有 IN (), NOT IN()呢！
+http://blog.csdn.net/zjq_1314520/article/details/62467086 IF表达式  -->Git--->sqlite!
+http://yanguz123.iteye.com/blog/2001302 coalesce
+
+SELECT ENTITYID,ENTITYTYPE,ENTITYNAME,DEPARTNAME FROM (SELECT ENTITYID,ENTITYTYPE,ENTITYNAME FROM ENTITY_PINYIN WHERE ENTITYTYPE = 0 AND (ENTITYNAME LIKE '%hej%' OR FULLPY LIKE '%hej%' OR FIRSTPY LIKE '%hej%') AND (IF(,))) LEFT JOIN USERINFO WHERE ENTITYID = USERID;
+
+INSERT INTO ENTITY_PINYIN (ENTITYID,ENTITYTYPE,ENTITYNAME) VALUES ('hjtest01',0,'何健测试01');
+SELECT ifnull(ENTITYID='hejian@anymacro.com', 0) FROM ENTITY_PINYIN;
+http://blog.csdn.net/liyuhui195134/article/details/78972713 case when+group by
+http://supershll.blog.163.com/blog/static/370704362013621112141449/?ignoreua
+https://www.2cto.com/database/201302/188150.html 真牛B的case when使用，脑洞大开！
+	case .. when then.. when then.. end
+	case ..when then..else..end
+select * FROM ENTITY_PINYIN WHERE (SELECT CASE WHEN ENTITYTYPE=0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) WHEN ENTITYTYPE<>0 THEN 1 END FROM ENTITY_PINYIN)=1;
+select * FROM ENTITY_PINYIN WHERE (SELECT CASE ENTITYTYPE WHEN 0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) else 2 END FROM ENTITY_PINYIN)=1;
+select * FROM ENTITY_PINYIN WHERE (CASE ENTITYTYPE WHEN 0 THEN 2 ELSE 1 END );
+SELECT (CASE ENTITYTYPE when 0 then 'Stuff' when 1 then 'Depart' else 'Group' END) AS 'TYPE' FROM ENTITY_PINYIN;
+SELECT (CASE ENTITYTYPE when 0 then (SELECT REALNAME FROM USERINFO WHERE USERINFO.USERID=ENTITYID) when 1 then 'Depart' else 'Group' END) AS 'TYPE' FROM ENTITY_PINYIN;
+SELECT (CASE ENTITYTYPE when 0 then exists(SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) when 1 then 'Depart' else 'Group' END) AS 'TYPE' FROM ENTITY_PINYIN;//exists是函数, then是关键字;
+SELECT (SELECT CASE ENTITYTYPE WHEN 0 THEN 1 else 2 END FROM ENTITY_PINYIN)=1;//返回结果永远为1！
+SELECT * from ENTITY_PINYIN WHERE (CASE ENTITYTYPE WHEN 0 THEN 1 else 2 END )=1;//这才是让case when语句正确返回值的方式! 前面不能加select, 因为select后返回一堆值, (select ..)=1永真!
+SELECT CASE RegType 
+	WHEN 1 THEN '月卡'   
+        WHEN 0 THEN '周卡'   
+        WHEN 2 THEN '季度卡'   
+        WHEN 3 THEN '年卡'      
+       	ELSE '未知卡类型'                         
+      END AS '卡类型'         
+FROM SL_Register_Info  
+
+总结: 需要根据某个字段作条件分支判断直接在WHERE从句后面加: AND (case [Attr] WHEN.. THEN.. WHEN.. THEN.. ELSE ..END)=1即可;
+      SELECT返回值:	select 1;返回1, 用(SELECT 1 FROM ..)=1来判断是可以的;
+			
+      case when两种形式:
+	case [attr]
+		when..
+		then..
+		when..
+		then..
+		else
+		..
+	end;
+	case
+		when [某字段]>..
+		then..
+		when ..
+		then..
+		else..
+	end;
+
+	select * FROM ENTITY_PINYIN WHERE (SELECT CASE ENTITYTYPE WHEN 0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) else 1 END FROM ENTITY_PINYIN)=1;
+	问题在于: 第二个SELECT 后面跟的ENTITYTYPE不是当前行的ENTITYTYPE了！而是一个新的查询!
+	所以修改成:
+		select * FROM ENTITY_PINYIN WHERE (CASE ENTITYTYPE WHEN 0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) else 1 END)=1;
+	就对了.
+
+(CASE ENTITYTYPE WHEN 0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) ELSE 1 END) AND
+SELECT ENTITYID,ENTITYTYPE,ENTITYNAME,DEPARTNAME FROM (SELECT ENTITYID,ENTITYTYPE,ENTITYNAME FROM ENTITY_PINYIN WHERE ENTITYNAME LIKE '%hj%' OR FULLPY LIKE '%hj%' OR FIRSTPY LIKE '%hj%') LEFT JOIN USERINFO ON ENTITYID = USERID;
+SELECT ENTITYID,ENTITYTYPE,ENTITYNAME,DEPARTNAME FROM (SELECT ENTITYID,ENTITYTYPE,ENTITYNAME FROM ENTITY_PINYIN WHERE ENTITYNAME LIKE '%js%' OR FULLPY LIKE '%js%' OR FIRSTPY LIKE '%js%' AND (CASE ENTITYTYPE WHEN 0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) ELSE 1 END)) LEFT JOIN USERINFO ON ENTITYID = USERID;
+
+
+
+运行一段时间后 head下面一堆临时文件垃圾！添加清除机制！
+
+HTML程序设计中说Canvas可以直接使用video标签的帧显示，然后点击就播放对应的视频，不必自己解析、处理? how?
+
+
+无法查看历史的地图消息
+无法查看群的任何历史消息
+
 css .miji01 --> .mjLevel
 .videoLength单聊中不必在canvas中绘制;
 整理 总结 Article Blog --> Git!
 音频时间长度不对 5秒变成了25''!
 video length format C++
-发送视频-->显示[图片] BUG! 
-发送位置-->显示[图片] BUG!
+
 群聊Video Style暂时未显示成员名称!
 群聊视频的播放时长作为userdata2;
 视频对应的下载URL不合法 或者 下载失败, 应给予提示. "下载失败"  "视频已过期" 等字眼,恰好富余留了一个state控件！
+CEF中 "阅后即焚" "撤回" "审核"等状态的更新机制! 梳理, 优化, 存储, 传输. My Software, My WAY.
+给MailIM添加模拟数据,即在offline状态下，可以通过加载模拟数据，至少让主界面跑起来!(上次的DB数据本来就没删;具有管理员视野) 长期维护 作为开发经典案例  通过POP3 SMTP WebSocket协议
+视频尖角有锯齿 优化 canvas.toDataURI()给<img>,然后利用这个<img>CreatePattern, 不论Gdi+还是Web Canvas, TextureBrush完虐SetClip()!
+其它消息展示css 优化 修改
 {
    "attachs" : [
       {
@@ -323,20 +561,35 @@ video length format C++
    "validate" : 0
 }
 
-{"longitude":116.286986,"latitude":39.908013,"address":"北京市海淀区复兴路辅路甲65号靠近中国民生银行(北京万寿路支行)","titlename":"中国民生银行(北京万寿路支行)"}
+msgContent: {"longitude":116.286986,"latitude":39.908013,"address":"北京市海淀区复兴路辅路甲65号靠近中国民生银行(北京万寿路支行)","titlename":"中国民生银行(北京万寿路支行)"}
+
+{
+   "attachs" : [
+      {
+         "cid" : "",
+         "filename" : "D:\\workspace_any\\安宁邮信项目\\bin\\Debug\\users\\hejian\\cachefiles\\thumb_rd3e7d42fcb7e4852bc68d3e28a33f354.jpeg",
+         "mj" : 0,
+         "playtime" : 0,
+         "position" : -1,
+         "size" : -44056576,
+         "sourcefile" : "",
+         "title" : "",
+         "type" : "jpeg",
+         "url" : ""
+      }
+   ],
+   "content" : "{\n   \"address\" : \"\",\n   \"detailInfo\" : \"\",\n   \"latitude\" : 0,\n   \"longitude\" : 0\n}\n",
+   "feature" : 0,
+   "mj" : 0,
+   "talkerid" : "wangqian@anymacro.com",
+   "validate" : 0
+}
+
 
 //PostMessage,打开视频播放窗口!!
 //下载完毕  清理DownloadMap!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-void* GetSessionDialogByID(std::string sSessionID);
-void* GetSessionDialogByID(std::string sSessionID)
-{
-
-}
-
-	userinfo 头像修改时间比较机制
-	上传头像改为直角
 	audio max width: body width*
 	点击非登陆用户的头像BUTTON,应该弹出ImageBrowser,而非头像编辑窗口. BUG!
 	查看更多-->音频消息定义的msgtype等要统一起来!
@@ -346,8 +599,6 @@ void* GetSessionDialogByID(std::string sSessionID)
 	注意更新cef中的css/html后,C++代码中需要改动的地方:(一改多改,表明代码需要优化了!!!!)
 		BOOL SessionLayout::_DisplayMsgToIE(IN MessageEntity msg);
 		BOOL SessionLayout::_DisplayMsgToIE(IN MessageEntity msg, Json::Value& value);
-		BOOL SessionLayout::_DisplayUnreadMsg();
-		void SessionLayout::_DisplayHistoryMsgToIE(IN UInt32 nMsgCount,BOOL scrollBottom);
 		void SessionLayout::DoDisplayHistoryMsgToIE(std::vector<MessageEntity>& msgList, BOOL scrollBottom, int hisBtnStatus);
 		BOOL CMessageManageWnd::_DisplayMsgToIE(MessageEntity& msg);
 		
@@ -386,11 +637,27 @@ void* GetSessionDialogByID(std::string sSessionID)
 不同的密级能正常展示吗?
 Video Length Format;
 
+
+
+******************
+Mission Doing
+******************
+http://www.runoob.com/nodejs/nodejs-event.html node.js
+
+
 *************
 待进行:
 *************
 	凭什么我的生命要由别人来主宰?!
-	
+	小鱼儿培养: 编程前 数学  效率意识
+
+	https://www.jianshu.com/p/a8b49ff64cd3 ConstraintLayout
+	http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2014/1118/2006.html ToolBar替换掉默认的ActionBar，提高可操作性!
+	http://blog.csdn.net/guolin_blog/article/details/26365683 ActionBar高仿微信
+
+	参考SOUI2，构造HighPerfListUI  支持多级展开!
+	https://github.com/nyakokishi/WeChatRadioBar 
+	http://www.open-open.com/lib/view/open1418604288089.html 下面有很多Android相关的文档! <<第一行代码>> <疯狂Android讲义>必看！
 	https://www.cnblogs.com/xiaoqi/p/weex-hackernews-code-part1.html weex demo
 	http://blog.csdn.net/isaisai/article/details/43023163 CSS 波浪选择器
 	http://www.w3school.com.cn/cssref/css_selectors.asp CSS所有的选择器
@@ -441,7 +708,24 @@ Video Length Format;
 	https://jingyan.baidu.com/article/7f41ececcf637a593d095cfd.html !important
 	https://zhidao.baidu.com/question/311666643.html 两个类的选中
 	https://www.zhihu.com/question/26880548 <i> 斜体 用作 icon
-	
+	https://www.ultimatepp.org/reference$Jsonize$en-us.html C++ 一些好的lib的集合 网站
+	https://www.cnblogs.com/guolixiucai/p/4943748.html cef 交互系列总结
+	http://blog.csdn.net/liwenfei123/article/details/69666880 css ellipsis
+	https://www.cnblogs.com/zhaoq/p/5061056.html H5 VIDEO AUDIO 疑难杂症
+	https://www.csdn.net/article/2013-02-01/2814041-1-line-browser-notepad 即可无极限 一行HTML5代码 data:text/html,[html code]
+	https://www.zhihu.com/question/27818548 before after 伪元素
+	http://www.jiawin.com/css-before-after 2
+	https://www.cnblogs.com/guolixiucai/p/4943748.html 国立秀才的cef文章
+	http://www.codexiu.cn/javascript/blog/33742/ 一个程序员对使用CEF正确介绍的哭诉
+	http://blog.sina.com.cn/s/blog_82c346de0100u7kq.html MoveWindow SetWindowPos
+	http://www.uisdc.com/free-photoshop-scripts PHOTOSHOP 高手脚本
+	http://www.jb51.net/photoshop/468984.html ps使用技巧
+	https://www.zhihu.com/question/39662488 1ActivityNFragment 总结 知乎
+		http://blog.csdn.net/wshngyf/article/details/51234746 一个Activity管理多个Fragment切换
+		
+		
+
+
 
 开发支持存在的问题:
 	测试账号因为是公用的、且频繁更改密码，即使自己用时间长了也会记不清密码。

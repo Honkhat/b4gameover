@@ -1,0 +1,105 @@
+Activity::onCreate(Bundle savedInstanceState);//savedInstanceState是上次app被系统kill前保存的数据,用于恢复;
+对应于CWindowWnd::OnCreate().
+        	Android                    		CSS					duilib
+文本对齐:    	android:gravity				text-align				align vertical-align;
+        	ImageView				<img>					Label
+        	android:visibility			display					visible
+        	AlertDialog				alert					ShowModal
+        	LinearLayout/orientation        	flex-direction/row/column		HorizontalLayout/VerticalLayout
+控件对齐    	android:layout_gravity(子控件指定)	justify-content/align-items(父控件指定) -
+        	android:layout_weight			flex-basis/flex-grow/flex-shrink    	-
+计量单位    	dp/sp/px/pt				px					-
+        	anroid:ellipsize			text-overflow:ellipsis            	endellipsis
+相对布局   	RelativeLayout(parent sibling)		display:relative(parent)		float="false"(parent)
+        	View                    		-					CControlUI
+        	ViewGroup                		div					CContainerUI
+引入布局    	include                    		frame?                    		include
+        	自定义控件/标签                		canvas                    		自定义控件/标签
+        	context					-					windows:hwnd + CWindow*
+
+
+Android 4大组件: activity、service、content provider、broadcast receiver。
+Android 4大布局: LinearLayout RelativeLayout FrameLayout TableLayout.
+
+Android布局长度单位: px pt dp sp.
+    px:pixel; pt:point; dp:device independent pixels; sp:scaled pixels;
+尽量使用match_parent或者wrap_content, 如果要指定固定值，请使用dp或sp(sp用于文字)。
+
+.9图片的制作: Android SDK/tools/draw9patch.bat.
+
+动态添加碎片(Fragment), 达到充分利用屏幕空间的目的;
+动态添加布局: 使用屏幕限定符: res/layout-large,xlarge等. 最小宽度限定符示例: res/layout-sw600dp;
+    在activity_main.xml中的<fragment>节点下指定android:id属性值后会自动加载碎片对应的xml;
+    判断当前是加载了一个fragment还是两个, 通过判断后一个fragment所在的FrameLayout是否存在.
+广播类型: 
+    按照是否可以被截断可分为: 标准广播、有序广播。代码中分别对应sendBroadcast()/sendOrderedBroadcast();
+    按照作用域: 全局系统广播、本地广播(LocalBroadcastManager).
+注册广播的方式: 动态注册(代码中写)、静态注册(xml中写)
+开机启动: 在xml中<receiver>节点下添加关联了android.intent.action.BOOT_COMPLETED的<intent-filter>.(注意需要权限)
+
+Android数据持久化主要有3种方式: File,SharedPreferences,DB.
+SharedPreferences可以被多个进程共享(名字由来), 内部以.xml文件格式进行数据存储, 所以并不高效.
+SharedPreferences相当于Windows下的.ini文件(效率上,.ini更高点);
+
+Android内置了Sqlite.
+ACID: Atom Consistency Isolation Durability.
+"增删改查"对应的官方词汇 "CRUD" Create Retrieve Update Delete.
+adb是android自带的调试工具, 在android sdk/platform-tools目录下.
+adb shell //进入设备的shell;
+sqlite3 BookStore.db
+.table //查看db中的所有表;
+.scheme //查看所有的建表语句;
+注意: 如果数据库更新了,更新的逻辑要在实现了SqliteOpenHelper接口的类的onUpgrade()回调方法中写;
+查询使用rawQuery(),其余使用execSQL();
+
+Content Provider--进程间共享数据
+Android系统电话簿、短信等都是通过sqlite db方式存储数据的, 这一点从增删改查的接口就可以明显看出来.
+在AndroidManifest.xml中用<provider>表示.
+
+
+Q: 广播接收器中不允许开启线程?
+A: 
+        
+Q: TableRow中的控件不能指定width? 那怎么让一行占满屏幕宽度? Android Bug?
+A: android:stretchColumns,对最后一个控件自动拉伸.
+        
+Q: 1个Activity窗体只能使用一次自定义控件? 因为控件id是写死的.
+A: 
+
+Q: 关于复用List Item View, viewHolder存放的控件都是第一个ListItemView对应的控件, 后续的Item View不应该使用新的吗?
+A: duilib的方式是把new出来的ListItem直接挂载到List上, Android显然不是这样, 取走view中的数据转化成android list内部渲染需要的数据, 所以每个item view可以都是同一个UI对象.
+
+CoolWeather小项目:
+省/市/县列表共享一个ListView, 同属一个Activity;天气信息是单独一个Activity;
+省/市/县分别对一个DB Table;
+WeatherInfoActivity内部的不同类通过SharedPreference共享数据;
+
+
+
+Service分为前台服务(IntentService,有类似通知的UI)和后台服务.
+
+
+WebViewClient::shouldOverrideUrlLoading();//重写, 即要: 网页跳转时,仍在这个WebView中显示,而不是跳转到系统默认浏览器.
+
+Android的HTTP API:
+	HttpURLConnection
+	HttpClient
+	
+网络传输常用的数据格式: JSON/XML/BINARY.
+	XML解析方式: Pull/SAX;
+	JSON解析方式: JSONObject/GSON;
+	
+LBS(Location Based Service) 基于位置的服务
+	(LocationManager)getSystemService(Context.LOCATION_SERVICE);
+	Android有3种位置提供器: GPS_PROVIDER/NETWORK_PROVIDER/PASSIVE_PROVIDER;
+	Latitude(维度)/Longitude(经度);
+	反向地理编码(经纬度转化为具体位置): Google提供的Geocoding API;
+	libs/armeabi?
+	map overlay
+
+光照传感器:
+	(SensorManager)getSystemService(Context.SENSOR_SERVICE);
+	
+全局状态、对象应该作为成员封装在继承了Application的全局类中, 并且需要在AndroidManifest.xml中指定.
+使用Intent传递对象,可以采用Serializable/Parcelable的方式;
+

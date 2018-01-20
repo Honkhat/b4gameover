@@ -1,25 +1,41 @@
 ==========================================================
-SQL ����жϼ�¼�Ƿ���ڣ�������������ţ�
+SQL 语句判断记录是否存在（最简洁简单性能最优）
 ==========================================================
-��������£��������ϵ�û��һ��sql���д�ĺõġ��жϼ�¼�Ƿ���ڣ�Ҫ������䲻����࣬Ҫ�����������кܴ����⡣
-�ҽ������Ż���������������ŵĵ�sql��䣬�����жϱ��еļ�¼�Ƿ���ڣ�
-	select PID FROM [table_name] WHERE [condition] LIMIT 1;//sqlite��top����, ��ĩβ��LIMIT 1ʵ��
-	���ؽ����Ϊ��, ��ʾ����;��,�����ڡ�
-���ϵĳ��������������䣺
-	����1��
+今天查了下，发现网上的没有一个sql语句写的好的。判断记录是否存在，要不是语句不够简洁，要不就是性能有很大问题。
+我进行了优化后，最简洁简单性能最优的的sql语句，用来判断表中的记录是否存在：
+	select PID FROM [table_name] WHERE [condition] LIMIT 1;//sqlite无top函数, 在末尾加LIMIT 1实现
+	返回结果不为空, 表示存在;空,不存在。
+网上的常见的有问题的语句：
+	错误1：
 	select COUNT(*) from tableName where conditions
-	count(*) �����Ծۼ���������ɨ��ͼ��㣬reads �ر�࣬�ر��� cpu ��Դռ�ü���
-����2��
+	count(*) 计算会对聚集索引进行扫描和计算，reads 特别多，特别是 cpu 资源占用极大。
+错误2：
 	if exists (select * from tableName where conditions) select '1' else select '0'
-	���ַ�����΢�е����ԣ�����ȴ�ܲ���ࡣͬʱ���� select * ǰ���� exists �����Ը���䲢û���������⣬ֻ���﷨������ࡣ
+	这种方法稍微有点灵性，但是却很不简洁。同时由于 select * 前面有 exists ，所以该语句并没有性能问题，只是语法不够简洁。
 
 
 =====================
-UNION �� UNION ALL
+UNION 和 UNION ALL
 =====================
-UNION�����ϲ���ͬ��ֵ, UNION ALL���ϲ����е�ֵ��
+UNION用来合并不同的值, UNION ALL则会合并所有的值。
 SELECT E_Name FROM Employees_China
 UNION ALL
 SELECT E_Name FROM Employees_USA
+
+
+==========================
+COLLATE NOCASE
+==========================
+SQL关于排序:
+	生产场景: 
+		CREATE TABLE ENTITY_PINYIN([ENTITYID] VARCHAR PRIMARY KEY,[ENTITYTYPE] INTEGER,[ENTITYNAME] VARCHAR COLLATE NOCASE,[FULLPY] VARCHAR COLLATE NOCASE,[FIRSTPY] VARCHAR COLLATE NOCASE);
+		数据保存, 如果FULLPY和ENTITYNAME是一样的值，那么FULLPY不保存;FIRSTPY同理.
+	需求:
+		检索所有数据, 严格按照FULLPY升序排列(不区分大小写).
+	实现:
+		【由于ENTITYNAME/FULLPY/FIRSTPY定义字段时, 都指定了COLLATE NOCASE, 使得排序、匹配都不会区分大小写.】
+		错误写法: SELECT * FROM ENTITY_PINYIN ORDER BY FULLPY ASC, ENTITYNAME ASC;
+		这样写的结果是: FULLPY为空的记录集合内部按照ENTITYNAME排了序, 但是它们没有参与全局的排序;
+		正确写法: SELECT * FROM ENTITY_PINYIN ORDER BY (CASE FULLPY WHEN '' THEN ENTITYNAME ELSE FULLPY END) ASC;
 
 

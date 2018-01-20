@@ -1,0 +1,4 @@
+Q: 我直接在.html中的<script></script>中写的方法,为什么cef中无法执行?
+A: 别看它不起眼, 却是致命的!
+	原因: ExecJavaScript()要在OnWebLoadEnd()之后才能正确执行, 否则cef找不到目标js方法.
+		另外, LoadUrl()要在OnBrowserCreated()之后才能正确执行,否则无法加载目标网页.
