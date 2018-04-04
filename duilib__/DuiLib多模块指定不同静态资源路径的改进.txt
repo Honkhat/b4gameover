@@ -1,0 +1,57 @@
+jian.he201803301910
+
+设置全局的ResourcePath与设置对象相关的ResourcePath互不影响!
+所以，只有一个模块可以不必实现私有的ResourcePath,使用公共的ResourcePath即可!
+
+void CPaintManagerUI::SetResourcePath(LPCTSTR pStrPath)//保持不动;
+const CDuiString& CPaintManagerUI::GetResourcePath() //保持不动
+添加方法:
+	const CDuiString& GetResourcePath2()
+	typedef std::function<const CDuiString&()> CALLBACK_GETRESOURCEPATH;//jian.he201803301910
+	CALLBACK_GETRESOURCEPATH m_cbGetResPath;
+
+UIGifAnim
+	CDuiString sFile = m_pManager->GetResourcePath2();//CPaintManagerUI::GetResourcePath();
+UIMarkUp:
+	bool CMarkup::LoadFromFile(LPCTSTR pstrFilename, const CDuiString& sResPath, int encoding);
+CRenderEngine:
+	TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, const CDuiString& sResPath, LPCTSTR type, DWORD mask);
+WinImplBase:
+	virtual const CDuiString& GetResourcePath(){return CPaintManagerUI::GetResourcePath();}
+
+
+
+
+引用UIMarkUp::LoadFromFile()的地方
+	CControlUI* CDialogBuilder::Create(
+	
+	
+引用CRenderEngine::LoadImage的地方:
+	const TImageInfo* CPaintManagerUI::AddImage(
+	void CPaintManagerUI::ReloadAllImages()
+	
+
+const CDuiString& CPaintManagerUI::GetResourcePath2()//jian.he201803301910
+{
+	if(m_cbGetResPath)
+		return m_cbGetResPath();
+	else
+		return CPaintManagerUI::GetResourcePath();
+}
+
+#include <functional>
+
+MainModule:(使用静态资源路径)
+	anymacro.cpp
+		CPaintManagerUI::SetResourcePath(CPaintManagerUI::GetInstancePath() + "\\skins\\");
+	
+	
+
+Device MOdule:
+	stdafx.h/cpp
+	MainWnd
+		virtual const CDuiString& GetResourcePath() {return g_sResourcePath;}
+
+Service Module:
+	stdafx.h/cpp
+	ServiceMainWnd.h/cpp

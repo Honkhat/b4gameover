@@ -37,6 +37,12 @@ HELLO WORLD DEMO
 	链接器-->输入: utilitiesd.lib;souid.lib;
 	
 	hey,最后融入一SINOVISION PROJECT CONFIGURATION!!
+
+	资源类型定义
+	Ui Lib		.xml文件		.zip文件		.dll内部zip资源
+	DUILIB		UILIB_RESOURCE		UILIB_ZIP		UILIB_ZIPRESOURCE(已缓存的标记"membuffer")
+	SOUI2		RES_FILE		无			RES_PE
+
 	dll内置的资源是RES_PE,文件定义的资源是RES_FILE;(duilib ZIPRES MEM) 明显这里可以指定相对路径;
 	CMainWnd():SHostWnd(_T("LAYOUT:XML_MAINWND")) 关联窗口类和xml文件，LAYOUT为父节点,XML_MAINWND为子节点, 可以定义相对路径吗?
 	REFLECT_NOTIFICATIONS_EX是干啥的 又复习WTL了 :)
@@ -66,10 +72,21 @@ EVENT_NAME_COMMAND 宏 都是用字符串类型的name来分发处理, 效率肯
 	_skin.sys SOUI INTERNAL RES?
 	ADD LOGO(IMITATE WITH 360PREVIEW)
 	soui的属性怎么设置, duilib是对应控件的SetAttribute()里面去看;
-	font资源如何索引? style文件人如何share?(duilib style share demo-sinovision)
+	font资源如何索引? style文件如何share?(duilib style share demo-sinovision)
 	如何给窗体增加圆角？圆角有锯齿吗? 把Texture加进去! VGScene可能就是用的这种技术! PS可能也用的这种技术!
 	如何给窗体增加阴影?
 	Window标签是干啥用的? 源码定义文件
 	有Text控件,有Label控件吗? 它们之间关系(duilib CTextUI:public CLabelUI,感觉继承反了，这样导致的后果就是Text控件基本不被使用)
 从360preview入口,剖析源码,然后编译自己的MDd UNICODE x64 dll 版本
 然后自己demo使用! 扩展模块 render-vkn, render-ogl;rapid-xml;postgres,sqlite codec;
+
+
+
+AUTHOR:启程软件;BLOG: http://www.cnblogs.com/setoutsoft/p/3903677.html;
+SOUI发展轨迹: BkWin-->DuiEngine-->SOUI.
+渲染模块化, 目前支持: GDI GDI+ SKIA.
+支持LUA.
+uires.idx <resource>节点下除了添加预定义的ICON BITMAP CURSOR类型外，还可以添加任意类型的节点.
+路径是相对于uires.idx文件的路径;
+确认是否也支持ZIPRES模式?
+sql expert

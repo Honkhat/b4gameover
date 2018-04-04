@@ -1,0 +1,27 @@
+必须的资源准备:
+	快速入门:https://software.intel.com/zh-cn/articles/api-without-secrets-introduction-to-vulkan-preface
+	CMake
+	Github Source Code
+	Vulkan SDK
+	Python SDK(For Samples)
+	VisualStudio2013.Update5
+	8G Memory
+	300M Disk Space;
+
+Vulkan SDK Download+Installation+Verify:
+
+
+
+
+
+Tutorials:
+	Official Doc: https://vulkan.lunarg.com/doc/sdk/1.1.70.1/windows/getting_started.html
+	https://www.cnblogs.com/heitao/p/6882815.html Vulkan+GLFW+GLM组合使用 类似LAMP
+
+
+Q:	如何检测当前的GPU是否支持Vulkan? 如何验证当前GPU是否安装了对应的Vulkan驱动?(ICD)
+A:	1. compmgmt.msc-->设备管理-->显示设备-->右键属性,可以查看显卡型号。我的是 Intel(R) HD Graphics.(集成/核芯显卡，有胜于无).
+	2. 如何查看当前的显卡是否安装了Vulkan驱动? 安装GPU-Z,切换到Advanced选项卡, 选择Vulkan即可.
+	3. 如何安装Vulkan驱动?
+		Intel不再支持核芯显卡的Vulkan驱动(Vulkan support is out of Beta and in every driver release since February, 2017): https://software.intel.com/en-us/blogs/2016/03/14/new-intel-vulkan-beta-1540204404-graphics-driver-for-windows-78110-1540
+		

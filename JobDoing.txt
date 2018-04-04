@@ -1,0 +1,554 @@
+MainDialog.cpp
+	else if(WM_FREESESSIONDIALOG == uMsg)//释放一个会话占用的资源;
+	释放SessionDialog的操作暂时屏蔽掉,因为会崩溃: void SessionDialogManager::removeSessionDialogPtr(IN const std::string& sId)
+
+为什么不能释放SessionDiloag?
+	创建方式: pRoot = DialogBuilder->Create(); pContainer->Add(pRoot);
+
+https://www.cnblogs.com/gakusei/p/4128885.html
+Rich Edit控件注册两种剪贴板格式："富文本格式(RTF)"和一种叫做"RichEdit 文本与对象"的格式。应用程序
+//      可以使用RegisterClipboardFormat函数来注册这些格式，其取值为CF_RTF与CF_RETEXTOBJ
+
+
+
+
+今日工作:
+	群优化, 合并提交SVN(删除无用测试代码 "jian.he out!!!!!"字眼);
+	群相关的开发文档整理;
+	SessionDialog的释放问题;（1.CCefBrowserUI控件本身析构释放资源有问题; 2. 要用duilib的方式来释放, 防止出现野指针)
+		CCefBrowserUI控件析构时的内存释放问题;
+			应用程序直接闪退!
+				原因: 收到了目标为hMain的WM_CLOSE(0x10)消息.
+				Solution:
+					既然CloseBrowser()会通知父窗口WM_CLOSE,那么我先更改了你的Parent，再释放你，让你无法关闭主窗口。
+					::SetParent(hHostBrowser, NULL);
+	BUG: 通过删除群, 删除几个SessionDialog后，快速切换其它Session, 发生崩溃!	
+	位置: 
+	Cause: 
+		删除群, 通过PostMessage(hMainDialog)在下次消息循环中释放SessionDialog--从m_lstSessionDialog中erase掉;
+		打开群会话, 会先从m_lstSessionDialog中查询是否已经存在的SessionDialog;
+		很明显,如果异步操作m_lstSessionDialog很可能出现访问冲突的情况.
+	Solution:
+		改成同步的方式释放SessionDialog.
+		
+					
+	增加异常提醒: 闪信登陆过程中, MainDialog.xml损坏, 登陆窗口永远无法通过; 修改后会弹窗提醒用户。
+	UI优化: 创建群成功的窗口要始终在MainDialog的上面. 不能跑到后面去！
+	CNativeRichEditUI控件:
+		插入OLE对象和删除后的内存泄露测试;
+		增加清除缓存机制;
+		类CScrollBarWnd的内存使用情况测试(主要针对MemoryLeak);
+		RichEdit提取OLE对象的机制实现;
+		RichEdit插入FileObject、Bitmap内容机制完善;
+		
+
+	多音字词汇组合资料收集:
+		常见词汇组合的集合生成;
+		纯Sql递归生成词汇拼音(使用常见词汇组合表过滤);
+		
+
+	@实现流程:
+		显示: RTF/Insert OLE Text;
+		
+
+
+20180317:
+	RichEdit增加FEATURE:
+		插入图片，可在保持宽高比例的同时,设置图片大小;
+		闪信业务上,自动缩放为一个最大为300*300的BOX.
+	
+
+20180319:
+	闪信头像编辑窗口：
+	UI修改: 选择本地头像后的预览图为非圆角头像，改为最终效果的圆角头像。
+		功能实现：
+			方案一：每次用户改变选择区域后，都重新生成一个对应的圆角尺寸的图片，更新到UI上去;
+			方案二：仍然使用矩形，上面盖一个框，像造模具那样。
+			显然方案二，性能更好。
+	功能修改: 点击关闭后，重新打开，应该显示用户的当前头像，而不是上次的编辑头像.
+	功能实现修改: User Avatar更新后，只需替换一次duilib internal image cache;
+	
+	归档: PS 创建圆角边框;
+		duilib 设置同名bkimage的问题/及如何做到只更新一次duilib internal image cache(设定一个全局map, 注意每个窗体都对应一个cache map!应该改成全局的！);
+		圆角头像的实现:
+			方案一：生成真实的圆角头像：
+			方案二：头像为矩形，上面罩一个圆角模具。
+				<HorizontalLayout width="124">
+					<Label name="120photo" padding="2,2,2,2" bkcolor="#ffCAE1FF"/>
+					<Control float="true" pos="0,0,124,124" bkimage="share/bkrdrc124.png" />
+				</HorizontalLayout>
+				前提需要PS技能：生成一个border宽度为1的圆角矩形，内嵌一个白色边框为1的平行圆角矩形。
+		头像HOVER发光效果的实现:
+			bkimage为内容,hoverimage为发光效果;(与普通的bkimage设置相反)
+			结合source dest corner属性;
+			example: <Button name="btnMe" float="false" padding="3,10,3,0" height="50" bkimage="file='head2.png' dest='5,5,45,45'" hotimage="file='share/borderhover.png' corner='10,10,10,10'"/>
+		
+		图像浏览窗口改为可以ShowModal()的单例后，重新打开窗口，显示状态不对的BUG!
+
+20180320：
+	BUG:图像浏览窗口，在竖屏不能达到全屏, 而且最大化后鼠标移动到关闭按钮或右按钮后，整个窗体会上缩。
+	Analysis:
+		怀疑duilib对竖屏的支持有问题(也许跟透明窗口也有关系),需要测试!
+	Solution:
+		不自己处理WM_MOUSEMOVE消息（去看PaintManager::MessageHandler()很明显TrackMouse已经内部有了，外部再调用就是多余!），应该让duilib处理，LeftArrowButton RightArrowButton设计成大小自适应，然后normalimage等设置dest属性即可.
+		看能否自己处理OnMouseLeave/Hover消息;(可考虑继承一个CButtonUI CAutoHideButtonUI)
+		DUILIB双击caption区域最大化 机制不好用了?
+			实现位置: LRESULT WindowImplBase::OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	
+	#201803201126# ImageBrowserWnd弹窗位置有原来的主窗口的中央改为SessionLayout的中央;
+	添加UINT ShowModal(bool bExitWhenInvisible);方法
+
+	ImageBrowser Component 参照专业的2345看图King
+	
+	给退出菜单添加ICON，使用了little trick满足当前的需求: bkimage+dest;
+	退出菜单中文字没有垂直居中对齐的问题:
+		m_rcItem.top = 2; //哪里来的值? 
+			定位方法:
+			void CControlUI::SetPos(RECT rc)
+			{
+				if(m_sName.Compare("exitMenuItem") == 0)
+				{
+					int i = 0;
+					i++;
+					//这里下断点, 然后查看调用堆栈.
+				}...
+			}
+			发现是m_rcInset，再跟踪发现是xml中设置的~！
+
+		
+	鼠标离开菜单后，菜单项的状态没有恢复的BUG:
+		设计不合逻辑: UIEVENT_MOUSEHOVER就SelectItem(), 怪不得我设置UIEVENT_MOUSEELAVE不顶用呢! SHIT!
+		pHoverItem可能为CMenuUI CMenuElementUI, 所以二者都要处理;同时处理UIEVENT_LEAVE
+	#20180320#duilib menu控件BUG1:鼠标移出窗体没有切换状态;BUG2:文字垂直方向没有居中;
+	#20180320#退出菜单添加ICON, 文字垂直方向居中对齐;
+20180321:
+	#20180321#创建群组窗体  修改群组窗体 设备管理窗体 界面边距微调;
+	#20180321#个人资料窗体 头像增加鼠标HOVER光晕效果;
+	语音消息，音频图标调小尺寸（包括动态尺寸和静态尺寸）;
+		@keyframes webkit-animation? SUMM.
+	语音消息，添加密级分隔条;
+	<div id="audio_area" class="send_audio " style="border-left:solid 1px #c2c1c1;" >
+		直接在class里面添加leftBorder不起作用, 估计是被覆盖了.
+		
+	语音消息, 密级文字增加上下边距;
+		line-height
+	#20180321#语音消息: 图标尺寸调整、添加分隔条;
+
+		
+	
+20180322:
+
+	退出需要再次确认:
+		if(AnyMessageBox::Show(GetHWND(), "提示", "检测到有新的版本，是否更新？", MsgBoxType_Info, MsgBoxBtn_OK | MsgBoxBtn_Cancel) == AMB_OK)
+		目前duilib的响应菜单时如果ShowModal()另一个窗体，那么关闭这个ShowModal()的窗体后崩溃.
+		解决方法是: PostMessage()然后在下次消息循环中做ShowModal()的工作.
+			
+	#201803221109#增加退出闪信的确认机制;修复"退出确认窗口"的取消按钮后崩溃BUG;
+	#20180322#改变登陆进度条的样式; 修改duilib progress控件,使得支持资源的平铺;
+	CEF中的消息样式, 头像与边框的左边距、消息体与头像的边距保持一致:
+		单聊: 
+		群聊:
+			style以我的Video/Location的样式为准(PC端只接不发)
+			音频: 
+				.Group_aud01 .head_img left:5px; 
+				.Group_aud01 .panel left:60px;(PC端只接不发)
+				.Group_aud01 .group_name padding-left:5px;
+			图片: 
+				接收风格:
+					.Group_rec01 .head_img left:5px;
+					.Group_rec01 .panel left:60px;
+					.Group_rec01 .group_name padding-left:5px;
+				发送风格: 
+					.Group_rec02 .head_img padding-left:5px;
+					.Group_rec02 .panel padding-left:60px;
+					.Group_rec02 .group_name padding-left:5px;
+			文本: 
+				接收风格: 见图片;
+				发送风格: 见图片;
+	#20180322#统一化CEF中的消息样式;
+
+	jQuery获取控件的ID: $context.attr("id");
+	jQuery自定义控件的属性:
+		$("#test").attr("test","aaa") // 设置  
+		$("#test").attr("test")	      // 获取
+		$("#test").removeAttr("test") // 删除 
+	语音消息: 所有的语音消息都是未读状态的BUG.
+		js 点击AudioMsg后, 回调cTagMsgRead();
+		C++ SessionLayout::JsonizeMsgForCef()增加"read"字段;
+		js SendMessage()方法中
+		js HistoryMessage()方法中
+	#20180322#BUG FIXED:所有的语音消息每次闪信启动后都是未读状态。	
+
+	视频消息: 所有的视频消息都是未读状态的BUG.(没有更新DB中的已读状态标记READ)
+	#20180322#视频消息打开后更新DB中的已读标记;
+
+20180324：
+	1. 	VS提示代码版本不一致，无法消除.
+		失败的解决方法:
+			Failed 1: 尝试更改.cpp的编码为UNICODE版本;
+		成功的解决方案:
+			使用VS2013.5打开, 需要转换.vcxproj，而已. 但是切换回VS2010, 仍然会存在这个问题.
+
+	2. Utf8ToUnicode() 测试CP_UTF8
+		AnsiToUnicode()测试CP_ACP
+
+	
+	3. Print RichEdit
+		hdcMem开辟的buffer是自动根据StretchBlt()等方法触发开辟的;
+		设置FormatRange是你要Print的区域范围
+		整个过程就是使用RichEdit内部的对RTF的解析渲染到你指定的一个HDC上去.
+		
+		Q: 如何将一个HDC的部分区域，保存为一个图像;
+		A: 方法一: GDI. 创建一个memDC+hBitmap, SelectObject(memDC, hBitmap); BitBlt(); Fill in BITMAPINFO;
+		   方法二: GDI+. new Bitmap;Graphics* g = Graphics::FromImage(); g->GetHDC();Bitblt();g->ReleaseHDC();pImage->Save().
+
+		Q: RICH EDIT可以插入的OLE对象有哪些?
+		A: c:\Program Files (x86)\Windows Kits\8.1\Include\um\cguid.h里面有很多定义。
+
+		#解析并提取出图片;#
+			这部分可以参考RichEditDemo-Duilib-QQ, 一个一个判断对象的类型.
+				BOOL RichEdit_GetImageOle(HWND hWnd, POINT pt, IImageOle** pImageOle);
+20180327:
+	#表格复制到剪切板中是什么格式?#
+		以CF_TEXT查看是文本; 其它格式看不到可读的字符串;
+	
+	#如何将光标定位到最后#
+		方法1： 待测试  EM_GETTEXTLENGTHEX 返回的是UNICODE版本的?
+		方法2：
+			SendMessage(hwnd, EM_SETSEL, 0, (LPARAM)-1);          // Select the entire contents.
+			SendMessage(hwnd, EM_EXGETSEL, 0, (LPARAM)&chrg);  // Get the selection into a CHARRANGE.
+			chrg
+	#给定表格的起末CharsRange, 能否准确截图一个表格?#
+
+	#目前闪信的简单图文混排格式转化为RTF格式，复制到剪切板#
+		图片使用RTF的哪种格式? 可选有: \pngblip \
+
+	#如何将RichEdit中的图文表混排转化成只有图文混排的简单格式#
+		(把RichEdit窗体隐藏, 只显示BkImage)
+		1. 首先把图片替换为标记图片的字符串;
+		2. 导出.rtf格式的字符串;
+		3. 从.rtf字符串中解析出所有的表格的位置, 分别转化为图片, 并替换为图片对应的字符串;
+			如何确定表格的Width Height? RtfRenderer(目前的Render功能借助RichEdit).
+			方法1: 1. 将(后台守护的RE)RichEdit设置成大小只有2*2, 且水平 竖直都自适应,　然后计算滚动条延长了多少即可.
+					Q: 窗口不可见, 还可以正确获取SCROLLINFO吗?
+					可以。但是可能需要在下次消息循环中正确获取.
+				2. 用CF_RTF格式拷贝表格定义字符串到GuardRE, 然后做FORMATRANGE.
+
+		4. GetWindowText(hRE);
+		(后台添加机制: 每一次从RichEdit中导出的图片放在一个统一的文件夹下, 每隔一定时间或者达到一定空间后，要提醒用户清理)
+		即使将来使用了OpenXML来操控, 对于获取Render后的对象尺寸, 估计没有多少帮助.
+
+		目前的实际执行策略(最小可执行集合): 
+			把图片提取出来, 其它全认为是Text.
+			
+	#符合目前需求的RtfReader/Writer#
+		表格语法
+			http://www.pindari.com/rtf1.html http://www.pindari.com/rtf2.html http://www.pindari.com/rtf3.html  http://www.biblioscape.com/rtf15_spec.htm
+			https://msdn.microsoft.com/en-us/library/aa140283(v=office.10).aspx#rtfspec_tabledef 还有很多DIAMOND类似的shape Interesting!
+
+			{\rtf1\ansi\deff0
+
+			\par \trowd \trqc\trgaph108\trrh280\trleft36
+			\clbrdrt\brdrth \clbrdrl\brdrth \clbrdrb\brdrdb
+			\clbrdrr\brdrdb \cellx3636\clbrdrt\brdrth
+			\clbrdrl\brdrdb \clbrdrb\brdrdb \clbrdrr\brdrdb
+			\cellx7236\clbrdrt\brdrth \clbrdrl\brdrdb
+			\clbrdrb\brdrdb \clbrdrr\brdrdb \cellx10836\pard \intbl
+			\cell \pard \intbl \cell \pard \intbl \cell \pard \intbl \row
+			\trowd \trqc\trgaph108\trrh280\trleft36 \clbrdrt\brdrdb
+			\clbrdrl\brdrth \clbrdrb \brdrsh\brdrs \clbrdrr\brdrdb
+			\cellx3636\clbrdrt\brdrdb \clbrdr \brdrdb
+			\clbrdrb\brdrsh\brdrs \clbrdrr\brdrdb
+			\cellx7236\clbrdrt\brdrdb \clbrdr \brdrdb
+			\clbrdrb\brdrsh\brdrs \clbrdrr\brdrdb \cellx10836\pard
+			\intbl \cell \pard \intbl \cell \pard \intbl \cell \pard
+			\intbl \row \pard
+
+			}
+			算法: 
+				1. 找到第一个"\trowd" 接着找下一个配对的"\row", LOOP
+				2. 在前后加上\par;
+				3. 填充rtf1.0等头部信息;
+		图片语法
+			图像数据格式: hexadecimal (the default) or binary format;
+			\pict
+			 \*\shppict
+			ms 推荐使用  \wmetafile, 不推荐wbitmap and \dibitmap
+			
+
+		Objects语法
+
+
+		Math Expr
+			
+
+		文本语法(目前给一个默认的style即可, 因为不支持各种rich text)
+
+		总体来看，RTF格式不是一个很好的适合网络传输的格式（图片数据会冗余）. 它的优势在于跟微软的RichEdit Office是兼容的.
+		但是你可以好好利用它，针对自己的业务做一些优化. 
+		最大的好处：免费;省的重复造轮子了。
+		
+	RTF基本语法:
+		表示'\'本身, '\\';
+		\line 表示换行
+		\par 表示单起一个段落(没有缩进,所以看起来效果和\line是一样的)
+		\pard 表示这个段落的一些default属性 可空
+		\highlight3 3代表颜色 \highlight0 0代表结束高亮
+		\cellx 对应于\tabx
+		\intbl 表示par是表的一部分;
+		\trowd table row data begin
+		\clbrdrt cell border right
+		\brdrs border single-thickness
+		
+	#20180328支持多种剪切板格式的图片数据提取为图片#
+	#测试从word复制过来的图片和自己OLE方式插入的图片，提取方式是否一样#
+		外部插入图片的流程:
+			(这个cache文件夹的所有操作都通过一个类, 保证管理数据与实际数据的一致性)
+			先根据文件指纹判断cache中是否有这个文件，如果没有，直接复制过去(00000000.文件);
+			设置ReObj->dwUser;
+			
+		1. 自己OLE方式插入的图片提取
+			首先根据obj tag判断自己的map中是否含这个图片且文件存在（插入的时候会复制到本地消息缓存文件夹）;如果不存在, 那么导出到临时文件(计算文件CHECKSUM MD5，只保存一份图片数据，小型的图片采集系统~);
+			遇到的问题及解决方案: https://bbs.csdn.net/wap/topics/390354424
+			因为我是使用CF_BITMAP格式插入的图片，所以解析的时候也需要使用CF_BITMAP;
+
+			HBITMAP转化为GDI+ Bitmap;
+
+		2. word中或qq中复制过来的图片
+
+		3. RTF格式StreamIn方式进入RE的图片
+
+libboost_system-vc100-mt-gd-1_56.lib
+libboost_filesystem-vc100-mt-gd-1_56
+#20180329# 用户的个人详情显示树形目录;同时添加tip和endelllipsis特性;
+	duilib CLabelUI控件 不具备UIFIND_HITTEST属性　即使设置mouse="true" 也不会展示tooltip;
+	duilib CTextUI相比CLabelUI的功能之一就是可以展示ToolTip，但继承关系不合理，继承自CButtonUI.
+
+	SQL递归查询
+		Common Table Expression(理解为public更容易，大家都可以访问的意思) https://www.cnblogs.com/kissdodog/archive/2013/06/24/3153012.html
+		https://blog.csdn.net/aflyeaglenku/article/details/50978986
+		https://blog.csdn.net/yenange/article/details/77930448
+
+		SELECT * FROM TB1, TB2 相当于 INNER JOIN?
+
+		sprintf(szSql, "WITH RECURSIVE anDept(id,name,parentid) AS (VALUES(%d,'%s',%d) UNION ALL \
+			SELECT DEPARTMENT.DEPARTID,DEPARTMENT.DEPARTNAME,DEPARTMENT.PARENTID FROM DEPARTMENT,anDept WHERE DEPARTMENT.DEPARTID=andept.parentid) \
+			SELECT GROUP_CONCAT(name,'/') FROM (SELECT name FROM anDept ORDER BY id ASC);",iDeptID, StringToUTF8(sDeptName).c_str(), iParentID);//越重要的实体编号越小;
+
+		改为适应性更好的:
+		sprintf(szSql, "WITH RECURSIVE anDept(id,name,parentid) AS (SELECT DEPARTID,DEPARTNAME,PARENTID FROM DEPARTMENT WHERE DEPARTID=%d UNION ALL \
+			SELECT DEPARTMENT.DEPARTID,DEPARTMENT.DEPARTNAME,DEPARTMENT.PARENTID FROM DEPARTMENT,anDept WHERE DEPARTMENT.DEPARTID=andept.parentid) \
+			SELECT GROUP_CONCAT(name,'/') FROM (SELECT name FROM anDept ORDER BY id ASC);",iDeptID);//越重要的实体编号越小
+
+		SELECT group_concat(departname, '/') from (select departname from department order by priority);
+
+		sqlite没有CONCAT聚合函数，取而代之的是||运算符; 还有批量拼接 group_concat() http://www.sqlite.org/lang_aggfunc.html#groupconcat
+
+		SELECT id,GROUP_CONCAT(DISTINCT score) FROM testgroup GROUP BY id  http://blog.163.com/ruby_study/blog/static/23868006520155604715101/
+##20180402
+	#闪信平台: duilib 是否可以不设置多个模块使用不同的资源路径，每个模块内部使用同一个资源路径;
+	
+
+
+
+
+	#闪信平台:个人详情窗口显示部门树路径#
+
+	#Embarcadero最新版本下载安装#
+		http://altd.embarcadero.com/download/radstudio/10.2/delphicbuilder10_2_2.iso //如果有10.2.3直接修改链接即可.
+		
+
+#20180403#
+	Problem: ServiceModuleMainWnd贴到ContainerWindow上面后, 主窗口工具条右边框线被覆盖了. 同样的DeviceModuleMainWnd就没有覆盖主窗口工具条的右边框线.
+	Solution: 
+		1. 设置ContainerWindow的左边距为实际的边距+1;
+		2. DeviceModuleMainWnd设置leftbordersize="1" bordersize="1", 盖住那条莫名其妙的灰色边线.
+
+	SystemConfig dll模块(.h .cpp文件一定要分开写，因为可能会被第三方调用！)
+		1. 减少生成exe的体积;
+		2. 引用/使用功能规范化;
+
+	
+
+	Utf8 Unicode转换等 .dll 模块化
+
+
+
+	const强制类型转换后，去掉const属性，可以修改了吗? 如果可以了，那么const的语法限制就比较弱了（警示作用）
+
+	PinyinUtil dll模块!(发现没,越来越趋近于SinoVision的那套结构了,科学的工程方法)
+
+
+	处理Splitter Click响应事件;
+	闪信平台启动时, 获取应用列表,写入DB;
+	ServicePlugin相关的DB操作，单独封装一个类
+
+SELECT A.EMAIL,A.NAME,A.[ORDER] FROM (SELECT EMAIL,NAME,[ORDER] FROM APPSERVICEINFO WHERE CATEGORYID=%d AND VISIBLE=1) A LEFT JOIN ENTITY_PINYIN ON A.EMAIL=ENTITYID ORDER BY [ORDER] ASC,FULLPY ASC;
+SELECT APPID,APPSRCNAME FROM APPSERVICE_CATEGORY WHERE PARENTID=288;
+SELECT * FROM ENTITY_PINYIN WHERE ENTITYID IN (SELECT EMAIL FROM APPSERVICEINFO WHERE CATEGORYID=288 AND VISIBLE=1)
+
+	初始化时, SessionContainer的初始状态: 不可见;
+		自己封装一个Session状态切换的高效机制;
+	
+
+
+	//JIAN.HE TESTING456! 测试搜索数据
+
+	
+
+	CUIDeviceTreeList()构造函数需要IApplication提供一个判断是否管理员的方法!!!!!!!!!!!!!!!!!!
+	TreeList需要封装  通用的！ 而不是现在这样 DeviceTreeList ServiceTreeList... UIIMList..
+	现在的SearchLayout只是改变了业务逻辑，UI逻辑一样，却重复实现!
+
+	#如果要把CNativeRichEditUI集成到闪信中去, 那么一定要用单例模式, 否则内存消耗大大的!#
+
+	#librtf parse的过程中提取出纯文本，和当前的CharPos#
+
+	#直接GetText()获取RE中的图文表混排内容，获取的内容是?#
+		ANSWER::GetWindowText() 除图片外的所有文本(包括表格中的文本);
+
+	#表格等其他非图片非文本类型转化成图片#
+
+		#InsertPolygon#
+
+		#InsertHyperLink#
+			原来选中的部分文字直接替换RTF格式的字符串应该不会有效果;
+			用空字符串替换掉原来选中的文字，然后组装一个RTF字符串，以CF_RTF格式复制到Clipboard,再Paste。
+		#获取某个OLE对象的区域#
+			EM_INSERTIMAGE https://msdn.microsoft.com/en-us/library/windows/desktop/hh780447(v=vs.85).aspx 我靠 可以直接InsertImage??
+			RTF中的TABLE在RichEdit中的映射: https://msdn.microsoft.com/en-us/library/windows/desktop/hh768760(v=vs.85).aspx
+			EM_INSERTTABLE https://msdn.microsoft.com/en-us/library/windows/desktop/hh768373(v=vs.85).aspx
+			GetClientSite https://msdn.microsoft.com/en-us/library/windows/desktop/bb774338(v=vs.85).aspx
+			
+		#失去焦点，仍然选中#
+
+
+		#响应点击事件#
+	4. Insert And Play Gif
+		思路:
+			COM组件 + 自绘(GDI/GDI+/D2D/D3D/OGL/VULKAN)的方式实现，如果嵌入的Ole加载的是超过1帧的动态Gif，则在timer中进行帧切换；如果加载其他类型静态图片，如png/bmp/1帧的gif，直接在ondraw()绘制即可。
+			可参考SOUI2中的实现;
+			
+		优化:
+			
+			对比QQ ImageOle.dll(OleImasge.dll)、Gif89a的接口和使用方法, 猜测与自己的实现版本的优略性比较;
+		博文:
+			https://blog.csdn.net/haoekin/article/details/8877979
+			使用定时器显示GIF动画的ATL控件实现
+			https://blog.csdn.net/happyhell/article/details/4263313 创建gif ole工程
+			https://blog.csdn.net/haoekin/article/details/8915207 再谈向RichEdit中插入GIF动画的实现
+
+		实现:
+			如何确定继承哪些COM接口的最小集?
+			DllRegisterServer()  与 #import "c:\program files\common files\system\ado\msado15.dll" 	no_namespace 	rename ("EOF", "adoEOF")效果一样吗?
+				注册写到了注册表? "Server"指的是"COM Server"? In-Process Server?
+			Proxy And Stub的必要性
+			
+			https://msdn.microsoft.com/en-us/library/office/bb448854.aspx OpenXML SDK For Office
+	5. Transparent Feature
+
+	6. Background Image
+
+	EM_GETTEXTLENGTHEX https://technet.microsoft.com/zh-cn/library/bb774195.aspx/ 这些都是要整理完，然后写入书里的 To Karl, Daddy is so loving you.
+
+	EM_DISPLAYBAND 的功能应该是: 把几个不同区域的内容打印到一页上去. https://msdn.microsoft.com/en-us/library/windows/desktop/bb787997(v=vs.85).aspx
+	
+	TM_PLAINTEXT 可以通过EM_GETTEXTMODE降级为Edit https://msdn.microsoft.com/en-us/library/windows/desktop/bb774364(v=vs.85).aspx 
+
+	RichEdit Control Reference https://msdn.microsoft.com/en-us/library/windows/desktop/ff486019(v=vs.85).aspx
+
+	BUG: 关于消息已读的标记, 默认只要在SessionDialog中显示出来, 就标记为已读了吧?  但正确做法是: 音频 视频消息这时候不能标记为已读，直至用户点击触发.
+	原来的执行逻辑:
+		void UpdateDBOperation::_SendReadedMsgNotify(); //这里应该是一处;
+		
+	#判断当前的OLE对象是否在RichEdit中被选中#
+		if(S_OK == pReOle->GetObject(i, &reObj, REO_GETOBJ_POLEOBJ)
+					{
+						if(reObj.poleobj)
+						{
+							pPos[i] = reObj.cp;
+							pUsrTag[i] = reObj.dwUser;
+							reObj.poleobj->Release();
+
+							if ( (reobject.dwFlags & REO_SELECTED) != REO_SELECTED ) // 
+	#直接从当前CP(character position)定位OLE对象#
+		REO_IOB_USE_CP IRichEditOle::GetObject();
+
+	BUG: CEF右键 "导出" "另存为"，对于音频/视频/图片等多媒体格式，应该导出为对应的多媒体格式才对.
+
+	对于域控，支持域名解析，不用输入IP
+	
+	CEF消息按照时间戳排序
+
+	#改进#
+		SCROLLINFO不是完全可靠的, 所以直接使得CustomScrollBar与NativeScrollBar UI保持一致即可。
+		
+	改进一个好用、高性能的树形控件,UIIMList与业务关联了. 查看SOUI呢?
+	
+	封装一个SearchEdit, 类似ComboBox那样，有一个下拉窗口.
+	
+
+	ZenTao BUG LIST
+
+	ImageBrowser需要重构, 有时候点击一个图片弹出窗体后，图片没有刷新，显示的还是上次显示的图片!
+		支持音频 视频 各种格式的图片，简直就是一个Kmplayer+2345PicKing!
+		支持对图片进行修改：滤镜风格 添加水印 添加说明 帧序列查看编辑 
+		WndStyleDialog存在鼠标移动某个控件就改变窗体大小的BUG;改成WndStyleFrame就没有了.
+		
+	RichEdit的Windowed windowless的封装可借鉴的工程项目:
+		NetEase IM DEMO
+		duilib anymacro GifSmiley
+		duilib RedRain
+		RichEditDemo-duilib
+		CNativeRichEditUI
+		
+	Proxy And Stub
+	https://bbs.csdn.net/topics/390629452
+	
+
+	https://vulkan.lunarg.com/doc/sdk/1.1.70.1/windows/getting_started.html
+	https://bbs.csdn.net/topics/340163882 CF_ENHMETAFILE
+	https://msdn.microsoft.com/en-us/library/ms649051 If a window delays rendering, it must process the WM_RENDERFORMAT and WM_RENDERALLFORMATS messages. 啥技术?
+	http://blog.sina.com.cn/s/blog_6297de5e0101jjjr.html 复制Word文档内容到RichEdit
+	https://software.intel.com/zh-cn/articles/api-without-secrets-introduction-to-vulkan-preface Vulkan:没有任何秘密的API Series
+	http://blog.sina.com.cn/s/blog_5d9a5bb90101ju4l.html 去查看下Word的CLASS封装代码
+	http://www.html5tricks.com/tag/css3%E8%BF%9B%E5%BA%A6%E6%9D%A1 CSS 各样的进度条 绘制学习!
+	https://jingyan.baidu.com/article/fec7a1e5ddaa051191b4e77b.html CSS DIV居中显示方法
+	https://www.cnblogs.com/z1h2/p/7067186.html div 水平居中；竖直用flex吧
+	https://blog.csdn.net/zang141588761/article/details/52210738 怎么样把CDC上的一个图保存为bmp格式的图
+	http://music.163.com/#/playlist?id=2139118830 Deep House
+	C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\WindowsAnimation\TimerDriven  选COM目录
+	https://www.codeproject.com/Articles/96/Beginner-s-Tutorial-COM-ATL-Simple-Project
+	http://www.brakmic.com/iunknown/ole-controls-part-2/
+	https://social.msdn.microsoft.com/Forums/vstudio/en-us/7cb41d7d-f9f6-4877-b178-f1d73e79ae03/sample-com-dll?forum=netfxbcl Sample COM
+
+	https://msdn.microsoft.com/en-us/library/599w5e7x(v=vs.140).aspx Active Template Library (ATL) Tutorial
+	http://blog.sina.com.cn/s/blog_4bb4e6510100j4h5.html 始终没有找到这个Polygon Container的Sample Code
+	https://blog.csdn.net/gxulg/article/details/330932 RichEdit支持点击超链接的实现  Hyper Link
+	https://www.cnblogs.com/findumars/p/4999198.html Print RichEdit 朝闻道夕死可矣
+
+	http://www.zhangxinxu.com/wordpress/2015/12/css3-animation-js-canvas-gif-pause-stop-play/ CSS js控制GIF播放/暂停
+	https://www.codeproject.com/Articles/10995/An-example-editor-with-table-and-image-support Table Image Text Mix
+	https://www.cnblogs.com/setoutsoft/p/4227529.html 快速查找Richedit中可见区域内OLE对象的方法
+	https://msdn.microsoft.com/en-us/library/windows/desktop/bb761566 Rich Edit Messages
+	https://www.cnblogs.com/setoutsoft/p/5240324.html 不注册COM在RichEdit中使OLE支持复制粘贴 启程软件
+	https://msdn.microsoft.com/en-us/library/windows/desktop/bb787875(v=vs.85).aspx Print RichEdit MSDN
+	https://msdn.microsoft.com/en-us/library/windows/desktop/bb787974(v=vs.85).aspx RichEdit处理键盘 鼠标 消息
+	SES_UPPERCASE https://msdn.microsoft.com/en-us/library/windows/desktop/bb788031(v=vs.85).aspx
+	将来要实现更加强大的OFFICE功能  可以直接嵌入 Excel Word到应用程序中去 https://support.microsoft.com/zh-cn/help/184663/how-to-embed-and-automate-a-microsoft-excel-worksheet-with-mfc
+	http://blog.sina.com.cn/s/blog_6e51df7f01015cci.html
+	https://blog.csdn.net/fullsail/article/details/8449448 高速操作EXCEL
+	https://blog.csdn.net/cai843383655/article/details/50310573 C++ 生成Word
+	https://www.cnblogs.com/believeit/archive/2009/09/29/2183585.html excel api
+	https://msdn.microsoft.com/en-us/library/windows/desktop/ms683979(v=vs.85).aspx IDataObject::EnumFormatEtc
+	http://www.xuebuyuan.com/2051785.html 大牛的文章 可以读读  如何稀松平常的使用ftp命令
+	https://docs.microsoft.com/zh-cn/dotnet/framework/winforms/advanced/how-to-render-images-with-gdi MSDN GDI+ HowTo
+	lunar	英[ˈlu:nə(r)]
+	美[ˈlunɚ]
+	adj.	阴历的; 月的，月球的; （光） 苍白的，微弱的; 银的，含银的;
+	[例句]The vast volcanic slope was eerily reminiscent of a lunar landscape.
+	开阔的火山坡让人心生怪异地联想起月球的地貌。
+	time_t now = time(0);//1970年到现在的秒数;
+	%I64d
+
+我最近常常想起一句歌词，“不过20几岁，但我见识过的，多到你不能体会，许多人一辈子抵不过我短短几年”。不过，这样的人生似乎显得更有意义。

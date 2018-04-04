@@ -1,3 +1,11 @@
+http://ebooks.syncfusion.com
+worksdata@163.com/worksdata163
+http://hardysimpson.github.io/zlog/UsersGuide-CN.html 
+汪晓明编写-深入浅出以太坊 高清完整.pdf
+以太坊白皮书 pdf
+http://8btc.com/thread-65335-1-1.html
+
+
 
 duilib类似bkwin中的imgframe的九宫格效果实现方法:
 
@@ -314,7 +322,22 @@ A:
 
 	void SessionModule_Impl::sessionMsgNotify(IN std::string userid, IN std::string notifyTime);
 	
+Q: 最前线的接收消息的方法.
+A: char* _receiveEmailMsgWithPop3(char* jsonContent, ReceiveEmailCallback callback, bool isANMessage, char* savePath, FilterCallBack filter, DataCallBack dataSave, char* embeddedSavePath, HistoryMsgCallBack hisoryMsgCB)
 
+
+Q: 闪信的头像差异化更新机制.
+A: 
+	1. 获取组织通讯录数据的时候, 对于每个部门/员工, 包含picmodifytime属性, 解析出来;
+	2. 闪信起来后, 后台跑一个线程, 对于mapUsrInfo中的每一个成员, 去UpdateLog表中对比, 如果不存在, 更新完毕更新DB;如果存在, 如果时间OUT, 更新完毕更新;
+
+Q: 群主如何标记。
+A: //目前判断群主的方法是群名;
+
+maillist_grpwbl_ 54 c3b3 d367 @test.com
+
+Q: 多语言如何支持的?
+A: 
 
 可以被审核的账号: wrp08@test.com/admin_1234
 
@@ -356,7 +379,7 @@ Forked Projects
 	Solution: 注释掉utils::Utf8ToString();
 	Reason: GroupHttpOperation已经把群名称从UTF8格式转化为ANSI格式了.
 
-#Optimizz:
+#Optimize:
 	搜索拼音同样匹配邮箱前缀
 	Expand/Collapse处理
 	PHOTO 40X40
@@ -407,6 +430,47 @@ Forked Projects
 	Solution: anEmailLib接收消息的时候每次都使用一个新的UUID(GenerateUUID()).
 		receiveEmailMsgWithPop3(); anEmailLib.cpp;
 
+#BUG: 头像更新机制,根据头像修改时间与本地的头像修改时间(用户的差异化属性table,差异化更新)比较,如果更新了,再去Server要图像.
+	Location: 
+		oCxImg.GetLastError(): "Unknown or Wrong Format"
+	Solution: 本地保存的文件名加后缀".png";
+
+#BUG: Win10下登陆窗口在 崩溃.
+	Reason: 安装目录中含有中文路径.
+	Solution: 
+
+#BUG:
+	创建工程HumanCharsCodec ANSI UTF8 UNICODE UNI16 .c文件, 而已.
+	String --> UTF8 -->UTF8 错！
+	UTF8 --> ANSI --> ANSI  可以？
+
+	编码文件可能在多个工程中使用，所以最好写成一个.hpp文件或者封装成一个.DLl，考虑到规模较小，直接封装成一个CharsCodec.hpp文件即可.
+	什么地方大日志，比如保存附件，anEmailLib.cp中这么重要的地方，如果保存文件失败，一定要打一个ERROR级别的日志！
+
+#BUG:
+	锁屏又恢复后，会主动去接收以前的消息。不关本地有没有。
+	Solution: ReceiveOffLine()要结合DB中的数据判断一下，再决定是不是要去获取离线消息。
+
+#BUG:
+	弹出登陆窗口后，半小时不操作，然后再点击登陆，提示“服务器异常”，反复重试也一样结果。
+	可能原因：WebService soap连接超时?
+	
+
+Base64编码测试:()    https://www.liaoxuefeng.com/wiki/001374738125095c955c1e6d8bb493182103fac9270762a000/001399413803339f4bbda5c01fc479cbea98b1387390748000
+	f = open('/d/pig2.txt','r')
+	u = f.read()
+	f.close()
+	fOut = open('/d/pig2.png','wb')
+	fOut.write(base64.b64decode(u))
+	fOut.close()
+
+	我的闪信客户端
+
+utils::StringReplaceAll(sBinary, "\n","");//快信移动端起初的版本Base64.Encode()方法未使用Base64.NO_WRAP标记,导致含有非法的"\n"! BUF FIXED:jian.he2018/01/23;
+
+
+python https://www.liaoxuefeng.com/wiki/001374738125095c955c1e6d8bb493182103fac9270762a000/001399413803339f4bbda5c01fc479cbea98b1387390748000
+
 
 #: coes.liu
 	left join..on
@@ -415,33 +479,893 @@ Forked Projects
 		ENTITY_PINYIN FULLPY FIRSTPY 创建字段的时候指定COLLATE NOCASE;(使用了COLLATE NOCASE之后sqlite不会更改字段值但是ORDER BY这个字段的时候，自动不区分大小写排序;但是如果联表之后再按这个字段排序,那么排序仍不会区分大小写;但是如果该字段可能为空, 使用case when使用其他字段替代比较，则排序仍会区分大小写!)
 		但是联表之后, 如果被排序的字段使用了case when替代语句, 那么排序又会区分大小写了; 解决方法:FULLPY不空!
 
+#BUG: 闪信端无法收到快信端(移动)发来的音频文件.
+	Reason: 
+	Solution: 
+
+
+#BUG: 群组列表按照拼音升序排序.
+#BUG: 添加server交互的独立log (SOCK对应的是BINARY, SERVER对应的是STRING)
+
+
+创建和添加群后，群列表自动更新!
+SELECT NAME FROM GROUPINFO LEFT JOIN ENTITY_PINYIN ON GROUPID=ENTITYID WHERE STATUS!=-1 ORDER BY FULLPY ASC;  
+GroupListModule_Impl 去掉无用的注释!!
+如果不从内存缓存数据，直接与DB交互，那么可能大量数据更新UI怎么破? HighPerfList,只绘制一屏!(按需加载也不如这种高效!)
+	HighPerfList使用一窥:
+		SetData(std::vector<void*>);
+		pHighPerfList->Refresh(-1,-1);//-1:all;iLowItemIdx-->iHighItemIdx;
+	但是对于频繁使用的数据，比如群列表，除非优化空间很大，否则不推荐内存再有一份数据，内存浪费!
+
+	getAllGroupListInfo 所有引用的地方,需要查看 优化
+	
+DBHelper GetHistoryMessage() sort在DB中做!!!!!!! 一定给它改了！！！
+
+
+//CAutoLock lock(&m_dbLock);//只读数据不加锁:加锁能避免写冲突,避免不了脏数据,脏数据的避免需要从逻辑上保证;jian.he 2018/02/07;
+========================================
+DBHelper sprintf统一改成ostringstream;不行！
+	因为有些sql是含有格式字符串的,而stringstream没有这方面的机制!
+	所以还需要CMemoryManage来辅助复用内存!
+	而且，理论上来说,stringstream也不如CMemoryManage效率高!
+	但是CMemoryManage加锁了，效率大大降低，可不可以内部实现按照线程ID去取不同的DataPool;
+		GetCurrentThreadID.这样就隔离了写操作, 从而避免写冲突.
+
+========================================
+
+群列表、群成员列表都按照拼音升序排列!
+Modified: Group Member在DB中是一个JSON字符串--排好序的!
+	Session有群成员列表;
+	CreateGroupDialog ChangeGroupDialog DeviceManageWnd ServiceManageWnd
+
+利用sql进行群成员排序:
+ SELECT USERID,REALNAME FROM USERINFO LEFT JOIN ENTITY_PINYIN ON USERID=ENTITYID WHERE USERID IN ('gxy06@test.com',
+      'wbl@test.com',
+      'research1@test.com',
+      'research2@test.com',
+      'research3@test.com',
+      'research4@test.com',
+      'sale1@test.com',
+      'wangqian@test.com',
+      'wangqian01@test.com') ORDER BY FULLPY ASC; 
+	void MainListLayout::_UpdateGroupList(IN const std::string& groupID);//群成员改变后, GroupList的显示群成员数量需要更新! 及群可能增加了!
+	解散群还没有做 DBHelper GroupModuleImpl
+
+排序当然从DB中排好，这样app中对应的数据结构就是vector, 为了便于查找，再用unordered_map映射一下vector的下标即可。
+
+
+#BUG 窗口显示状态下, 如果点击任务栏，不能自动最小化、还原切换。
+	原因：可能WM_SYS_COMMAND_RESTORE/WM_SYS_COMMAND_MINIMIZE消息被截断处理了.
+	Solution: 
+
+
+void MainListLayout::MKOForGrouplistModuleCallback(const std::string& keyId, MKO_TUPLE_PARAM mkoParam)
+	
+		
+
+	
+
+		UpdateGroup();所有引用是否有存在的必要！！！
+		void SessionLayout::_UpdateGroupMembersList() 不需要这么麻烦 直接把从DB中获取的数据顺序加载到界面上即可.
+
+		GroupModule的观察者: MainListLayout、SessionLayout;
+		从功能上捋直：创建群、修改群成员、删除群
+
+		创建群:
+			CreateGroupDialog, 点击创建按钮;
+				1.GroupOperation, http request;//发送给服务器数据;
+					服务端返回数据, TWebsocketMsgManager::NotifyGroupChanged(const Json::Value value)
+						module::getSessionModule()->groupChangeNotify(id, groupName, members);//更新DB, 更新RecentSession;
+						GroupModule通知所有观察者KEY_GROUPLIST_UPDATE_CREATNEWGROUP;
+							_UpdateUI_NewGroupCreated()//更新GroupList;更新RecentSessionList;
+				2.CreateGroupDialog::OnOperationCallback()
+					提示用户:创建群成功/失败.
+		
+		删除群:
+			GroupList右键菜单"删除":
+				1. 发送请求给服务器(GroupOperation);					
+				2. 回调MainDialog::OnOperationCallback()
+					GroupModule通知所有观察者KEY_GROUPLIST_UPDATE_DELETEGROUP;
+						MainListLayout Observer: 更新DB(标记群STATUS=-1,表明用户删除了,联网后继续请求);更新RecentSessionList;更新GroupList;删除SessionDialog/SessionEntity;
+				3.  收到/处理服务器广播"群删除"的通知;
+					
+
+		修改群成员:
+			ChangeGroupDialog 点击确认按钮:
+				1. 向服务器发送添加群成员请求;
+				2. 向服务器发送删除群成员请求;
+				3. 回调ChangeGroupMemberDialog::OnOperationCallback();(3.1 3.2实际上是重复的)
+					3.1 添加群成员操作成功反馈:
+						通知观察者KEY_GROUPLIST_UPDATE_MEMBER_CHANGED:
+							观察者MainListLayout:
+								更新Main Window UI;
+							观察者SessionLayout:
+								更新会话面板右侧的Group Member List;
+					3.2 删除群成员操作成功反馈:
+						更新DB GroupInfo;
+						通知观察者KEY_GROUPLIST_UPDATE_MEMBER_CHANGED:
+							观察者MainListLayout:
+								更新Main Window UI;
+							观察者SessionLayout:
+								更新会话面板右侧的Group Member List;
+		(可以看出，修改群成员本来只需要一个服务接口ChangeGroupMembersRequest()!!!!!!!!!!!!!!!!!!!)
+
+
+
+			删除群, 在一次HTTP请求的返回值就带来了服务器反馈的操作结果(表明服务器是否处理成功客户端请求), 服务器广播一次删除群的通知(这部分需要测试!服务器是否由此机制，闪信是否处理了！);
+			创建群, 在一次HTTP请求的返回值就带来了服务器反馈的操作结果, 服务器还会广播一次正式的包含群成员列表的通知;
+
+		UIGroupTreeList重构！
+			1. AddNode()不需要排序!
+			2. UI与UI对应的数据绑定的不好！删除一个节点也要删除对应的UI Data!(是树形结构吗?展开/折叠如何找到children的?)
+			3. MainListLayout SessionLayout右侧  CreateGroupDialog ChangeGroupDialog
+
+如果群消息屏蔽了，还能正常接收消息吗？测试，梳理工作流！！
+CDialogBuilder::Create()创建出来的Window或者控件，可以用delete删除吗? 正确的释放方法是?????????????????????
+	应该是无句柄的;
+	void SessionDialogManager::removeSessionDialogPtr(IN const std::string& sId)中做delete?? close??
+
+
+1个SessionDialog 在SessioContainer中保存一份，在SessionDialogManager中一份，应该不必这样!!!!!!!!!!!!
+	好像SessionContainer只保存当前显示的一个，本身作为一个占位容器，控制Visible;
+	
+接收一个群消息时，要确保自身在这个群中！有可能服务器在发送某条群消息的同时，自己退出了这个群，所以需要在客户端判断。
+
+
+创建一个新群后，自动置顶最近会话，并打开Session了吗? CHECK.
+退出群 和  解散群 是两码事，现在不能退出群，只能“删除群”解散自己创建的群
+如果删除当前打开的群会话，那么会闪退
+	原因：在工作线程中操作了UI,比如释放了一个窗口，实际上这个窗口还运行着
+		MainListLayout::_DeleteGroup()是在线程中运行着的,不能操作UI只能异步通知主线程去更新!
+	Solution: 不能在工作线程中操作UI!!
+		所以某些同步/异步调用敏感的函数表明"async"是很有必要的!
+		
+
+
+BOOL LoginDialog::_ReadGroupInfo()	
+	功能: 从所有的mailList过滤挑选出grouplist中; 插入groupList到DB;同时更新包含设备和群信息的g_MailList;
+	
+MainListLayout.cpp
+
+InsertGroupInfoToDB() 添加排序机制;
+容错机制:如果排序失败,那么返回不排序的列表;
+多音字纠错机制: 对多音字的组合提供纠错机制，比如"万"在单姓的时候读"WAN"，复姓"万俟"读"MOQI";
+群列表 群成员列表如何在服务端计算就更好了;(服务器只需算一次，省的每个客户端每次启动都要计算)
+群名称现在没有滤重! 放在Server端更合理，因为不同的客户端可能同时创建一个同样名称的、包含同样成员的群！
+
+GroupListUI不要折叠!
+RecentSessionListUI 添加群创建成功的消息!
+
+拼音组合是否完全使用SQL?
+
+BUG: 一个汉字截断一般显示为问号? 以前不是改过了吗????????!!!!!!!!!!!!!!!!!!
+BUG: 通信这块，看DEBUG黑屏窗口，?????send to?????????类似的东西，获取的数据可能有脏数据！需要处理下！
+
+GroupListMoudule继承自ModuleBase, 使用的观察者模式，AsyncNotify()之后的OnOperationCallback()是在另一个线程中的吧? 
+	如果是，那么就不能在OnOperationCallback()中直接操作主线程的Ui!
+
+GroupList更新数量后，应该显示箭头啊
+创建群成功后，直接打开新建的群
+GenPinyin 的时候，添加mapUsualPronounce 比如MOQI WAN; 
+	https://www.douban.com/note/487212754/ 常见多音字集合 我只取拼音不一样、只是音调不一样的                
+
+插件化平台应该如何设计，比如消息插件 会话插件，类似浏览器、Windows这种平台式的东西，容错、错误处理、交互
+
+提交Git GBK_HanziToPinyin, 定期温故
+
+sqlite整理
+各种编译模式：
+sqlite.dll --> sqlite3.lib sqlite3.exp 
+sqlite3.h sqlite3_ext.h如何使用
+如何静态lib
+如何动态dll
+如何使用
+
+
+汉字资料
+
+
+
+悬浮球
+		消息器
+		报警器
+		
+		
+SQLITE "database is locked"
+生产环境: 头像批量更新.
+原因: 使用sqlite必须使用库级锁，现在的锁是函数级别的。
+
+
+//里面处理的情况，都看看处理的是否完善。
+void MainListLayout::_UpdateUI_GroupMemberChanged(IN const std::string& groupID)
+{
+	//需要处理的情况:
+	//1. 已存在的群的成员数量改变了;
+	//2. 新增的群;
+	//3. 群解散了,需要删除;
+
+	//数据驱动UI;(比如如果群数据不存在了,那么说明群解散了)
+	//处理策略:直接与数据仓库进行交互(去掉内存层:1浪费内存,2性能提升不大,3需要小心维护), 而且因为需要拼音排序+群数量不会很多(将来移植过来SOUI中的List,大数量更新List也OK),直接重新加载!
+	module::TGroupInfoArray arGroup;
+	module::getGroupListModule()->getAllGroupListInfo(arGroup, true);
+
+	//重新加载群列表;
+	_ReloadGroupList(arGroup);
+}
+
+******************************************
+Sqlite 多线程模式下  只读数据也需要加锁?
+******************************************
+sqlite Multi-Thread 模式下，好像在写的过程中(因为sqlite内部加了LOCK)，读也不允许!
+2018-02-11 15:40:57 dbhelper.cpp(utils::isGroupSessionId,2814) [error] -> isUserSessionId Failed. Error: database is locked
+2018-02-11 15:41:04 dbhelper.cpp(utils::isUserSessionId,2748) [error] -> isUserSessionId Failed. Error: database is locked
+2018-02-11 15:41:09 dbhelper.cpp(utils::isStrangerSessionId,2781) [error] -> isUserSessionId Failed. Error: database is locked
+2018-02-11 15:41:10 moduleobserver.cpp(module::MKOEvent_Impl::process,41) [error] -> unknown exception
+2018-02-11 15:41:12 dbhelper.cpp(utils::GetAllGroupInfo,1640) [error] -> GetAllGroupInfo Failed. Error: database is locked
+2018-02-11 15:44:10 dbhelper.cpp(utils::SetDiffUpdate_UsrAvatar,3881) [error] -> SetDiffUpdate_UsrAvatar Failed. Error: database is locked
+2018-02-11 15:44:12 dbhelper.cpp(utils::SetDiffUpdate_UsrAvatar,3881) [error] -> SetDiffUpdate_UsrAvatar Failed. Error: database is locked
+
+Analysis: 闪信使用的sqlite编译版本是MultiThread版本(其它还可以是SingleThread/Serialize版本), 在写的过程中使用了一个全局锁, 所以如果当前在写DB，读DB的时候就会抛出"database is locked"错误
+	此错误是sqlite db抛出的。
+	实际上，按照sqlite官方的说法，只要使用不同的instance,并行写也是安全的? 是，但是如果当前已经由一个实例在写，会返回一个SQLITE_BUSY错误，需要自己添加循环尝试机制。
+	SQLITE_LOCKED: 同一个连接，多线程执行了两个不兼容的数据操作;
+	SQLITE_BUSY: "database is locked" 不同的连接, 多线程的其中一个在写DB.
+Solution: 实现sqlite3_busy_handler() 或者 直接使用一个外围锁.
+优化: 既然加锁了，使用一个DB Connection就可以.
+	既然写都是顺序执行的，单线程模式，自己控制逻辑，岂不是更高效? 单线程模式在写的同时可以读吗?　测试！
+	但是要注意，线程是有时间片的，可能多线程更高效?
+如何实现sqlite postgres在写的同时可以并发读? 需要写专门的测试程序!!!
+
+1. TDxScene Parent: TForm;
+3. Transparency: True;Fill:#0;
+4. Root: HitTest:False;
+但是还是无法正常透明异形窗口，不得已，只能在Layered基础上修改(打开工程后F2重命名即可)
+
+
+
+yaolog demo
+Q1: 如何禁用一个log输出?
+
+
+
+#BUG: RecentMessage刚启动闪信后, "[图片]"显示为"[??]"
+
+#BUG: 创建群"wrp魏_006" 群名称显示也是错误的;
+
+BUG：1个或两个汉字既符合ANSI又符合UTF8的格式，无法有效过滤，索性去掉判断是否UTF8.
+
+
+http://blog.csdn.net/lufeng20/article/details/17961411  VS ERROR Microsoft.CppCommon.targets(719,5): error MSB6006: "rc.exe" exited with code 1
+
+SaveAudio/EmlFile 1. ChineseCharacters -->   utf8; 2. mime create file  _receiveEmailMsgWithPop3() anEmailLib.cpp;
+
+StringToUtf8 internal add judgement: if utils::isTextUtf8();!!!BUG ACTUALLY ASCII UNICODE UTF8 SHOULD JUDGE BEFORE CONVERT!
+
+#BUG: 不同端登陆应该提示，而且同一种类型的客户端只能登陆一个。
+#优化点: 拖拽窗体, 会出现刷新不及时导致的连续纹理条;
+#规则BUG: HANDLE hMutex = ::CreateMutex(NULL, FALSE, AppSingletonMutex);//第二个参数bInitOwner如果设为TRUE,那么标记这个MUTEX的方式是"Owner.MUTEX";FALSE, 则标记"MUTEX";如果要实现单一进程启动,则须设为FALSE;
+#BUG: 如果获取不到密级,那么重试3次后，如果仍然失败直接退出.
+
+UTILS 合并 按照功能领域细分
+
+#BUG BaseLayout不能delete的问题, 不崩溃，但是会导致duilib框架出现闪退!
+	Analysis: m_dlgBuilder.Create("xx.xml")返回的UI对象如何释放的问题?
+		返回的是CControlUI*类型，为何不是windows的HWND类型? 难道强制把一个窗口转化成一个CControlUI*对象，肯定不是，倒是有可能是Root控件.
+
+	Solution: 
+
+duilib每个window对应一个PaintManager?
+1个PaintManager可以对应多个Window?
+WindowImplBase如何关闭(释放)一个窗口的?
+因为SessionDialog使用的主窗口的PaintManager? 所以释放的时候把主窗口给释放了?
+	因为没有设置window节点的其它属性，所以不会改变主窗口的显示特性.
+	测试设置SessionLayout的window节点的其它属性，是否会改变主窗口的显示特性。
+		会。如果没有改变(比如sizebox)，是因为PaintManager内部过滤掉了，很多属性都会起作用，比如roundcorner.
+	正确的释放方法为:
+		获取pSessionNeedFree的Parent, 然后Parent->Remove(pSessionNeedFree);
+		而不是直接delete pSessionNeedFree;这样父控件保存的索引就成了野指针!
+	整理出Demo 写Blog 文章 写入BOOK中！
+	写个Demo 暂时先不删!
+#BUG 历史消息展示，大部分时候都是空白的。
+
+
+
+更新头像策略: 每隔一定时间, 反复尝试, 直至成功更新所有头像为止;
+更新个人头像的条件: 服务器端已设置头像 && (本地无更新记录 || 本地更新时间早于当前服务器的更新时间);
+SELECT USERID FROM (SELECT USERID,PICMODTIME,ENTITYVAL FROM USERINFO LEFT JOIN (SELECT ENTITYID,ENTITYVAL FROM UPDATELOG WHERE ENTITYKEY = 1) ON USERID=ENTITYID) B WHERE B.PICMODTIME<>'' AND (B.ENTITYVAL IS NULL OR B.ENTITYVAL='' OR B.PICMODTIME>B.ENTITYVAL)
+
+
+
 闪信优化点：直接把固定的表组装成.db文件，从server上下载;
 	本地另外一个DB,只保存配置、动态信息;
 	密级什么的都可以只请求一次，不必反复请求，浪费带宽；
 	GBK编码库生成模块可配置大小写;
 	
+**************************
+MS Word兼容的剪切板操作
+**************************
+最保守的实现机制: 	添加一个有窗口句柄+实现了OLE接口的CRichEditCtrl, 所有的SessionDialog共享一个;
+			CEF里面的图文混排数据的复制就要改成通用的RTF格式. 还是有一个问题: RTF格式如何拷贝的到切板?
+			!!!!!!!!!! 但是Native的实现方式存在滚动条风格的问题!!!!!!!!!
+				滚动条可能可以自定义替换;
+				如果继承CRichEditCtrl后，能实现异形和半透明吗?
+			所以拟最不济使用RedRain的RichEdit控件;(不支持OLE!!!)
+			因为你自绘，不可能全部支持word中个各种富格式，所以直接让RichEdit自己处理好了，这是使用Native Rich Edit的最大好处!
+			(可能只绘制局部,比如gif，其余交给RichEdit的默认处理)
+			duilib的CPoint与MFC的CPoint有明明冲突, 改: CPoint -->CDuiPoint;
+			>c:\program files (x86)\microsoft visual studio 10.0\vc\atlmfc\include\afx.h(24): fatal error C1189: #error :  Building MFC application with /MD[d] (CRT dll version) requires MFC shared dll version. Please #define _AFXDLL or do not use /MD[d]
+				工程->属性- >配置属性->c++->命令行 结尾加上 /D "_AFXDLL"
+			1>c:\program files (x86)\microsoft visual studio 10.0\vc\atlmfc\include\afxv_w32.h(16): fatal error C1189: #error :  WINDOWS.H already included.  MFC apps must not #include <windows.h>
+				把#include <Windows.h>的所有地方 替换为 #include "MFC_Headers.h"，因为mfc框架中必定已经包含了windows.h;
+			AfxGetInstanceHandle()崩溃!
+				WinMain()需要全局初始化MFC: AfxWinInit(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
+			IDC_RTF1可以通过修改resouce.h 和 .rc文件完成! MFC只是对WIN32提供了一个重量级的封装而已，所以不会与duilib矛盾。
+
+	CNativeRichEditUI:
+		1. 核心功能借助于Windows Native Control: CRichEditCtrl;
+		2. 自绘Scroll Bar;
+		3. 实现了OLE接口, 可与MS Word进行剪切板互操作;
+		4. 只使用Win32基本窗口API, 不依赖MFC(多亏了微软将后来版本的CRichEditCtrl改成了COM模型);
+
+RTF 是从RichEdit复制出来的, 显示到CEF中去的时候，是不是应该转化为HTML代码? 还是说只显示有效文字? RTF <--> HTML
+	如果CEF中不能正确显示RTF格式，那么消息传输使用RTF格式就没有意义了!
+
+	librtf源码及使用方法分析:
+		RTFWriter: rtfproc.c 主要在这个文件中实现RTF Writer相关的机制.
+			调用请看: librtf.h extern processor * create_rtf_processor(output* out);
+		librtfcpp.cpp void utils::attributes_stack::attr_remove(int * tab, int size)存在BUG.
+			如何修改?
 
 
-排序效果是不一样的:
+RichEdit插入图片:
+	1. OLE方式插入 http://bbs.csdn.net/topics/390706095?page=1
+	2. 重新生成RTF文本，重新载入;
+	显然，方式1在用户体验上更好些.
 
-//如果全拼为空,则使用名称作为排序比对的字符串;
-SELECT USERID,GENDER,ALIASNAME,REALNAME,AVATAR,ANYUSERMJ,WORKID,PHONE,EMAIL,DEPARTNAME,PRIORITY,ENTITY_PINYIN.FULLPY FROM (SELECT USERID,GENDER,ALIASNAME,REALNAME,AVATAR,ANYUSERMJ,WORKID,PHONE,EMAIL,DEPARTNAME,PRIORITY FROM USERINFO WHERE ISVISIBLE=1 AND DEPARTID=830) LEFT JOIN ENTITY_PINYIN ON USERID=ENTITYID ORDER BY PRIORITY ASC, (CASE FULLPY WHEN '' THEN REALNAME ELSE FULLPY END) ASC;
-//如果全拼相等，则使用名称排序;(区别在于只重排 全拼相等的记录的相对顺序，前者则全局排序)
-SELECT USERID,GENDER,ALIASNAME,REALNAME,AVATAR,ANYUSERMJ,WORKID,PHONE,EMAIL,DEPARTNAME,PRIORITY,ENTITY_PINYIN.FULLPY FROM (SELECT USERID,GENDER,ALIASNAME,REALNAME,AVATAR,ANYUSERMJ,WORKID,PHONE,EMAIL,DEPARTNAME,PRIORITY FROM USERINFO WHERE ISVISIBLE=1 AND DEPARTID=830) LEFT JOIN ENTITY_PINYIN ON USERID=ENTITYID ORDER BY PRIORITY ASC, FULLPY ASC,REALNAME ASC;
+如果弄懂了RTF格式的数据如何放入到内存中去,那么RichEdit的复制直接往内存中添加RTF数据就可以实现word通用了.
 
-注意联合查询时要排序的字段如果不都是COLLATE NOCASE，那么有可能达不到效果;
-SELECT * FROM ENTITY_PINYIN ORDER BY FULLPY ASC,ENTITYNAME ASC;//测试创建时指定了COLLATE NOCASE的字段排序效果;
+高级的实现方式: wndless --> Rich Edit 8.1 --> SOUI 多gif的Timer组合机制.
 
-如果想排序的时候不区分大小写，最高效的方法是在创建表时给这个字段加上COLLATE NOCASE;
-如果想匹配的时候不区分大小写, 最高效的方法是:SAME.
-也就是说, 创建表的时候给字段加上COLLATE NOCASE, 会影响该字段的排序、匹配均不区分大小写。
+最后，一步一步写成一系列Blog+Code/Book!
+	放效果, 录屏, 与Word交互;
+	有句柄版本和无句柄版本;
+	
+
+DEMO需要具备的功能:
+	1. 判断RichEdit的版本;
+	2. 正确的方式拷贝RTF格式数据到Clipboard, 使之可与Microsoft Word交互.
 
 
+RTF如何拷贝到剪切板:
+	http://bbs.csdn.net/topics/392259350
+	
+
+
+
+RedRain DuiLib RichEdit Implementation:
+	BOOL CTxtWinHost::Init(CRichEditUI *re, const CREATESTRUCT *pcs);
+		LoadLibrary(_T("msftedit.dll"));
+
+SkinScrollBar Demo Implementation:
+	class CSkinScrollBar : public CScrollBar;
+		处理CScrollBar接收的消息:
+		主动利用CScrollBar向外发送消息:
+		如何跟RichEdit绑定到一起的?
+		RichEdit是设置不显示SCROLL_BAR了吗? SkinScrollBar是覆盖默认的ScrollBar了吗?
+		m_wndLimit是除了水平、数值滚动条之外的区域, RichEdit附着在上面;当滚动条显示时,m_wndLimit会收缩;反之扩张.
+		拖动滚动条，调用的是CSkinScrollWnd::OnVScroll()这传递出信息:
+			拖动滚动条  --> CSkinScrollWnd收到WM_VSCROLL消息--> 获取m_wndLimit的第一个子窗口即RichEdit, 转发WM_VSCROLL消息给RichEdit;
+			ScrollBar的消息会上传给父窗口?
+		创建SkinScrollWnd时，使用的是RichEdit的DlgCtrlID、Style，却处理了RichEdit的WndProc;
+		当SkinScrollWnd HOOK到RichEdit的WM_SCROLL消息后，自己处理, 改变滚动条的显示状态;
+		实际上是创建了一个自定义的滚动条盖住了原来的滚动条，而已。
+		所以，关键点在于: HOOK WNDPROC;
+		QUESTION 1: wndLimit的范围是除了ScrollBar之外的区域吗? 为啥RichEdit内置的滚动条没有占据wndLimit的部分区域?
+			CSkinScrollFrameWnd收到WM_NCCALCSIZE时,会调整wndLimit的区域: 
+				pNcCalcSizeParam->rgrc[0]//调整客户区的大小;
+				实际上RichEditCtrl是wndLimit的子窗口, 但是RichEditCtrl的客户区全部占据了wndLimit的可视空间(即滚动区域在wndLimit的可视区域外),所以导致滚动条不可见!
+				如果实际的滚动条区域没有绘制东西，滚动条就会显示出来（脏区域）
+		QUESTION 2: CSkinScrollWnd::OnPaint()绘制的东西会被RichEdit的内容覆盖?
+			它只绘制了滚动条区域的箭头! 绘制在RichEdit内容区域的部分会被覆盖!
+		QUESTION 3: CSkinScrollBar可否直接继承CWnd，或者 一个最简单的窗口? 是不是仍然可以处理WM_VSCROLL等消息?如果可以，就太好了，不用包含MFC的头文件了.
+		DUILIB 做的修改:
+			1. CPoint --> CDuiPoint;
+			2. Add UINativeRichEdit.h/.cpp;
+			3. Add NativeWnd.h/.cpp;(对于WinImplBase,xml必须有;NativeWnd则只提供一个可以处理消息的窗体框架)
+	
+	typedef struct tagSCROLLINFO
+	{
+	    UINT    cbSize;
+	    UINT    fMask;
+	    int     nMin;//内容的最小值;
+	    int     nMax;//内容的最大值;
+	    UINT    nPage;//当前一页(屏)的内容的长度;
+	    int     nPos;//滑块上边沿的位置(内容长度);注意:最大值为nMax-nPage;
+	    int     nTrackPos;//注意:最大值为nMax-nPage;
+	}   SCROLLINFO, FAR *LPSCROLLINFO;
+	做成一个.dll,来创建一个CRichEditCtrl？
+
+	讲解其中的数学原理：不过比例式，而已。
+	int nSeg = nInterH * si.nTrackPos / iContentH;
+	OR: 
+	int nSeg = (nInterH - nSliderH) * si.nTrackPos / (iContentH - si.nPage);
+
+	使用一个Timer来防止用户频繁点击LineUp/Down、PageUp/Down.(过滤掉在延迟间隔之内的点击)
+	在RichEdit中滚动滚轮，通过一个Timer来驱动CustomScrollBar的;
+流程未跑通:
+	::SendMessage(::GetParent(m_hWnd), pBar->IsHorizontal()?WM_HSCROLL:WM_VSCROLL, (WPARAM)pBar->GetScrollPos(), (LPARAM)this);
+		
+	处理OnSize()消息，最大化后SessionDialog会变宽!
+	CScrollBarUI的宽度 高度 是如何确定的 ? 资源?
+		DEFAULT_SCROLLBAR_SIZE
+		
+			
+
+	::SetScrollPos(hEdit, SB_VERT|SB_HORZ, -160, TRUE);//专为CScrollBar MFC类设计的;需要测试！！！jian.he;
+	POINT ptPos;
+	ptPos.x = 10;
+	ptPos.y = 100;
+	SendMessage(hEdit, EM_SETSCROLLPOS, 0,(LPARAM)&ptPos);//设置RichEdit的滚动位置的方法一: 在滚动条滚动之后调用;
+	还有一种设置滚动位置的方法:
+		WM_VSCROLL wParam组合字段 详见MSDN 在有滚动趋势时调用;
+
+	滚动条风格通过调用CPaintManagerUI::GetDefaultAttributeList("VScrollBar");/("VScrollBar")实现加载;
+		代码中的设置的地方:void CContainerUI::EnableScrollBar(bool bEnableVertical, bool bEnableHorizontal)
+					LPCTSTR pDefaultAttributes = m_pManager->GetDefaultAttributeList(_T("VScrollBar"));
+					if( pDefaultAttributes )
+						m_pVerticalScrollBar->ApplyAttributeList(pDefaultAttributes);
+		需要在包含RichEdit的window中指定<default V/HScrollBar> 属性才可生效!
+
+	UIDlgBuilder.cpp
+		CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPaintManagerUI* pManager)
+		添加 new CNativeRichEditUI;
+	UILib.h
+		#include "Control/UINativeRichEdit.h"
+	CControlUI* CDialogBuilder::Create()
+		BUG FIXED: 直接xml字符串解析;
+	UIImageAttribute.cpp 添加 RECT CImageAttribute::GetSource() const;
+	UIScrollBar.cpp 添加方法 int CScrollBarUI::GetThumbWidth();
+
+	OLE CALLBACK
+	SET FONT
+	SET TEXTPADDING
+	设置字符输入限制
+	READONLY支持
+	修改使得ScrollBar完全盖住滚动条，比实际风格多的地方留白；（防止出现鼠标形状闪烁）
+	左侧滚动条测试!
+	右键菜单
+	自处理点击Link事件: http://bbs.csdn.net/topics/90501234
+		http://blog.163.com/l1_jun/blog/static/14386388201231724015509/
+		http://blog.csdn.net/gxulg/article/details/330932
+	regex规则检测 https://www.cnblogs.com/friendjoey/archive/2015/01/29/4258944.html
+	自动识别URL LINK:http://blog.csdn.net/gxulg/article/details/330932
+			https://stackoverflow.com/questions/6196738/richedits-em-autourldetect-message-recognizes-link-but-i-cant-click-it
+			https://stackoverflow.com/questions/8897841/how-to-detect-url-links-after-setting-em-autourldetect-in-trichedit
+	PARAGRAPH FORMAT:
+	CAN PASTE: 菜单是否灰化
+	PASTE SPECIAL: 以特定格式粘贴 
+	设置RichEdit边距:
+		1. 设置CNativeRichEditUI与CRichEditCtrl的边距;
+		2. 使用EM_SETRECT设置CRichEditCtrl的内容编辑区域的大小.
+		3. EM_SETMARGINS 只能设置左右边距，不能设置上下。
+		通过测试，方法1不适合处理有滚动条的情形（滚动条要顶到头）。
+	此MFC文件中包含CRichEditCtrl的所有设置选项: C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\atlmfc\src\mfc\winctrl4.cpp
+	对于ScrollBar来说，BkScroll才应该是真正的宽度; 16等写死的数字是不实用的;
+	 	修改前，先看下anymacro的 duilib 版本 是否应修改?
+		thumb: rail: button1: button2:
+		ScrollBar自动决定宽度，还是用户自己设置?
+		GetScrollBarWidth();是否有存在的必要？ 没必要，删除！
+	当窗口大小改变时, duilib的流程是如何走的?
+		搜索"WM_SIZE":
+			CPaintManagerUI case WM_SIZE:m_pRoot->NeedUpdate();
+			CPaintManagerUI: case WM_PAINT: m_pRoot->SetPos(rcClient);
+			
+	xml中的<Window>tag被解析成了什么? DialogBuilder.Create()返回的是CControlUI是ROOT CONTAINER? 还是 Window?
+		CPaintManagerUI::m_pRoot是Window节点下的第一级控件.
+		
+	if(horzScrollBarAttrList)//如果为空，会导致只有RichEdit窗口可见，duilib的控件都无法绘制！！
+		m_sbHorz->ApplyAttributeList(horzScrollBarAttrList);
+	duilib child窗口 在WM_NCCREATE之后 很快就收到WM_NCDESTROY消息，被立即释放了?
+		原因: CreateWindowEx()执行失败.
+	duilib中的VirtualWnd是干什么的?
+		模仿MFC的窗口
+	问题: 一个duilib窗口window节点下面直接就是ScrollBar节点，窗口变大后，脏矩形得不到刷新!
+	解决: root节点一定要是一个Container节点，添加一个CContainer节点就OK了。
+	心得: 使用duilib构建窗体, 根节点一定是容器节点.
+	EM_SETRECT/SETRECTNP https://technet.microsoft.com/zh-cn/aa926965 可以设置内容的显示区域，可用于留边距
+	CHARFORMAT2 https://msdn.microsoft.com/en-us/library/windows/desktop/bb787883(v=vs.85).aspx 
+		可以看出8.0以后的版本有了新的特性bUnderlineColor
+		属性bAnimate看啥的?
+	
+	问题: 鼠标移动到CRichEditCtrl与CustomScrollBarWnd交界地方时, 发生IDC_ARROW EditCaret形状的闪烁。
+	原因: 由于CustomScrollBarWnd的宽度比CRichEditCtrl默认的滚动条窗体的宽度要窄, 我们做了一部分hack: 改变了CRichEditCtrl的内容区域的宽度.
+		而windows并不知情。所以，在windows看来这里既是滚动条区域，又是内容编辑区域。
+	解决: 	1. 不改变CRichEditCtrl的内容编辑客户区的大小, 让CustomScrollBarWnd完全占据默认滚动条的区域. CustomScrollBarWnd内部做些padding即可。
+		失败的方法: 通过SendMessage(EM_SETRECT)设置内容客户区的大小.仍然闪烁;
+	
+	问题: ScrollBar不能自适应大小. 
+	原因: m_cxyFixed.cx初始化的过早.
+		CScrollBarUI构造函数中:
+		if(!m_bHorizontal)
+			m_cxyFixed.cx = DEFAULT_SCROLLBAR_SIZE;
+		实际情形是, 因为SetHorizontal()永远在构造函数的后面执行,导致m_bHorizontal为true的时候, m_cxyFixed.cx仍为16，正确的初始值应该为0!
+		这样EstimateSize()才会返回一个正确的估值, 水平滚动条才能正常显示!
+		在这种模型下，SetHorizontal()方法只能调用一次，因为重复调用会将m_cxyFixed.cx/cy设置为0，从而可能出现意想不到的效果. 但也可能不会出现，如果SetPos()稍后被调用，会更新位置。
+	解决:
+		构造函数中改成:
+		//这里不能用DEFAULT_SCROLLBAR_SIZE初始化m_cxyFixed任何一个成员, 因为m_bHorizontal还没有赋值! jian.he 2018/03/08;
+		m_cxyFixed.cx = m_cxyFixed.cy = 0;
+		方法void CScrollBarUI::SetHorizontal(bool bHorizontal)去掉下面这句:
+			if( m_bHorizontal == bHorizontal ) return;
+		SetHorizontal()应该只调用一次.
+	Duilib优化: 使控件支持文字竖排显示;
+		改动 CLabelUI SetAttribute() 添加属性"singleline"
+			else if(_tcscmp(pstrName, _T("textsingleline")) == 0)
+			{
+				if(0 == _tcscmp(pstrValue, _T("false")))
+					m_uTextStyle &= ~DT_SINGLELINE;
+				else
+					m_uTextStyle |= DT_SINGLELINE;
+			}
+		Example:  <Button height="200" width="30" showhtml="true" textsingleline="false" text="设<n>置<n>最<n>大<n>字<n>符<n>数<n>20" />
+		注意: text的前后不要加<n>, 否则不会严格垂直居中对齐.
+		效果图: doc目录下.
+	
+	
+	https://msdn.microsoft.com/en-us/library/aa924582.aspx CRichEditCtrl 所有的消息
+	https://docs.microsoft.com/en-us/cpp/mfc/reference/cricheditview-class CRichEditCtrl各种用法
+
+	最后需要清理的代码"
+		xml RichEdit bkcolor 使用白色
+		CSkinScrollFrame control bkcolor 使用白色
+		
+	估计又是一个非常难解决的BUG:
+		调用::CreateWindowEx()后, 收到WM_NCCREATE之后，收到WM_NCDESTROY消息, ::CreateWindowEx()返回NULL.
+		常见的问题是因为传的windowClassName,与REGISTERCLASS结构体中的className不一致;
+		这个问题是因为实现了WindowImplBase的virtual方法LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)但是统统的return 0!
+		如果在WM_NCCREATE消息处理后，返回0，代表你要结束创建这个窗口.
+		https://msdn.microsoft.com/en-us/library/ms632635.aspx:
+			If an application processes this message, it should return TRUE to continue creation of the window. If the application returns FALSE, the CreateWindow or CreateWindowEx function will return a NULL handle.
+		使用的定位方法是: 与之前及时保存的一个版本进行代码对比。
+		教训：1.及时copy backup;  2.冷静分析自己做了什么;
+	BUG:
+		1. 先粘贴word的大篇幅图文混排内容，再窗口最大化，滚动条窗口总有一部分成为脏矩形得不到刷新;
+		2. 先最大化窗口再粘贴，再最小化，再最大化，就没有这个脏区域.
+	
+	关键实现点: 改变的只是wndLimit的大小, RichEdit的大小一直没有变化! 等于SkinFrameWnd的大小!
+
+	支持简洁的模式ScrollBar 细长、没有上下箭头
+	
+	Duilib优化
+		给VerticalLayoutUI添加"vscrollbarwidth"属性;给水平容器添加"hscrollheight"  用户可以通过设置与自己使用的资源一致的大小，覆盖默认的DEFAULT_SCROLLBARSIZE 16.
+		实现机制: 直接find scorllbar，设置fixed width height即可。
+		duilib既然不提供可以同时支持水平、竖直滚动条的容器，那如何实现两个方向同时支持呢?
+		答案为: 水平容器嵌套竖直容器 或 竖直容器嵌套水平容器。
+		代码修改位置:
+			void CHorizontalLayoutUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
+			{...
+				else if(0 == _tcscmp(pstrName, _T("hscrollbarheight")))//jian.he added 2018/03/09 17:41;
+				{
+					if(m_pHorizontalScrollBar)
+						m_pHorizontalScrollBar->SetFixedHeight(_ttoi(pstrValue));
+				}
+			...
+			}
+
+		但是正确的使用方法为: 拿HorizontalLayout为例, hscrollbar="true"必须放在hscrollbarheight="8"的前面,否则不会生效.
+
+	Duilib BUG:
+		非ListUI的普通Container: Vertical/HorizontalLayout, 设置vscrollbar="true" hscrollbar="true"后,
+		B1. 竖直滚动条不出现;
+		B2. 水平滚动条的范围不对.
+		REASON:
+		SOLUTION:
+			B2: 查看CVerticalLayoutUI::SetPos()可以发现: duilib中VerticalLayout的设计只支持竖直滚动，水平最多支持100的多余空间（ScrollRange的默认值）, 所以使用起来要注意啦! 可以猜想, HorizontalLayout只支持水平滚动.
+				按照这种用法，写一个有滚动条的水平容器，发现水平容器的滚动条的范围不对.
+				原来void CHorizontalLayoutUI::SetPos(RECT rc)中的redrain添加的代码就是专门针对水平布局, ScrollRange没能得到正确更新的问题.
+
+			B1: void CContainerUI::EnableScrollBar(bool bEnableVertical, bool bEnableHorizontal)由于更改了滚动条默认值得问题, 水平和竖直风格需要显式设置, 所以添加:
+				m_pVerticalScrollBar->SetHorizontal(false);//jian.he added 2018/03/09;
+				即可。
+		CVerticalLayoutUI::SetPos()
+			szAvailable:未使用的space;
+			nAdjustables: 自适应(均分空间)的控件;
+				cyExpand: 自适应控件最终均分到的高度;
+			只要支持滚动条, 自动把可利用的space增加100px(滚动条的默认范围);
+			cyFixed: 已使用的space;
+	DuiLib BUG: Label控件不支持的多行展示文字.
+		Reason: PaintText()中强制给TextStyle二进制或了DT_SINGLELINE风格;
+		Solution: 类似CButtonUI: 在构造函数中, 默认为单行模式: CLabelUI::CLabelUI():m_uTextStyle(DT_VCENTER|DT_SINGLELINE);
+			void CLabelUI::PaintText(HDC hDC)中把强制添加的DT_SINGLELINE风格统统去掉.
+
+	Duilib Font相关使用说明:
+		duilib一般在MyStyle.xml中指定一个font list, 然后在窗口定义的xml中引用其ID.
+		一般<Font/>可以定义shared属性的, redrain版本的没有实现CPaintManagerUI静态Font Array! 你可以实现！
+		解析xml中的font代码:
+			CPaintManagerUI::AddFont(); --> m_aCustomFonts;
+			CPaintManagerUI::AddDefaultFont(); --> m_DefaultFontInfo;
+
+	CNativeRichEditUI 设置只有垂直滚动条，没有水平滚动条，必须在创建的时候就指定，如果在运行时指定，不会有预期效果;
+
+	CNativeRichEditUI 轻量级化，起点从MFC 控件降为COM控件，自己封装属性设置方法.
+
+https://software.intel.com/zh-cn/articles/api-without-secrets-introduction-to-vulkan-preface 没有任何秘密的API
+http://blog.csdn.net/tomicyo/article/details/70201046 30分钟入门Vulkan
+http://blog.csdn.net/hjzyzr/article/details/53889310 vulkan学习笔记
+https://www.cnblogs.com/heitao/p/7125118.html vulkan tutorials
+https://www.cnblogs.com/wq1282/archive/2012/07/02/2573578.html Windows Message Explanation
+https://www.cnblogs.com/lidabo/p/3284907.html WINDDOW 窗口 风格详解
+https://msdn.microsoft.com/en-us/library/ms632598.aspx#destroying_win UsingWindows
+https://msdn.microsoft.com/en-us/library/windows/desktop/ms633570(v=vs.85).aspx#associating_proc using window procedures
+https://technet.microsoft.com/zh-cn/aa926965 EM_SETRECT EM_SETRECTNP
+“Dui_RichEdit_Demo.exe”: 已加载“C:\Program Files (x86)\Microsoft Office\root\Office16\2052\GrooveIntlResource.dll
+GROOVEEX.DLL
+高版本的RICHED20.DLL可能还以来其它dll?
+
+
+
+1. OLE剪切板格式 
+	RTF
+	RTF DEMO:
+		OnContextMenu() 右键菜单没有被实际调用? 调查!
+		目前不支持Ctrl+C操作，支持Ctrl+A, 支持Ctrl+V.
+			可能没有实现这个接口:COleRichEditCtrl::IExRichEditOleCallback::GetClipboardData(CHARRANGE FAR *lpchrg, DWORD reco, LPDATAOBJECT FAR *lplpdataobj);
+
+	RichEdit4.1自带该功能? 与word剪切板交互机制
+
+	使用CF_RTF格式复制rtf字符串到内存，然后粘贴到word可行吗?
+	反正word直接复制是可以粘贴到RichEdit里面的.
+	
+	写个测试DEMO,word中复制图文混排，看看剪切板中是什么格式!
+		49161
+		这可能就是CF_RTFTEXTOBJ?
+		就以这个格式放入剪切板，对应的数据位RTF字符串数据，看看能否正常粘贴到Word中去?!!!!
+
+	测试使用RichEdit的高级版本的优化和新增功能.
+	RichEdit本身就具有copy paste内置功能，除了gif不支持，RTF应该是默认支持的吧。。
+		word本身不支持.gif显示的, UIIMRichEdit主要添加了对Gif的显示支持，自绘实现的。(gif可以局部绘制吧? 其它可以仍然使用RichEdit默认绘制吗?)
+	
+	当前RichEdit最高版本是8.1（对应Windows10的内部版本号8.1）
+		似乎只有4.1前的版本在windows中使用，后面版本的专为office设计，所以你需要安装最新版本的office，然后去program files中找msftedit.dll或者riched20.dll,然后使用LoadLibrary()显式判断其版本.
+		是否可以拷贝出来单独使用????! 查了下 richedit.h具有8.1的版本!
+		MsftEdit.dll  --> v4.1;//目前闪信使用的.dll;
+		WIN10上安装最新的office（升级到最新）/VisualStudio/Windows Kits，查看riched20.dll的版本! 是否是8.1!!!!!!!!!!!!!!!!!!!
+		貌似Windows Kits中包含8.1版本的richedit.h?!! 跟Win10下的一样吗? 有更新的吗?
+		有人说,RichEdit8.0对应的CLASSNAME: RICHEDIT60W;
+		有可能8.0版本的riched20.dll还依赖office?
+		结论:
+			Win7安装最新的office2016+升级到最新, 包含的32位的riched20.dll的版本是:8.0;内部版本号:16.0.8431.2110;大小:1.87M;（闪信目前是32位程序）
+			
+	gif的识别不应该由RTF Reader来负责，而是应该由图片数据解析程序来负责。
+	RichEdit使用 \pngblip 来表示gif(当然最基础的含义是表示png)
+		因为使用\pngblip表示gif:
+			RichEdit导出内容为.rtf时, RTF中只会保存gif文件的第一帧,显示也只显示第一帧;
+			但是创建一个.rtf文件时,可以写入所有的gif二进制数据? 或者 写入 文件URI? (测试!!!!);
+			使用WIC进行绘制, WIC Bitmap包含所有的gif数据;
+		 0-delay intermediate frames:
+			一种情形是Stationary Multiframe Gif(静止GIF), 为了解除8-bit color的限制;
+			一种情形是GIF, 让应用程序自己定义 帧时间间隔;
+		激活gif显示:
+			1. 调用 ITextDocument2::SetProperty(tomAnimateImages, Value) //tomAnimateImages值为0x95, Value为tomTrue/tomFalse;
+			2. 确保调用 ITextServices2::TxDrawD2D() 时, ID2D1RenderTarget 类型的变量是有效的; (gif激活只能在D2D模式下,GDI模式下不行)
+
+	RichEdit控件的内容导出为RTF格式: EM_STREAMOUT https://msdn.microsoft.com/en-us/library/bb774304(v=vs.85).aspx
+
+2. 后台对应一个word文件
+
+RichEdit内存占用问题: 反复大数据量粘贴-->删除-->粘贴的过程中，内存只增不减.
+	测试情形1： 不设置OLECALLBACK, 设置UNDO_LIMIT为0, 内存在满足RichEdit基本需求后不再改变.
+	测试情形2: 设置OLECALLBACK,不设置UNDO_LIMIT,反复粘贴大批量文字，调用EMpty()内存恢复到以前;
+	测试情形3: 设置OLECALLBACK, 调用InsertFileObject()100次，发现虽然再次调用Empty()后使用的内存有波动，但是波动不大，或者说增长很缓慢.
+	测试情形4: 设置OLECALLBACK, 从word文档中粘贴大量图文混排内容，点击EMpty()后内存基本恢复到以前, 波动不大，增长很缓慢。
+
+	结论: 手动全选DELETE不会释放缓存，SetWindowText("")会释放缓存.
+		目前的内存使用基本安全。
+
+StgCreateDocfile如果不指定STGM_DELETEONRELEASE，应该如何释放?
+测试结果表明:	不指定STGM_DELETEONRELEASE，手动Release()不会造成内存泄露;
+		不指定STGM_DELETEONRELEASE，不手动Release()，明显会造成内存泄露;
+
+微软官方提供的关于RichEdit的好的Demo:WordPad
+	C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\atlmfc\include\afxcmn.inl里面有很多控件的内部实现;
+
+RTF Reader/Writer:
+	BUG: d:\workspace_hj\librtf_test\librtf_test\src\c\convert.c(1877): error C2275: “TextStyle”: 将此类型用作表达式非法
+	SOLUTION: 没听错, VS用C编译器来编译, 变量的声明必须放在函数块的前面。（变量定义块，逻辑块）
+
+	测试图文混排的RTF内容 以CF_BITMAP  CF_TEXT格式粘贴的效果
+	测试导出.rtf格式的文本
+
+	RemoveRtfControlSymbols()
+	
+	Empty()
+	Copy()
+	Paste()
+	CanPaste()
+		EM_CANPASTE 判断的结果是，除非调用EmptyClipboard(), 否则即使有0个字符，也一样是可粘贴的!
+		EnumClipboardFormats
+	SelectAll()
+	ES_NUMBER() 只接受数字输入
+	扩展REGEX!
+	ES_PASSWORD 自动密码模式
+	EM_SETPASSWORDCHAR
+	EM_SETCUEBANNER EM_SHOWBALLONTIP tip
+	EM_POSFROMCHAR
+	RTF STREAM IN/OUT
+	EM_CANREDO MENU:REDO
+	EM_UNDO    MENU:UNDO
+	EM_SETBKGNDCOLOR
+	WM_CLEAR clear/remove the current selection
+	windows命令 清空剪切板 cmd /c "@echo off | clip
+	EM_AUTOURLDETECT
+		https://msdn.microsoft.com/zh-cn/library/windows/desktop/bb787991(v=vs.85).aspx
+		https://bbs.csdn.net/topics/84045 响应点击事件
+	自动将类似"\haha"进行表情转换;
+	RichEdit设置不显示水平滚动条是不合理的:
+		只要你有插入图片的需求，那么插入一个大的图片时, 水平方向会被截断;
+
+OLE插入text对象 图片对象等:
+	http://blog.sina.com.cn/s/blog_557d25460100h3k1.html CF_RTF CF_TETEXTOBJ
+	http://blog.csdn.net/rabbit2003/article/details/391030 InsertBmp InsertGif
+	http://blog.sina.com.cn/s/blog_4bb4e6510100j4h5.html 官方DEMO InsertPolygon
+	http://blog.csdn.net/sichuanpb/article/details/22984389 RICHEDIT 杂记 注意里面包含的链接
+	http://www.vckbase.com/module/articleContent.php?id=181 右键菜单简约风格可以拿过来借鉴 maybe使用一个MFC的菜单, 主要想使用TrackPopupMenu
+	http://www.vckbase.com/module/articleContent.php?id=821 IM RichEdit
+	http://www.rosoo.net/a/201401/16890.html 啰嗦实验室
+	https://www.codeproject.com/Articles/11253/See-through-Rich-Edit-control RichEdit DrawBackground no-flickring Semi-Transparent
+	https://www.codeproject.com/Articles/4544/Insert-Plain-Text-and-Images-into-RichTextBox-at-R chat style richedit--更新RTF字符串
+	插入Bitmap: 一种方式更新RTF字符串;另一种方式使用OLE接口.
+		后者又分为两种方式: 使用图片路径, 使用HBITMAP;
+	http://blog.csdn.net/akof1314/article/details/5983443 无幻博客
+	http://blog.csdn.net/longhaoyou/article/details/6434129 路径转HBITMAP 调用HBITMAP的InsertImage
+	https://msdn.microsoft.com/en-us/library/dd387916(VS.85).aspx 官方 OLE INSERT IMAGE
+	https://msdn.microsoft.com/en-us/library/bb787875(v=vs.85).aspx 官方 RICHEDIT 打印 DEMO
+	https://msdn.microsoft.com/en-us/library/windows/desktop/ms648045(v=vs.85).aspx LoadImage功能其实很强大！不看不知道
+	http://blog.csdn.net/awillaway/article/details/7973102 COM IPicture接口 流式加载图像!
+	http://blog.csdn.net/study_live/article/details/5885469 IPicture
+	http://blog.csdn.net/breaksoftware/article/details/30365913 GDI+ 改变图片尺寸 类似CxImage::Resample();
+	http://blog.csdn.net/tomwillow/article/details/52919720 屏幕分辨率 和 真实尺寸 转换
+	
+	实际物理尺寸（毫米）与REOBJECT SIZE的比例，推导过程! 总结
+int iDestResW = 100;
+		int iDestResH = 100;
+		int iDestDevW = (int)(1.0f * iDevW / iResW * iDestResW);
+		int iDestDevH = (int)(1.0f * iDevH / iResH * iDestResH);
+	首先需要插入一个100px*100px的图片，在分辨率为1080*1920分辨率，物理尺寸381mm*667mm的条件下，REOSIZE为2645.
+	从而可以精确计算这个比例到底时多少!
+ 一个微软的坑:关于REOBJECT.sizel(物理尺寸)
+MSDN says, "The unit of measure is 0.01 millimeters, which is a HIMETRIC measurement".
+MSDN轻描淡写一句结束,好嘛,实际竖直都是大几千级别,这个误差被放大,严重影响结果! 
+经过我的反向推导，一个更好的值为127/9522. 而且要写成一个表达式,不要中间值.
+
+With REOBJECT.sizel,MSDN says "The unit of measure is 0.01 millimeters, which is a HIMETRIC measurement".
+But today I advise you DO NOT USE IT(TRAP!!!).
+A BETTER VALUE IS 127/9522.
+
+	组后封装成dll 开放DEMO 放在博客上 源码请购买
+	
+Murray Sargent: Math in Office
+https://blogs.msdn.microsoft.com/murrays/2012/05/25/richedit-8-0-image-support/ rich edit 8.0 image support
+https://msdn.microsoft.com/en-us/library/bb774306(v=vs.85).aspx RichEdit  OLE!
+https://blogs.msdn.microsoft.com/murrays/2018/02/21/richedit-animated-gifs/ Rich Edit Animated GIFs
+https://stackoverflow.com/questions/29473940/using-newer-richedit-versions Rich Edit 8.1 在哪里找?
+https://blogs.msdn.microsoft.com/murrays/2006/10/13/richedit-versions/ Rich Edit Versions 2006年的, 现在肯定出新版本了
+MurrayS3 March 26, 2009 at 12:42 pm
+RichEdit is developed  by Microsoft Office and is a basic component in this program suite. Two versions (RichEdit 3.0 and 4.1) are also distributed with Windows. They shipped originally with Office 2000 and Office 2002. We’ve been hoping to ship a newer version in Windows for some time, but testing the huge backward compatibility scenarios and writing the up-to-date documentation have been stumbling blocks. Comments like yours help increase the priority. Thanks
+For a more complete discussion, see my post http://blogs.msdn.com/murrays/archive/2006/10/14/richedit-versions.aspx
+看来,riched20.dll是一个独立的功能模块,但是因为兼容性测试不足, 所以只向Windows投放到v4.1的版本;
+
+https://msdn.microsoft.com/en-us/library/bb787873(VS.85).aspx RichEdit Specification!
+http://blog.csdn.net/lixiang987654321/article/details/45271851 duilib 使用 MFC的控件CRichEditCtrl
+https://msdn.microsoft.com/en-us/library/windows/desktop/hh298375(v=vs.85).aspx 如何创建一个RichEdit控件
+https://msdn.microsoft.com/en-us/library/windows/desktop/ms649015(v=vs.85).aspx CF_HTML  HTML TO RICHEDIT
+https://msdn.microsoft.com/en-us/library/windows/desktop/ms649016(v=vs.85).aspx#_win32_Example_of_a_Clipboard_Viewer 官方demo
+https://www.codeproject.com/Articles/14724/Replace-a-Window-s-Internal-Scrollbar-with-a-custo 自定义MFC控件的滚动条
+https://www.cnblogs.com/Alberl/p/3379718.html duilib中使用MFC控件
+http://bbs.csdn.net/topics/380180219?page=1 RichEdit右键“另存为”
+https://www.codeproject.com/Articles/98062/RTF-Document-Constructor-Library RTF Constructor
+	https://www.codeproject.com/Articles/10582/rtflib-v
+	https://sourceforge.net/projects/librtf/ librtf应该不错!
+	http://librtf.sourceforge.net/ Unrtf : application to convering RTF file to HTML or other formats. 
+	http://pyrtf.sourceforge.net/ PyRtf
+	https://github.com/mmanela/MarkupConverter RTF HTML CONVERTER
+	https://github.com/jokecamp/RtfConverter RTF --> Plain
+	
+https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/e09ecbe7-934d-4f4b-9c87-2292332539ed/windows-81-richedit-ole-and-png-pictures?forum=windowsgeneraldevelopmentissues
+https://blogs.msdn.microsoft.com/murrays/2012/05/25/richedit-8-0-image-support/ RichEdit 8.0 Image Support
+https://www.cnblogs.com/gakusei/p/4128885.html RichEdit OLE实现FAQ
+https://www.codeproject.com/Articles/15906/Using-Windowless-RichEdit-Controls windowless richedit
+https://msdn.microsoft.com/en-us/library/hh270402(v=vs.85).aspx
+https://msdn.microsoft.com/en-us/library/windows/desktop/ms649016(v=vs.85).aspx#_win32_Example_of_a_Clipboard_Viewer
+https://blogs.msdn.microsoft.com/murrays/2018/02/21/richedit-animated-gifs/ richedit gif
+http://blog.csdn.net/gjtboa/article/details/50561926 VC 操作word部分代码(利用剪切板取得Word中的图片，ClipBoard, Addpicture)
+http://code.taobao.org/p/VSDemo/diff/12/trunk/ImageOleCtrl 
+https://www.codeproject.com/Articles/10582/rtflib-v?msg=4760403#xx4760403xx rtflib v1.0 很多局限 不支持表格?
+RTF SPECIFICATION https://www.microsoft.com/en-us/download/details.aspx?id=7105
+https://www.codeproject.com/Articles/9541/A-Rich-Edit-Control-That-Displays-Bitmaps-and-Othe
+https://www.codeproject.com/Articles/42/All-you-ever-wanted-to-know-about-the-Clipboard ClipBoard操作！
+http://bbs.csdn.net/topics/390354424 RichEdit粘贴来自word qq的图片
+https://www.cnblogs.com/setoutsoft/p/5240324.html 启程软件 不注册COM 使用OLE对象
+https://www.cnblogs.com/GhostEx/archive/2011/08/16/UseRichEdit50.html 使用RichEdit4.1
+http://blog.csdn.net/u012905879/article/details/21200207 word与RichEdit处理文字的差异
+http://www.cppblog.com/changshoumeng/articles/107429.html 利用RichEdit显示word文档
+https://www.cnblogs.com/c-study/archive/2012/01/04/2311772.html word操作封装
+https://msdn.microsoft.com/en-us/library/windows/desktop/ms649013(v=vs.85).aspx Clipboard支持的格式 没有CF_RTF?!!!!!!!!!!
+http://www.cppblog.com/wanghaiguang/archive/2013/08/21/202684.html?opt=admin RichEdit转RTF文件
+https://www.cnblogs.com/dennytao/p/5351956.html 操作word封装类
+https://www.cnblogs.com/For-her/p/3499778.html
+http://blog.csdn.net/wang_xiao_wei/article/details/2119400 RichEdit加入复制 粘贴功能
+http://bbs.csdn.net/topics/390437842 RichEdit4.1自带支持与word剪切板交互? 查MSDN
+https://www.codeproject.com/Reference/1091137/Windows-Clipboard-Formats Windows Clipboard Formats
+http://blog.csdn.net/educast/article/details/9979637 RichEditCtrl 使用经验
+http://blog.csdn.net/anyisoft/article/details/48683959 RichEdit复制 粘贴
+https://msdn.microsoft.com/en-us/library/windows/desktop/ee720056(v=vs.85).aspx WIC D2D GIF IMAGE VIEWER
+https://code.msdn.microsoft.com/CppWindowsCommonControls-9ea0de64  (duilib可)使用MFC COMMON CONTROL
+
+http://tieba.baidu.com/p/4977870252 office 365破解方法
+
+
+32位Win7操作系统:GRMSDK_EN_DVD.iso;
+64位WIN7: GRMSDKX_EN_DVD.iso; AMD64
+Itanium: GRMSDKIAI_EN_DVD.iso;
+只要不是Intel Itanium，都是AMDX86-64.
+
+在Win7 SDK Samples中;
+需要安装.NET Framwork 4.7.1;(https://download.microsoft.com/download/9/E/6/9E63300C-0941-4B45-A0EC-0008F96DD480/NDP471-KB4033342-x86-x64-AllOS-ENU.exe)
+	安装错误: 
+	解决方法: 先卸载“Microsoft Visual C++ 2010 Redistributable”, 再安装.NET Framwork 4.7.1，再安装VS2010.
+	所以我说安装完操作系统后，先安装.NET Framework 4.7.1啊。
+VC2008 Samples
+	介绍页面: https://msdn.microsoft.com/zh-cn/bb330936.aspx
+	下载地址: https://download.microsoft.com/download/4/e/b/4eb9b75e-e6c9-49bf-b106-bc48809244b1/vc_samples.exe
+VS2015 Samples:
+	介绍页面: https://msdn.microsoft.com/en-us/library/se881ay9.aspx
+WindowsDriverKit 8.1 Samples:
+	https://code.msdn.microsoft.com/vstudio/Windows-Driver-Kit-WDK-81-cf35e953
+MSDN-Visual Studio Samples:
+	https://code.msdn.microsoft.com/vstudio/site/search?f%5B0%5D.Type=ProgrammingLanguage&f%5B0%5D.Value=C%2B%2B
+
+duilib NOTE 整理 BOOK！ blog+ CODE 心做shi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+************
+PDF
+************
+FORMAT
+
+OPENSOURCE CODE
+
+
+
+***************
+多音字词汇的收集
+***************
+https://www.douban.com/note/487212754/
+
+是否可行：用sql来实现拼音组合 和 多音字词汇正确发音的过滤?
+
+
+ json_extract(Content,\"$.content\") AS MSGCONTENT
+
+
+void anEmailSmtp::Send(anEmailBuilder* pi_Email) //SendMail 核心Method
+	Email与EmailMsg相比,只是后者多了些业务上的消息字段;
+	最后靠vmime::transport发出去;
+闪信使用SMTP发Email，使用Pop3收Email? Pop3不能发? SMTP不能收?
+libvmime与soap是如何分工/配合的?
+	SOAP从WebService获取数据;vmime不行?
+	
+（果然是：先掌握大架构）
+// NEVER include windows.h in a header file in a Managed C++ project !!（HOW TO UNDERSTAND IT?）
+http://www.cs.fsu.edu/~engelen/soap.html gSoap官网
+WebService客户端调用的本质就是将SAOP格式的XML通过通信协议发送到WebService的服务器端,然后接收服务器端返回的XML.
+
+
+https://www.cnblogs.com/PattonCCNU/p/5767705.html SOAP WEB SERVICE
+https://www.codeproject.com/Articles/719490/vmime-NET-Smtp-Pop-Imap-Library-for-Cplusplus-and Elmue
+http://blog.csdn.net/armman/article/details/1710128 c++ FAMOUS LIB
+BOOST ICONV/ICONVPP SDL gSOAP
 http://blog.csdn.net/atco/article/details/8268349 collate nocase
-
-
-sql 查询不区分大小写如何写?
- select * from sqlite_master where type='table' and tbl_name='project' and like ('%name%',sql)>0 COLLATE NOCASE; 通过.
+https://docs.gradle.org/current/userguide/userguide_single.html
 
 修正方法:
 	1. FULLPY FIRSTPY ENTITYNAME在创建的表的时候这些字段COLLATE NOCASE;
@@ -459,68 +1383,106 @@ sqlite的条件判断语句: ifnull nullif case..when
 除了IF NOT EXISTS, 还有 where not exists呢！ 还有 IN (), NOT IN()呢！
 http://blog.csdn.net/zjq_1314520/article/details/62467086 IF表达式  -->Git--->sqlite!
 http://yanguz123.iteye.com/blog/2001302 coalesce
-
-SELECT ENTITYID,ENTITYTYPE,ENTITYNAME,DEPARTNAME FROM (SELECT ENTITYID,ENTITYTYPE,ENTITYNAME FROM ENTITY_PINYIN WHERE ENTITYTYPE = 0 AND (ENTITYNAME LIKE '%hej%' OR FULLPY LIKE '%hej%' OR FIRSTPY LIKE '%hej%') AND (IF(,))) LEFT JOIN USERINFO WHERE ENTITYID = USERID;
-
-INSERT INTO ENTITY_PINYIN (ENTITYID,ENTITYTYPE,ENTITYNAME) VALUES ('hjtest01',0,'何健测试01');
-SELECT ifnull(ENTITYID='hejian@anymacro.com', 0) FROM ENTITY_PINYIN;
 http://blog.csdn.net/liyuhui195134/article/details/78972713 case when+group by
 http://supershll.blog.163.com/blog/static/370704362013621112141449/?ignoreua
 https://www.2cto.com/database/201302/188150.html 真牛B的case when使用，脑洞大开！
-	case .. when then.. when then.. end
-	case ..when then..else..end
-select * FROM ENTITY_PINYIN WHERE (SELECT CASE WHEN ENTITYTYPE=0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) WHEN ENTITYTYPE<>0 THEN 1 END FROM ENTITY_PINYIN)=1;
-select * FROM ENTITY_PINYIN WHERE (SELECT CASE ENTITYTYPE WHEN 0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) else 2 END FROM ENTITY_PINYIN)=1;
-select * FROM ENTITY_PINYIN WHERE (CASE ENTITYTYPE WHEN 0 THEN 2 ELSE 1 END );
-SELECT (CASE ENTITYTYPE when 0 then 'Stuff' when 1 then 'Depart' else 'Group' END) AS 'TYPE' FROM ENTITY_PINYIN;
-SELECT (CASE ENTITYTYPE when 0 then (SELECT REALNAME FROM USERINFO WHERE USERINFO.USERID=ENTITYID) when 1 then 'Depart' else 'Group' END) AS 'TYPE' FROM ENTITY_PINYIN;
-SELECT (CASE ENTITYTYPE when 0 then exists(SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) when 1 then 'Depart' else 'Group' END) AS 'TYPE' FROM ENTITY_PINYIN;//exists是函数, then是关键字;
-SELECT (SELECT CASE ENTITYTYPE WHEN 0 THEN 1 else 2 END FROM ENTITY_PINYIN)=1;//返回结果永远为1！
-SELECT * from ENTITY_PINYIN WHERE (CASE ENTITYTYPE WHEN 0 THEN 1 else 2 END )=1;//这才是让case when语句正确返回值的方式! 前面不能加select, 因为select后返回一堆值, (select ..)=1永真!
-SELECT CASE RegType 
-	WHEN 1 THEN '月卡'   
-        WHEN 0 THEN '周卡'   
-        WHEN 2 THEN '季度卡'   
-        WHEN 3 THEN '年卡'      
-       	ELSE '未知卡类型'                         
-      END AS '卡类型'         
-FROM SL_Register_Info  
-
-总结: 需要根据某个字段作条件分支判断直接在WHERE从句后面加: AND (case [Attr] WHEN.. THEN.. WHEN.. THEN.. ELSE ..END)=1即可;
-      SELECT返回值:	select 1;返回1, 用(SELECT 1 FROM ..)=1来判断是可以的;
-			
-      case when两种形式:
-	case [attr]
-		when..
-		then..
-		when..
-		then..
-		else
-		..
-	end;
-	case
-		when [某字段]>..
-		then..
-		when ..
-		then..
-		else..
-	end;
-
-	select * FROM ENTITY_PINYIN WHERE (SELECT CASE ENTITYTYPE WHEN 0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) else 1 END FROM ENTITY_PINYIN)=1;
-	问题在于: 第二个SELECT 后面跟的ENTITYTYPE不是当前行的ENTITYTYPE了！而是一个新的查询!
-	所以修改成:
-		select * FROM ENTITY_PINYIN WHERE (CASE ENTITYTYPE WHEN 0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) else 1 END)=1;
-	就对了.
-
-(CASE ENTITYTYPE WHEN 0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) ELSE 1 END) AND
-SELECT ENTITYID,ENTITYTYPE,ENTITYNAME,DEPARTNAME FROM (SELECT ENTITYID,ENTITYTYPE,ENTITYNAME FROM ENTITY_PINYIN WHERE ENTITYNAME LIKE '%hj%' OR FULLPY LIKE '%hj%' OR FIRSTPY LIKE '%hj%') LEFT JOIN USERINFO ON ENTITYID = USERID;
-SELECT ENTITYID,ENTITYTYPE,ENTITYNAME,DEPARTNAME FROM (SELECT ENTITYID,ENTITYTYPE,ENTITYNAME FROM ENTITY_PINYIN WHERE ENTITYNAME LIKE '%js%' OR FULLPY LIKE '%js%' OR FIRSTPY LIKE '%js%' AND (CASE ENTITYTYPE WHEN 0 THEN (SELECT 1 FROM USERINFO WHERE USERID=ENTITYID) ELSE 1 END)) LEFT JOIN USERINFO ON ENTITYID = USERID;
-
-
+	
 
 运行一段时间后 head下面一堆临时文件垃圾！添加清除机制！
 
 HTML程序设计中说Canvas可以直接使用video标签的帧显示，然后点击就播放对应的视频，不必自己解析、处理? how?
+SASL全称Simple Authentication and Security Layer，是一种用来扩充C/S模式验证能力的机制。
+常用协议: HTTP SOAP SSL TLS SNMP MIME IMAP/SMTP/POP3
+软件开发者必精通的TOOL: CMake/pkg-config 
+LIB: curl openssl duilib/bkwin/soui/bolt/vgscene/dxscene/electron/weex ReactNative
+	Ffmpeg/Mlt/VLC/
+LANG: C++/ASM/Java/Clojure/Delphi/C#  JS/CSS/H5 Python/Lua
+
+
+
+虚函数表时一个类对应一个，还是一个对象对应一个？
+指向子类对象的父类指针，调用一个虚方法，如何从虚函数表中查找？
+析构函数如果不virtual,那么可能造成内存泄露的是父类的资源， 还是子类的资源?
+
+
+#BUG 群列表 中的折叠按钮有时候在左边不可见的区域。
+
+ 你
+
+#BUG 创建一个群的回调居然是从wsgService中写死的，这种设计肯定不好啊，应该让调用者自己决定将来如何响应！
+
+
+#BUG std::list assign崩溃，原来是同意函数中的pSql指针申请的内存不够! 造成了奇葩的BUG.
+
+0126 17:57
+
+一般软件安装都有“安装至所有用户可用”和“安装至当前用户可用”，而且这两个的区别一般仅仅是快捷键创建目录不同，前者创建于"all user"目录下，后者创建于当前登录账户的目录下。
+  4.特殊账户:比管理员的权限还要高，有2个：
+
+       1种：trustedinstaller账户：是一个虚拟账户，nt service\trustedinstaller是他的全名描绘。对文件拥有所有权限，大家知道 administrators组 也就是administrator管理员的组，只能读取和运行的文件，管理员账户就没权删除。这就是管理员用户无法删除的原因。
+
+       2种：system账户：内置账户，系统服务，账户登录，后台进程，都是这个账户管理的，system是一个真实账户，可以登录.
+
+
+1、使用超级管理员账户登陆计算机2、进入软件安装目录，发送软件启动程序到桌面快捷方式3、复制快捷方式到C:\DocumentsandSettings\AllUsers\桌面4、设置软件安装目录的访问权限，可以单独为单一用户设置，也可以为DomainUsers组设置权限，一般赋予除完全控制之外的所有权限即可！
+C:\Documents and Settings\All Users
+
+
+
+设置步骤如下：
+1、点击开始，点击运行，输入gpedit.msc，点击确定；
+2、依次“计算机配置——管理模板——Windows组件——Windows Installer”；
+
+3、在右键窗口中，找到并双击“禁止用户安装搜索”；
+4、在禁止用户安装界面，选择“已启用”后，点击底部确定即可。
+
+
+C:\Users\Bcer>cacls C:\hej\*.* /T /G everyone:F
+是否确定(Y/N)?Y
+处理的目录: C:\hej\hej_1
+处理的文件: C:\hej\hej_2.txt
+
+
+C:\Users\Bcer>Icacls "C:\Program Files\hejian*" /grant everyone:F /T /C
+C:\Program Files\hejian: 拒绝访问。
+C:\Program Files\hejian\hejian01: 拒绝访问。
+C:\Program Files\hejian\hejian02: 拒绝访问。
+C:\Program Files\Windows NT\附件\hejian*: 拒绝访问。
+已成功处理 0 个文件; 处理 4 个文件时
+
+C:\Program Files\hejian>Icacls "C:\Program Files\hejian" /grant everyone:F /T /C
+
+Program Files
+Program Files (x86)
+
+System
+System32
+
+
+很简单.加了/c参数后它将运行/c后面的命令 
+不加参数的话,它只执行CMD命令. 
+你可以命令窗口中测试CMD /C DIR C:和CMD DIR C:的区别 , 请注意不要在运行中直接运行,原因是CMD加/C后会执行完命令后直接关闭窗口,导致你根本无法观察.
+
+最后解决：
+1. 快捷方式放到All Users目录下
+2. 修改安装目录的权限为everyone
+3. cmd /c 才会执行后面的命令
+
+http://blog.csdn.net/whoispo/article/details/50183629  windows下批量修改文件（或文件夹）权限或所有者
+https://www.cnblogs.com/upendi/archive/2012/09/21/2697239.html windows batch 中内置的系统常量
+http://blog.csdn.net/helinsen/article/details/50464581 用ShellExecute执行cmd命令遇到的问题总结
+https://msdn.microsoft.com/en-us/library/windows/desktop/bb762154(v=vs.85).aspx ShellExecuteEx 
+http://blog.csdn.net/shenyunsese/article/details/17024631 %~dp0%
+https://www.cnblogs.com/mq0036/p/3497821.html batch相对目录的获取
+http://www.jb51.net/article/52744.htm 截取字符串
+
+
+bool anEmailPop3::GetEmailUIDLList(std::map <int, string>& uidls); //UIDL 消息的RAW形式, 发送/接收消息的原始格式。
+
+
+http://soft.yesky.com/398/36179898.shtml Windows禁用其它用户安装特定集合之外的软件
+
+
 
 
 无法查看历史的地图消息
@@ -590,6 +1552,9 @@ msgContent: {"longitude":116.286986,"latitude":39.908013,"address":"北京市海
 //下载完毕  清理DownloadMap!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
+音频 视频消息太挤!
+CEF聊天中的头像没有及时更新!
+
 	audio max width: body width*
 	点击非登陆用户的头像BUTTON,应该弹出ImageBrowser,而非头像编辑窗口. BUG!
 	查看更多-->音频消息定义的msgtype等要统一起来!
@@ -642,8 +1607,29 @@ Video Length Format;
 ******************
 Mission Doing
 ******************
+冷静 果敢 速度
+
+
 http://www.runoob.com/nodejs/nodejs-event.html node.js
 
+book:
+	一本道，并非所说的一本足矣，没有任何一本书可以覆盖一门只是，此系列书的目的是：一本足以覆盖常用，其它书只作为 辅助足矣。
+	sqlite·一本道
+	postgres·一本道
+	duilib·一本道
+	vgscene·一本道
+	CEF·一本道
+	码农处理汉字·一本道
+	软件开发实用原则
+		1. 同步 异步
+			只在一个线程中更新UI，一般在主线程中，当然也可以在某个子线程中跑一个窗口；
+		2. 申请空间一定要够用，所以不能写死（即使1024之类的大容量也不可取，总有特殊）
+		3. 频繁申请内存的时候，就要考虑内存复用了，线程绑定的复用数据池;
+		4. 
+探究：（更新BLOG、更新文章）
+	sqlite pg 并行read while writing
+	RichEdit Clipboard Caret COM
+	
 
 *************
 待进行:
@@ -651,9 +1637,14 @@ http://www.runoob.com/nodejs/nodejs-event.html node.js
 	凭什么我的生命要由别人来主宰?!
 	小鱼儿培养: 编程前 数学  效率意识
 
+http://vdisk.weibo.com/s/aSzWOdyGOdF2d good books
 	https://www.jianshu.com/p/a8b49ff64cd3 ConstraintLayout
 	http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2014/1118/2006.html ToolBar替换掉默认的ActionBar，提高可操作性!
 	http://blog.csdn.net/guolin_blog/article/details/26365683 ActionBar高仿微信
+
+
+	http://blog.csdn.net/mao834099514/article/details/75162098 TeamTalk 这个猫大人有速度有耐力
+
 
 	参考SOUI2，构造HighPerfListUI  支持多级展开!
 	https://github.com/nyakokishi/WeChatRadioBar 
@@ -724,8 +1715,18 @@ http://www.runoob.com/nodejs/nodejs-event.html node.js
 		http://blog.csdn.net/wshngyf/article/details/51234746 一个Activity管理多个Fragment切换
 		
 		
+	https://www.cnblogs.com/5211314jackrose/p/5792459.html sqlite体系结构
 
-
+	http://www.jb51.net/article/128576.htm c++ 判断一个字符串是否UTF8存储格式
+	http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html 字符串编码
+	http://blog.csdn.net/down_cry123/article/details/51242111?%3E mipmap
+	http://blog.csdn.net/cokui/article/details/52384047 drawable mipmap
+	http://blog.csdn.net/zuishikonghuan/article/details/47441163 ChooseDirDialog
+	http://blog.csdn.net/wshngyf/article/details/51234746 one activity multi fragment
+	http://blog.csdn.net/y_chengyong/article/details/35289471 IF(expr1,expr2,expr3) 
+	http://www.w3school.com.cn/cssref/pr_box-shadow.asp css box-shadow
+	http://blog.csdn.net/lmj623565791/article/details/24740977 android tab
+	
 
 开发支持存在的问题:
 	测试账号因为是公用的、且频繁更改密码，即使自己用时间长了也会记不清密码。
@@ -864,6 +1865,31 @@ http://blog.csdn.net/anda0109/article/details/40075925 整个内存的使用情�
 http://www.mamicode.com/info-detail-1454109.html C++ %I64d
 http://web.jobbole.com/86734/ Web Front大牛必读书籍
 http://www.hankcs.com/nihongonote/ 码农日语大牛
+http://blog.csdn.net/u010019717/article/details/78175131/ lua实现原理
+
+
+
+peyote	英[peɪˈəʊti]
+美[peɪˈoʊti]
+n.	仙人掌的一种;
+[例句]When one night I ate peyote and had a vision.
+一个晚上我吃佩奥特时产生了幻觉。
+
+
+detour	英[ˈdi:tʊə(r)]
+美[ˈdi:tʊr]
+v.	绕路，绕道;
+n.	绕道; 弯路;
+[例句]He did not take the direct route to his home, but made a detour around the outskirts of the city.
+他没有直接回家，而是绕到市郊兜了个圈子。
+
+
+gravel	英[ˈgrævl]
+美[ˈɡrævəl]
+n.	砾石; 沙砾，碎石; [医] 结石;
+vt.	以砾石铺路; 使困惑; 使（船）搁浅在沙滩上;
+[例句]The gravel pits have been landscaped and planted to make them attractive to wildfowl
+砾石采掘坑已进行了景观美化并种上了草木，希望能吸引野禽的到来。
 
 
 ***********
@@ -947,3 +1973,42 @@ Five Slash!
 　　蒸梨炊黍旋铺排，瓮中新酿熟，真个壮幽怀！”
 　　二、扩展知识：《西游记》简介
 　　《西游记》这本书出自明代小说家吴承恩之手，出版署名：华阳洞天主人。是中国古典四大名著之一、中国古代第一部浪漫主义长篇神魔小说，深刻描绘了社会现实，是魔幻现实主义的开创作品。主要描写了孙悟空、猪八戒、沙僧三人保护唐僧西行取经，唐僧从投胎到取经八十一受难，一路降妖伏魔，九九归一，终于上了西天见到如来佛祖。取材于《大唐西域记》和民间传说、元杂剧。宋代《大唐三藏取经诗话》（本名《大唐三藏取经记》）是西游记故事见于说话文字的最早雏形。自《西游记》问世以来在民间广为流传，各式各样的版样层出不穷，明代刊本有六种，清代刊本、抄本也有七种，典籍所记已佚版本十三种。鸦片战争以后，中国古典文学作品大量被译为西文，西渐欧美，已有英、法、德、意、西、世（世界语）、斯（斯瓦希里语）、俄、捷、罗、波、日、朝、越等文种。并发表了不少研究论文和专著，对这部小说作出了极高的评价。
+
+
+百度 孔子 易经
+https://zhidao.baidu.com/question/581982381.html
+https://zhidao.baidu.com/question/370478608854984644.html?qbl=relate_question_2&word=%BF%D7%D7%D3%20%D2%D7%BE%AD
+http://blog.csdn.net/fantasydreams/article/details/45487757 sqlite locked sqlite_busy的问题分析和解决
+http://www.sqlite.org/cvstrac/wiki?p=DatabaseIsLocked
+http://blog.csdn.net/lijinqi1987/article/details/51754846
+万俟
+https://www.cnblogs.com/podolski/p/7152144.html
+
+
+
+http://news.ifeng.com/a/20180228/56344921_0.shtml#p=1  她15年的时候就月薪3W了;
+
+SQL递归查询 主要为了解决多音字拼音组合的问题
+可否不使用sql procedure,只是用sql sentence?
+有空探究下WS_EX_TRANSPARENT CreateWindowEx()的使用? 指定某个控件的透明度，还是子控件可以透明?
+https://www.cnblogs.com/corerman/p/4726933.html 下载最牛当属迅雷  迅雷下载API实际上是开放的! WHAT?!!!
+	http://www.2ccc.com/article.asp?articleid=6583
+	http://www.pudn.com/Download/item/id/3248275.html
+
+
+谍战剧《借枪》中安德森的日籍未婚引用《大辞林》第三版的解释：
+いっぽんみち【一本道】
+途中で分かれず，一本だけで続く道。
+ 「小屋までは－だ」
+意思其实就是中途没有岔路的直路、直道。
+例句可以解释为“到小屋（的路）是一直路”。
+
+从没听说过抗日剧里那种“致命一击”的解释...
+妻说“一本道就是经过一段时间的积蓄然后使出全部力量给出的致命一击”
+
+
+http://vdisk.weibo.com/s/uJrM9ywnGdsU9 香港大学推荐的50本
+https://www.zhihu.com/question/24964987 互联网公司的面试题总体划分
+https://www.nowcoder.com/activity/oj LEETCODE
+https://baike.baidu.com/item/%E7%A6%85/5325?fr=aladdin 禅
+http://secure.verycd.com/topics/2913448/ 禅的先决条件
