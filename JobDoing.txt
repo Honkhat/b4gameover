@@ -368,7 +368,286 @@ libboost_filesystem-vc100-mt-gd-1_56
 		1. 减少生成exe的体积;
 		2. 引用/使用功能规范化;
 
+#20180408#
+	CEF能够加载.html文件, 但执行里面的js函数无任何现象。
+		执行非.html内部的js函数，没有问题;//document.write(\"hello cef3!\");
+		可能编码问题. 部分字符串没有正确转化为UTF8格式.
+	SOLUTION: 异步问题. 页面没有加载完毕，调用里面的js函数当然不会有任何效果!
+
+	主窗口点击List Item后动态加载下一层节点的机制;
+	搜索相关的功能点实现:
+		能正确搜索出AppCate 和 AppEntity;
+		点击AppCate后能展开;
+		点击AppEntity后能创建SessionDialog;
 	
+	你认为怎样是一个好的工程结构.
+	分工明确、模块化。
+	首先，工程目录中就要区分开那些是数据相关、哪些是UI相关、哪些是第三方库（开源、闭源）、哪些需要独立作为一个模块，
+	什么时候可以直接引用文件到工程，什么时候可以使用什么作用域的全局变量（比如多模块使用的类就不能在类内使用一个模块特定的全局变量）
+	类与类之间 模块之间 进程之间 线程之间 客户端与服务端之间 使用什么样的通信方式
+	
+	从以前的闪信版本开始代码结构、类的封装，就不咋地（或者说MoguTalk的结构就不咋地）
+
+	
+#201804012#
+	配置服务端化 改造:
+		
+	{
+	"config": { "maxinputlen":"", "takesnapshot":"", "sendemoji":"", "sendpic":"", "sendshake":"", "msgadvancedfunc":"", 
+	         "msgexport":"", "msgimport":"", }
+	}
+
+	BUG: 从主窗口中切到Plugin的SessionDialog，点击收缩条若干次，切换到PluginWindow，再点击收缩条的时候就不起作用了。
+	问题在于: Plugin的窗口在作为SessionDialog时，依赖PluginContainer;作为PluginWindow时，不依赖PluginContainer.
+	暂时的解决方法： 注释掉if( bShow != pContainer->IsVisible() )。
+
+	m_bShowContainer --> m_bShowSessionContainer //命名问题;
+
+	GroupModule DeviceModule 主窗体xml添加滚动条默认style
+
+	MainDialog主功能区的头像的光晕问题.
+
+	个人资料窗体中，登陆用户的头像的光晕问题。
+
+#20180413#
+	配置服务端化机制, 与服务端交互数据打通，功能测试;
+		http://kx.anymacro.com/kxcfg.txt
+		如何访问: 
+	
+	ImageBrowser弹窗机制;
+	视频、位置消息展示弹窗机制;
+	
+更新头像提升效率
+需要做双向索引: id<-->list item index.
+  oListItem.setTag(iID);
+  mpId2ListItem();
+
+MainDialog.cpp
+void MainDialog::OnAvartarUpdate(std::string sUserID)
+	CreateGroupDialog ChangeGroupMemberDialog etc.
+	NotifyChangeEvent 给所有Plugin！
+		GroupPlugin:
+			GroupMemberList
+			CreateGroupDialog
+			ChangeGroupDialog
+void MainListLayout::UpdatePluginMsgStatus(MessageSendResult* sendResult)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	m_sCurSession的存在是否合理
+	模块化做的烂:
+		只想包含MessageEntity一个数据结构，却要把UIIMEdit UsrListModule EmotionModule 也引用进来..（问题是这个模块压根不需要！） 耦合的多严重！数据跟UI鸟到一起了。
+		
+	测试新接收的EMAIL 消息，是否能正确插入的AppService的CEF中去;
+	syncTimer是干啥的?
+		从Server拿到的数据: "msgtime" : "2018-04-09 22:11:15"
+	
+	点击推送的MAIL消息，点击后，传给AppServiceModule，但是没有打开SessionDialog
+	点击左侧的收缩条，插件的SessionDialog位置不能铺满.
+
+	先改配置, 配置服务端化;
+		SystemConfig从Server端获取配置，如果获取失败，使用默认配置；
+		其它模块都从SystemConfig接口中获取数据;
+		
+
+	
+	
+	"查看更多"	
+	"查看邮件"的响应	
+	CEF上的"扩展"功能
+	位置消息没有正确显示
+	群模块 ScrollBar默认资源没有指定;
+	点击视频无法播放 崩溃
+	右键菜单注意导入/导出消息时，要先从SystemConfig读取是否可以操作的配置, 如果不可以，那么不要展示相关菜单.
+	CEF中没有正确显示用户头像！
+
+	SessionLayout AuditLayout HomeLayout应该抽象成一个完整的抽象基类，然后派生; 修改整合！
+	
+	
+	MainWnd 主要功能区的头像
+	cef中聊天的头像没有正确显示
+	与个人的聊天中出现"1970-01-01"
+	每个Plugin的bkgnd 插画需要张恒设计
+	duilib wrapcontent属性添加 根据内容的宽度来决定父控件的size
+	@功能
+	群头像-仿微信
+void MainDialog::ShowPluginSessionContainer(bool bShow) MainDialog.cpp
+void Platform_Impl::ResizeCurPlugin() PlatformImpl.cpp
+
+void MainDialog::ShowSessionContainer(bool bShow)
+{SessionContainer* pSessionCon =   module::getSessionModule()->getContainer();		 
+ if(pSessionCon)
+ {//if( bShow != pSessionCon->IsVisible() )//有待调查，哪里设置的问题！！！！！！！！！！
+
+ServicePlugin 处理了OnResizeEvent()消息!但是rc的数据是不对的!
+******************************
+PluginArea SessionArea设计
+******************************
+	区域1: 主窗口除去标题栏、左边功能导航栏的区域;
+	区域2: 会话框的区域;
+	1. xml布局
+           对于区域1，主窗口使用一个HorizontalLayout, 用PluginLayout并列占位, 显示插件的时候，把主窗口对应的水平布局隐藏;
+	   对于区域2，主窗口使用一个SessionLayout, 用PluginSessionLayout并行占位, 显示插件的时候，把主窗口对应的布局隐藏.
+	2. 
+
+DoSpliter(); 不应该展开后就默认显示SessionContainer,原来的逻辑对，现在不一定显示SessionContainer了.
+PluginContainer内部包含一个真实窗口 ContainerWindow
+其实没必要。SessionContainer总是占位的作用。
+
+	ImageBrowser
+	config from server: screen shot/input length limit/
+	avatar update 走 GroupPlugin::OnNotifyChangeEvent()
+	cef context menu
+
+	SessionContainer PluginContainer的设计:
+		
+
+	CHighPerfTreeListUI (Promised to Chao.Sun) still not yet!
+	CEcgUI
+	
+	一个不好的类/控件的封装，或者 临时缝缝补补改动的类，迁移也会伴随相应的补丁来补丁去。
+	线程安全的类型相关的内存复用工具类（每个线程对应一个数据池）
+	
+	点击CEF内部"查看邮件"后的响应
+	Search Mechanism
+	CCefBrowserUI hwnd+windowless, 两个控件，参考NetEaseDemo中的duilib的封装, 和具体CEF响应的使用方式.
+	CSearchEditUI 参考ComboBox的下拉弹窗的方式（可能ComboBox本身的实现方式也有待优化）
+		甩出具体搜索机制、布局、点击响应事件等.
+	Pinyin Generate Mechanism(Big Data) //Server Generate one collection, transport it to client or search by network.
+	
+	class SessionLayout :public BaseLayout, public CWebBrowserEventHandler//SessionLayout继承IE的EventHandler没必要了吧???????
+
+**************************
+Expandable List Design
+**************************
+Requirements:
+	1. 继承CListItemUI 或者 CListContainerElementUI;
+		CExpandableListContainerElementUI实现下面的方法:
+		bool CListContainerElementUI::IsExpanded() const
+		bool CListContainerElementUI::Expand(bool /*bExpand = true*/);
+			开发要点:
+				Expand/Collapse后，要更新影响到的ListItem的index!
+					需要更新m_items，需要更新ListItem对象自身标记的index;
+					  for(int i = iIndex; i < m_pList->GetCount(); ++i) {
+					        CControlUI* p = m_pList->GetItemAt(i);
+					        IListItemUI* pListItem = static_cast<IListItemUI*>(p->GetInterface(_T("ListItem")));
+					        if( pListItem != NULL ) {
+					            pListItem->SetIndex(i);
+					        }
+					    }
+						不调用CListUI::Remove()方法因为每次都会更新所有ITEM的INDEX并且刷新;
+							考虑批量更新的方式，调用内部接口(只操作数据).
+							展开折叠后尽量公用原来的ListItemUI，不释放!
+				判断是否已经展开/折叠，已经是目标状态，就直接返回!
+				可以在xml中设置级缩进;
+				m_iExpandedItem: 对于只允许展开一个ListItem的List，代表当前展开的Item;对于允许多个同时展开的List，则代表最近展开的Item;
+				
+				
+	2. 
+		注意
+
+后期需要看下: CListUI::DoEvent()里面需要添加这段代码响应右键吗:
+ 	if( event.Type == UIEVENT_CONTEXTMENU )
+ 	{
+ 		if( IsContextMenuUsed() ) {
+ 			m_pManager->SendNotify(this, DUI_MSGTYPE_MENU, event.wParam, event.lParam);
+ 			return;
+ 		}
+ 	}
+
+SelectChildren()添加的相关代码是否合理?
+
+PaintManager等等 需要更新到DuiLib_Bcer
+
+if(m_cbOnListItemSelect)//这套机制是否合理，直接响应DUI_MSGTYPE_ITEMSELECT不是也可以吗?!!!!!!!!
+	m_cbOnListItemSelect(m_iCurSel, iOldSel);
+
+
+********************
+Private Land
+********************
+SOUI不提供流式布局, 只提供锚点布局; DUILIB则提供两者(relativepos 可以有百分比 和 具体pixel, 使用DEMO)
+
+控件标签和控件类名的关联:
+<window>标签:
+<root>
+<SOUI>
+<caption>
+OnCreate()
+	_InitFromXml(xmlDoc.child(L"SOUI"),lpCreateStruct->cx,lpCreateStruct->cy);
+		SWindow::InitFromXml(xmlNode.child(L"root"));
+			SObject::InitFromXml(xmlNode);
+			//创建子窗口
+			CreateChildren(xmlNode);//递归解析xml所有节点，并创建相应的SWindow
+			//请求根窗口重新布局。由于布局涉及到父子窗口同步进行，同步执行布局操作可能导致布局过程重复执行。
+			RequestRelayout();
+    		BuildWndTreeZorder();
+<root>标签的sizable指针实际不能改变大小，倒是能拖动改变位置(却只能left top拖动,right bottom不能):
+	WM_WINDOWPOSCHANGING 屏蔽了Windows系统本身的处理;//屏蔽掉相应代码，效果不变;
+	
+	
+
+dummyWnd不会也像duilib那样用于显示shadow吧?
+
+file:///D:/workspace_any/%E5%AE%89%E5%AE%81%E9%82%AE%E4%BF%A1%E5%B9%B3%E5%8F%B0/bin/Debug/plugins/service/module/chat.html
+file:///
+/
+汉字编码: 
+ImageBrowser.html 传路径是utf8格式的字符串吧?
+
+
+CEF BROWSER 只保留AppService相关的布局;//把拼接字符串改成web template? 提升效率？
+
+module目录已经污染了要删除掉
+CEF PUT INTO DUILBI!~@!!!!
+ExecJavaScript()方法的字符串中可以含有 双引号，而不用加转义符号'\'?
+
+
+	既然主模块已经知道了作为插件的ServiceModule的业务，那ServiceModule肯定就已经不是一个独立的插件了.
+	
+	if(m_pServList)
+	{
+		m_pServList->m_admin = false;
+		m_pServList->m_bDeviceMode = false;
+	}
+
+
+
+	
+	记得响应WM_OPENSESSIONDIALOG
+	测试"btnMore" of cef
+	收消息
+	发消息
+		//待实现:
+	//	所有SessionDialog共用一个UI, 这就需要为每一个Session保存运行时数据, 便于切换后展示;
+
+
+	TrepxeTideHcir
 
 	Utf8 Unicode转换等 .dll 模块化
 

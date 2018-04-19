@@ -1,13 +1,22 @@
-source code -->pan.baidu.com/Honkhat20
+OpenGL的优势: 所有平台+配置不限。
 
-OpenGL本身只是一套操作GPU绘图的API，不提供窗口相关的操作，WGL、GLUT等封装了常用的窗口需求，所以如果你想在一个WTL窗口或者其他的基本窗口中调用OpenGL API绘图是完全可行的。
+OpenGL本身只是一套操作GPU绘图的API，不提供窗口相关的操作，WGL(Windows Platform)、CGL(Mac Platform)、GLUT等封装了常用的窗口需求，所以如果你想在一个WTL窗口或者其他的基本窗口中调用OpenGL API绘图是完全可行的。
+Windowing Subsystem: GLUT、WGL、CGL、SDL、GLFW etc.
 
+GLUT:
+	glutInit(&argc, argv);// -sync: X Window内部默认是异步执行的; -gldebug: 调试模式会显示GL崩溃的错误信息等.
 
-GLEW: the OpenGL Extension Wrangler Library. 一定放在其他include的前面!
+GLEW: the OpenGL Extension Wrangler Library. 管理OGL的各种厂家的扩展。
+	#include <GL/glew.h> 一定放在其他include的前面!
+	glewInit();必须放在glut相关初始化完毕后!
 
+VBO:	Vertex Buffer Object.
+	VBOs are the most efficient way to load vertices into the GPU. They are buffers that can be stored in video memory and provide the shortest access time to the GPU so they are definitely recommended.
+IBO:	Index Buffer Object.
 
-glewInit();必须放在glut相关初始化完毕后!
+OpenGL中的X/Y/Z轴的取值范围都是:[-1,+1], 最后映射到屏幕的四个角.
 
+So "Buffer" in GL is a concept similar to "memDC" in GDI?
 
 glBindBuffer(GL_ARRAY_BUFFER, VBO);
 要点：
@@ -32,9 +41,9 @@ glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	0: 属性索引，这里是position的索引;
 	3: 这个属性有3个分量，x y z;
 	GL_FLOAT: 分量的数据类型;
-	GL_FALSE: 属性值在进入固定管线前是否进行归一化;
-	0: 两个顶点属性数据之间的偏移量，如果每个顶点包含position normal两个属性的话，这个值就是6*=24;
-	0: 顶点内部属性之间的偏移量，同样上面例子，如果指定position这个值就是0，如果是normal这个值就是12.
+	GL_FALSE: 属性值在进入固定管线前是否进行了归一化;
+	0: vertex stride. 两个顶点属性数据之间的偏移量，如果每个顶点包含position normal两个属性的话，这个值就是6*4=24;
+	0: attribute offset. 顶点内部属性之间的偏移量，同样上面例子，如果指定position这个值就是0，如果是normal这个值就是12.
 
 
 glDrawArrays(GL_POINTS, 0, 1);
@@ -64,6 +73,7 @@ Pipeline Step 3: 剪切处理(Clipper). 把不在Normalized Box里面的顶点�
 Pipeline Step 4: 光栅化/片段(像素)处理。片段(像素)处理器对每个像素进行处理，比如设置颜色等.
 
 如果你不设置顶点着色器(VS)、几何着色器(GS)、片段着色器(FS), 对应的处理部分就会由默认的固定管线操作代替。
+Fragment Shader也是以一个顶点的pixel为单位进行渲染的。
 
 glValidateProgram(ShaderProgram);
 要点:
@@ -71,7 +81,7 @@ glValidateProgram(ShaderProgram);
 
 glUseProgram(ShaderProgram);
 要点:
-	如果使用NULL或者其他的参数重新掉用了glUseProgram, 自动disable last shader-program.
+	如果使用NULL或者其他的参数重新调用了glUseProgram, 自动disable last shader-program.
 
 #version 330
 功能: 告诉编译器我们使用GLSL 3.3的版本，如果低于，会报错。
@@ -99,9 +109,24 @@ glutPostRedisplay(); 相当于 Gdi/+中的 InvalidateRect();
 | 0 0 0 1  |              | w |                 |     w    |
 (这里w设为1)
 Column 1: X轴方向向量; Column 2: Y轴; Column 3: Z 轴; Column 4: 平移向量.
-通过这个矩阵构造方法，可以看到第4个变量w之所以称为"缩放因子"的原因了。对于点，一般w设为1，对于向量，则设为0.因为点“平移”后就变成了另一个点，向量平移还是原来的向量（起止点对于向量本身来说是没有意义的）
+通过这个矩阵构造方法，可以看到第4个变量w之所以称为"缩放因子"的原因了。对于点，一般w设为1，对于向量(把上面的列向量看做一个向量)，则设为0.因为点“平移”后就变成了另一个点，向量平移还是原来的向量（起止点对于向量本身来说是没有意义的）
+所以, w主要是为平移设计的?
 
-列优先(一个点是一个列向量，而非行向量)，变换矩阵在乘号左边.
+
+旋转矩阵:
+
+
+
+缩放矩阵:
+
+
+
+列优先(一个点是一个列向量，而非行向量)，变换矩阵在乘号左边（与矩阵乘法规则有关）.
+一般来说, OpenGL对于点存储是列优先, DirectX是行优先, 但是具体使用过程中是灵活的:
+glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, &World.m[0][0]);//第3个参数GL_TRUE表示点存储采用的是行优先.
+====================================================================================================================================================
+Tutorial 05: 使用sinf(a)作为缩放因子, 随着sinf(a)从[1,-1,1]之间变换, 顶点坐标跟着缩放, 整个三角形跟着缩放、倒立..
+
 ====================================================================================================================================================
 Tutorial 09:
 左下角: (-1.0f, -1.0f, 0.0f)  --clamp--> (0.0f, 0.0f, 0.0f) 黑色

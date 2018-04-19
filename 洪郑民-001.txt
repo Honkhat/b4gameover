@@ -1353,6 +1353,8 @@ void anEmailSmtp::Send(anEmailBuilder* pi_Email) //SendMail 核心Method
 闪信使用SMTP发Email，使用Pop3收Email? Pop3不能发? SMTP不能收?
 libvmime与soap是如何分工/配合的?
 	SOAP从WebService获取数据;vmime不行?
+	SOAP走的是HTTP协议;(所以这里只能用户与WebSocket通信)， SOAP的好处是可以穿透防火墙！因为只要能使用浏览器上网，就允许HTTP协议通信！
+
 	
 （果然是：先掌握大架构）
 // NEVER include windows.h in a header file in a Managed C++ project !!（HOW TO UNDERSTAND IT?）
