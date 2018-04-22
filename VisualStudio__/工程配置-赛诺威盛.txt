@@ -6,7 +6,7 @@
 选择【配置属性】->【常规】:
 【常规】->【输出目录】设置成：
 ..\..\out\$(Platform)\$(Configuration)\bin\       (前面可能3个..)
-
+【中间目录】：..\..\out\$(Platform)\$(Configuration)\intermediate\
 2.设置输出文件名：
 选择【配置属性】->【常规】:
 【常规】->【目录文件名】设置成：
