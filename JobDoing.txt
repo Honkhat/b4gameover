@@ -568,6 +568,23 @@ Requirements:
 				m_iExpandedItem: 对于只允许展开一个ListItem的List，代表当前展开的Item;对于允许多个同时展开的List，则代表最近展开的Item;
 				
 				
+<ListContainerElement expandable="true" />
+List需要增加的属性:
+	expandico/collapseico
+	expandexclusive="true" 支持互斥展开模式
+		
+级别之间的索引由ListItem自身控制(xml布局控制);
+
+每个ListContainerElement自己维护一个arChild,点击要展开时，通知pOwner, pOwner取ListContainerElement的第一层Children,
+
+List来控制哪些ListItem展开/收缩, 大哥小弟关系，而不是父子关系. 多级展开呢?
+branch branchParent
+
+展开就把arBranch插入到m_pList的即可;
+折叠就从i+1找最后一个brach所在的索引，然后移出m_pList即可;
+不支持xml中指定，只支持动态代码中指定，静态没啥实际意义。
+最外层互斥展开后，添加一个占位的pControl即可。
+
 	2. 
 		注意
 
@@ -586,6 +603,124 @@ PaintManager等等 需要更新到DuiLib_Bcer
 
 if(m_cbOnListItemSelect)//这套机制是否合理，直接响应DUI_MSGTYPE_ITEMSELECT不是也可以吗?!!!!!!!!
 	m_cbOnListItemSelect(m_iCurSel, iOldSel);
+
+展开与折叠本质上：只是控制visible与否。只是在ListItem之间建立了一个branch/branchParent关系。
+如果可以展开/折叠，甩出去一个callback的回调方法(可以设置个性的展开/折叠状态标记);
+毕竟互斥展开不通用：
+	在Application中把已经展开的折叠，然后插入一个占位的CControlUI控件，使得底部对齐。
+
+===================================================================================================
+duilib技术点:ListItem.xml最外围不是dlgBuilder::Create()的返回值, 其内一层才是! 查找原因!!!
+             哪里设置的重复点击一个控件，太短间隔的过滤掉?
+
+CListUI::SelectItem();//目前选中与展开是独立的功能;"规避嵌套循环执行展开/折叠而导致结果非预期"的问题!
+CListContainerElementListUI::Select() //不与展开折叠掺合! 请外部显式调用!
+
+pList->ExpandItem(-1,true/false);//表示全部展开或折叠!   测试！！！！！！！！！！！！！！
+测试全部展开/全部关闭的时候，底部对齐后的效果，代码是否合理执行！！！
+
+注意：如果排序，一定要给CListContainerElementUI更新Index!
+
+显示的时候，只显示最近的一级，并把所有可展开的Item的状态置为collapsed.(折叠的时候不设置)
+测试同级互斥展开!填充使得底部对齐!
+不同的ListContainerElement可能会使用不同的展开/折叠标记:一个private 一个static的,private优先级高;
+可以指定特定的level互斥展开 m_arExpandExclusive;
+	进一步，如果互斥展开，可以指定特定的level，同一级别，一个Item展开后，其后的Item顶到底部对齐.
+所有都"互斥顶底": expandbottomalign="true"
+特定的"互斥顶底": expandbottomalignlevel="0,1"
+所有都"互斥展开": multiexpand="false"
+特定的"互斥展开": expandexclusivelevels="0,1"
+
+"互斥顶底":只有在界面空间比较大的情况下才能看到UI效果，由于内部实现机制的影响，在当前一般显示器分辨率下，请只在第0级设置（如果第0级已经能满控件空间，请不要设置）！
+实现机制：
+	展开一个Item:
+		首先判断是否需要后来项底部对齐;
+			如果Item的前一个是PlaceHolder，invisible it;
+			如果最后一个desendant后面是否还有非PlaceHolder的Item, invisible PlaceHolder;
+		总结 "前面的PlaceHolder关闭，后面的PlaceHolder打开"
+	折叠一个Item:
+		"不管前面的PlaceHolder（肯定是关闭状态），后面的PlaceHolder关闭"
+	
+	占位用的CListContainerElement属性: name:"ExpCluBtmAlign",enabled:"false",
+	不行啊，这样会影响m_pList->GetCount()!!! 遍历的时候也会影响实际操作！
+		外部一般不会有这种业务需求，用了就要判断:
+			1. 获取一个ListContainerElementUI就要判断，是否是占位用的;
+			2. GetCount()-GetPlaceHolderCount_ForExpExclusiveBottomAlign();
+		提供外部的接口:
+			PlaceHolderCount()
+			IsPlaceHolder(pControl);
+	再者，既然是TreeModel，可能会有DirItem，统计所有的Count的需求可能不多。
+
+删除一个可展开的Item:
+	删除其后的所有ancester branch为它的item;
+	更新m_arLevelToExpand;
+
+//added by jian.he 2018/04/23;
+Add:
+	List 添加属性:
+		expandexclusivelevels
+
+	TListInfoUI 添加 iExpandIndent;//展开缩进;
+	CALLBACK_ONLISTITEMEXPAND m_cbOnListItemExpand;
+	TBranchArray m_arBranch;//只是一个关联,删除还是应该从CListUI做;
+	CListContainerElementUI* m_pBranchParent;
+	typedef std::vector<CListContainerElementUI*> TListConItemArray;//使用指针,规避排序后的索引洗牌;
+	TListConItemArray m_arLevelToExpand;//the expanded item of every level;
+	typedef std::unordered_map<int,bool> TIntToBoolMap;
+	TIntToBoolMap m_arLevelExpandExclusive;//指定的互斥展开的级别的集合;
+	TIntToBoolMap m_arLevelExpandBottomAlign;//互斥展开,更进一步, 展开的Item之后的Item底部对齐;
+
+	bool CListContainerElementUI::CanExpand();
+	void CListContainerElementUI::AddBranch(CListContainerElementUI* pItem);
+	int CListContainerElementUI::GetListItemExpandLevel(CListContainerElementUI* pConItem);
+	void CListUI::_CollapseItem(CListContainerElementUI* pConItem);
+	void CListUI::_ExpandItem(CListContainerElementUI* pConItem);
+	bool CListContainerElementUI::IsAncestorBranchParent(const CListContainerElementUI* pItem);
+	int CListContainerElementUI::GetLastDecendantBranchIndex();
+	void CListUI::_SetLevelExpandItem(int iLevel, CListContainerElementUI* pItem);
+	CListContainerElementUI* CListUI::_GetLevelExpandItem(int iLevel);
+	void CListUI::SetExpandExclusiveLevels(LPCTSTR szLevels);
+	void CListUI::SetExpandExclusiveBottomAlignLevel(LPCTSTR szLevels);
+	bool CListUI::IsPlaceHolderItem_4ExpandExclusiveBottomAlign();
+	CListContainerElementUI* CListUI::_GetNewPlaceHolderItem_4ExpandExclusiveBtmAlign();
+	virtual bool IListUI::CheckOnExpandEvent();
+
+Modify:
+	展开/折叠实现:
+	bool CListContainerElementUI::IsExpanded() const;
+	bool CListContainerElementUI::Expand(bool /*bExpand = true*/);
+	bool CListUI::ExpandItem(int iIndex, bool bExpand /*= true*/);
+	单击展开/折叠:
+	bool CListUI::SelectItem(int iIndex, bool bTakeFocus);
+	void CListContainerElementUI::DoEvent(TEventUI& event);
+	删除一个Branch，则删除其下的所有子孙Branch:
+	
+	属性支持:
+	void CListUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+
+如果从CListUI层次删除一个CListContainerElementUI,需要更新branch归属关系:
+CListUI::Remove()
+	如果此节点可展开，那么递归删除arBranch[]--走CListUI::Remove()因为arBranch只是一个关联关系，生命期还是归CListUI控制，所以不能在析构时候释放arBranch[];
+	实现上：找到最后一个祖先branchParent为最后一个子branch的节点，全部删除即可。
+	
+	
+
+
+默认只显示第一级(Trunk);在AddBranch()内部就设置visible:=false;
+
+实现接口IListItemUI
+virtual bool IsExpanded() const = 0;
+virtual bool Expand(bool bExpand = true) = 0;
+
+###############################
+#Mail Client Main Frame#
+###############################
+临时保存Sqlite3 API demo 作为以后开发的模板! 不对 应该建立 Git Project: BdEtil LiteDB_Demo(sqlite3.dll只有一个! 手动生成.def .lib教程see also-->ReadMe, 以后还有可能会有Postgres, reddis FireBird etc.)
+完善Expandable List Git+BOOK CHAPTER;
+完善ImageClipper Git+BOOK CHAPTER+Blog;
+
+
+没有明确的UI资源文件，字号、尺寸、开发规格的PNG图片(4种常见状态)等，拖慢了开发进度；
 
 
 ********************
