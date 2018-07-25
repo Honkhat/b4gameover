@@ -41,3 +41,8 @@ rm -r [dir]
 4. git remote add origin https://github.com/Honkhat/DuiLib_Bcer.git(事先从github创建好这个仓库)
 5. git push -u origin master
 
+===================================
+提交代码之前一定要先更新代码！！
+===================================
+git branch	-----查看当前分支
+git pull	-----更新代码到本地  

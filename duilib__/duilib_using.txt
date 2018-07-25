@@ -1,23 +1,23 @@
-Q:	ʲôʱ�򴰿ڻ���ʾ������������?
-A:	˵��ʲôʱ�򲻻��:child/owned/WS_EX_TOOLWIDOW���Ĵ��ڡ�
+Q:	什么时候窗口会显示在任务栏区域?
+A:	说下什么时候不会吧:child/owned/WS_EX_TOOLWIDOW风格的窗口。
 
 
-Q: �Ҽ����CListUI,Ϊʲô�ղ���DUI_MSGTYPE_CONTEXTMENU��Ϣ?
-A: ��Ҫ�ڴ���������CListUI����ʾ����SetContextMenuUsed(true).
+Q: 右键点击CListUI,为什么收不到DUI_MSGTYPE_CONTEXTMENU消息?
+A: 需要在创建完成这个CListUI后，显示设置SetContextMenuUsed(true).
 
 Q: 
-A: CTextUI�ڹ��캯�����������DT_WORD_BREAK���CLabelUI��û���������ܶ�λ��ͬ�ɡ�
+A: CTextUI在构造函里面就添加了DT_WORD_BREAK风格，CLabelUI则没有做。功能定位不同吧。
 
 
 2017/11/24
-BUG: ����������ַ�����̫��������ʾʡ�Ժŵ��ı��ؼ�(endellipsis='true')�����ı��к��к���ʱ����ʱ��β�������'?'.
-Anyalysis: ��Ϊһ������ռ2���ַ�, ���ǡ�ð�1�����ִ��м�ض�,��ʾ��������'?';jian.he 2017/11/24 15:36;
-Solution: 1. ������һ���ַ���>127���ַ�,ǰһ���ַ�ȴ��[0,127]��ASCII��,��ô��������"�����"������
-	  2. ���ֱ������DT_WORD_BREAK�����ô����ȷʵ�ܹ���ȷ�ضϣ������������ַ�"we aaaaaaaaaaaaaaaaaaaaaaaaaa"ȴ�ܿ��ܻ���ʾΪ"we ...",����ʾЧ��Ҳ���á�
-�ۺ����������õ�һ�ַ�����
+BUG: 设置了如果字符数量太多就最后显示省略号的文本控件(endellipsis='true')，当文本中含有汉字时，有时结尾处会出现'?'.
+Anyalysis: 因为一个汉字占2个字符, 如果恰好把1个汉字从中间截断,显示出来就是'?';jian.he 2017/11/24 15:36;
+Solution: 1. 如果最后一个字符是>127的字符,前一个字符却是[0,127]的ASCII码,那么把最后这个"半个字"抛弃。
+	  2. 如果直接添加DT_WORD_BREAK风格，那么汉字确实能够正确截断，但是这样的字符"we aaaaaaaaaaaaaaaaaaaaaaaaaa"却很可能会显示为"we ...",即显示效果也不好。
+综合起来，采用第一种方法。
 
-Q: duilib�Ƿ�֧�ֱ�����ɫ����?
-A: ֧�֡���ֻ֧����ֱ�����ϵ���ɫ����, ���Էֱ�Ϊbkcolor1  bkcolor2 bkcolor3, ����鿴UIControl.cpp.
+Q: duilib是否支持背景颜色渐变?
+A: 支持。但只支持竖直方向上的颜色渐变, 属性分别为bkcolor1  bkcolor2 bkcolor3, 具体查看UIControl.cpp.
 
 
 
